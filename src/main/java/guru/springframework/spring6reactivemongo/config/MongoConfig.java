@@ -9,32 +9,39 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.config.AbstractReactiveMongoConfiguration;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import static java.util.Collections.singletonList;
 
 @Configuration
 public class MongoConfig extends AbstractReactiveMongoConfiguration {
 
     @Value("${spring.data.mongodb.uri}")
-    private String test;
+    private String mongoUri;
 
     @Bean
     public MongoClient mongoClient() {
-        return MongoClients.create();
+        return MongoClients.create(mongoUri);
     }
 
     @Override
     protected String getDatabaseName() {
-        return "sfg";
+        ConnectionDetails connectionDetails = parseMongoUri();
+        return connectionDetails.databaseName;
     }
 
     //@Override
     // TODO: add credentials to Mongo db. we get authentication failure
     /* we do not need that configuration because there is no authentication */
     protected void configureClientSettings(MongoClientSettings.Builder builder) {
-        System.out.println("#### Mongo DB URI: " + test);
+        ConnectionDetails connectionDetails = parseMongoUri();
+        System.out.println("#### Mongo DB Host: " + connectionDetails.host);
+        System.out.println("#### Mongo DB Port: " + connectionDetails.port);
+        
         builder.applyToClusterSettings(settings -> {
             settings.hosts((singletonList(
-                new ServerAddress("127.0.0.1", 32769)
+                new ServerAddress(connectionDetails.host, connectionDetails.port)
             )));
         });
         /*
@@ -46,5 +53,30 @@ public class MongoConfig extends AbstractReactiveMongoConfiguration {
                 )));
             });*/
     }
+
+    private ConnectionDetails parseMongoUri() {
+        try {
+            URI uri = new URI(mongoUri);
+            String host = uri.getHost();
+            int port = uri.getPort();
+            String path = uri.getPath();
+            String databaseName = path != null && path.length() > 1 ? path.substring(1) : "sfg"; // Default to "sfg" if no database is specified
+            return new ConnectionDetails(host, port, databaseName);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException("Invalid MongoDB URI", e);
+        }
+    }
+
+    private static class ConnectionDetails {
+        String host;
+        int port;
+        String databaseName;
+
+        ConnectionDetails(String host, int port, String databaseName) {
+            this.host = host;
+            this.port = port;
+            this.databaseName = databaseName;
+        }
+    } 
     
 }
