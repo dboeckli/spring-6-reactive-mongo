@@ -19,7 +19,7 @@ import reactor.core.publisher.Mono;
 import java.math.BigDecimal;
 
 @Testcontainers
-@SpringBootTest
+@SpringBootTest(properties = "spring.data.mongodb.uri=mongodb://localhost:77777/test")
 public class DummyTest {
 
     @Autowired
