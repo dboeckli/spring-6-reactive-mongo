@@ -11,6 +11,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -34,6 +36,11 @@ public class DummyTest {
     @Container
     static MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo:7.0").withExposedPorts(27017);
 
+    @DynamicPropertySource
+    static void setProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.data.mongodb.uri", mongoDBContainer::getReplicaSetUrl);
+    }
+
     @BeforeEach
     void setup() throws Exception {
         System.out.println("################## starting container ####################");
@@ -42,10 +49,8 @@ public class DummyTest {
         
         System.out.println("################## url ####################:" + mongoUri);
         MongoDatabase database = mongoClient.getDatabase("sfg");
-        MongoDatabase database2 = mongoClient.getDatabase("gaga");
 
         System.out.println("################## starting container ####################:" +database.getName());
-        System.out.println("################## starting container2 ####################:" +database2.getName());
     }
     
     @AfterEach
