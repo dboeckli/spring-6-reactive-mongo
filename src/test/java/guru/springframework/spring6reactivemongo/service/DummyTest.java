@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.testcontainers.containers.MongoDBContainer;
+import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import reactor.core.publisher.Mono;
 
@@ -24,21 +25,25 @@ public class DummyTest {
     @Autowired
     BeerMapper beerMapper;
 
-    MongoDBContainer mongoDBContainer;
+    @Container
+    static MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo:7.0").withExposedPorts(27017);
+
     @BeforeEach
     void setup() throws Exception {
-        mongoDBContainer = new MongoDBContainer("mongo:7.0").withExposedPorts(27017);
+        System.out.println("################## starting container ####################");
         mongoDBContainer.start();
     }
     
     @AfterEach
     void tearDown() throws Exception {
+        System.out.println("################## stopping container ####################");
         mongoDBContainer.close();
     }
 
     @Test
         // TODO: THIS TEST REQUIRES RUNNING MONGO DB
     void testSaveBeer() throws InterruptedException {
+        System.out.println("################## testSaveBeer ####################");
         Mono<BeerDto> savedMono = beerService.saveBeer(Mono.just(beerMapper.beerToBeerDto(getTestBeer())));
 
         savedMono.subscribe(savedDto -> {
