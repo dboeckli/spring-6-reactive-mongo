@@ -42,7 +42,9 @@ public class DummyTest {
         Mono<BeerDto> savedMono = beerService.saveBeer(Mono.just(beerMapper.beerToBeerDto(getTestBeer())));
 
         savedMono.subscribe(savedDto -> {
+            System.out.println("################## hallo start ####################");
             System.out.println(savedDto.getId());
+            System.out.println("################## hallo ende ####################");
         });
 
         Thread.sleep(1000l);
