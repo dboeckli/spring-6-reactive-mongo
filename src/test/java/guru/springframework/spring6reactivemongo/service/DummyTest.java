@@ -46,8 +46,10 @@ public class DummyTest {
         System.out.println("################## starting container ####################");
         mongoDBContainer.start();
         String mongoUri = mongoDBContainer.getConnectionString();
+        String replicaSetUrl = mongoDBContainer.getReplicaSetUrl();
         
         System.out.println("################## url ####################:" + mongoUri);
+        System.out.println("################## replicaSetUrl ####################:" + replicaSetUrl);
         MongoDatabase database = mongoClient.getDatabase("sfg");
 
         System.out.println("################## starting container ####################:" +database.getName());
