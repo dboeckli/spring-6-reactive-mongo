@@ -37,6 +37,8 @@ public class DummyTest {
     void setup() throws Exception {
         System.out.println("################## starting container ####################");
         mongoDBContainer.start();
+        String url = mongoDBContainer.getConnectionString();
+        System.out.println("################## url ####################:" + url);
         MongoDatabase database = mongoClient.getDatabase("sfg");
         System.out.println("################## starting container ####################:" +database.getName());
     }
