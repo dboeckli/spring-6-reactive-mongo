@@ -16,7 +16,7 @@ public class MongoConfig extends AbstractReactiveMongoConfiguration {
 
     @Bean
     public MongoClient mongoClient() {
-        return MongoClients.create("mongodb://localhost:32769");
+        return MongoClients.create();
     }
 
     @Override
