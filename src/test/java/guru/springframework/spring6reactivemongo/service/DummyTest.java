@@ -43,8 +43,6 @@ public class DummyTest {
         System.out.println("################## url ####################:" + mongoUri);
         MongoDatabase database = mongoClient.getDatabase("sfg");
 
-        mongoClient = MongoClients.create(mongoUri);
-        
         System.out.println("################## starting container ####################:" +database.getName());
     }
     
