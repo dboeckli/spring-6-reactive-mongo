@@ -31,15 +31,18 @@ public class DummyTest {
     MongoClient mongoClient;
 
     @Container
-    static MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo:7.0").withExposedPorts(27017);
+    // port was 27017
+    static MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo:7.0").withExposedPorts(35999);
 
     @BeforeEach
     void setup() throws Exception {
         System.out.println("################## starting container ####################");
         mongoDBContainer.start();
         String url = mongoDBContainer.getConnectionString();
+        
         System.out.println("################## url ####################:" + url);
         MongoDatabase database = mongoClient.getDatabase("sfg");
+        
         System.out.println("################## starting container ####################:" +database.getName());
     }
     
