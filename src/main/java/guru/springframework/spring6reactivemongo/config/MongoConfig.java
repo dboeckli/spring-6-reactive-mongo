@@ -21,7 +21,8 @@ public class MongoConfig extends AbstractReactiveMongoConfiguration {
 
     @Override
     protected String getDatabaseName() {
-        return "sfg";
+        //return "sfg";
+        return "test";
     }
 
     //@Override
