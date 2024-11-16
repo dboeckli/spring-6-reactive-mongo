@@ -27,15 +27,15 @@ public class MongoConfig extends AbstractReactiveMongoConfiguration {
 
     //@Override
     // TODO: add credentials to Mongo db. we get authentication failure
-    /* we do not need that configuration because there is no authentication 
+    /* we do not need that configuration because there is no authentication */
     protected void configureClientSettings(MongoClientSettings.Builder builder) {
         builder.credential(MongoCredential.createCredential("root",
                 "admin", "example".toCharArray()))
             .applyToClusterSettings(settings -> {
                 settings.hosts((singletonList(
-                    new ServerAddress("127.0.0.1", 27017)
+                    new ServerAddress("127.0.0.1", 32769)
                 )));
             });
-    }*/
+    }
     
 }

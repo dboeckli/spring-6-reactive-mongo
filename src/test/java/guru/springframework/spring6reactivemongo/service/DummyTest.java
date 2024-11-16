@@ -1,8 +1,6 @@
 package guru.springframework.spring6reactivemongo.service;
 
 import com.mongodb.reactivestreams.client.MongoClient;
-import com.mongodb.reactivestreams.client.MongoClients;
-import com.mongodb.reactivestreams.client.MongoDatabase;
 import guru.springframework.spring6reactivemongo.dto.BeerDto;
 import guru.springframework.spring6reactivemongo.mapper.BeerMapper;
 import guru.springframework.spring6reactivemongo.model.Beer;
@@ -50,9 +48,8 @@ public class DummyTest {
         
         System.out.println("################## url ####################:" + mongoUri);
         System.out.println("################## replicaSetUrl ####################:" + replicaSetUrl);
-        MongoDatabase database = mongoClient.getDatabase("sfg");
 
-        System.out.println("################## starting container ####################:" +database.getName());
+
     }
     
     @AfterEach
