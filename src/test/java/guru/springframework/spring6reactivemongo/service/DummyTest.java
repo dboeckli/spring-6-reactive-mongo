@@ -1,5 +1,7 @@
 package guru.springframework.spring6reactivemongo.service;
 
+import com.mongodb.reactivestreams.client.MongoClient;
+import com.mongodb.reactivestreams.client.MongoDatabase;
 import guru.springframework.spring6reactivemongo.dto.BeerDto;
 import guru.springframework.spring6reactivemongo.mapper.BeerMapper;
 import guru.springframework.spring6reactivemongo.model.Beer;
@@ -24,6 +26,9 @@ public class DummyTest {
 
     @Autowired
     BeerMapper beerMapper;
+    
+    @Autowired
+    MongoClient mongoClient;
 
     @Container
     static MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo:7.0").withExposedPorts(27017);
@@ -32,6 +37,8 @@ public class DummyTest {
     void setup() throws Exception {
         System.out.println("################## starting container ####################");
         mongoDBContainer.start();
+        MongoDatabase database = mongoClient.getDatabase("sfg");
+        System.out.println("################## starting container ####################:" +database.getName());
     }
     
     @AfterEach
