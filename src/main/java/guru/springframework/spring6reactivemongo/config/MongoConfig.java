@@ -14,8 +14,8 @@ import static java.util.Collections.singletonList;
 @Configuration
 public class MongoConfig extends AbstractReactiveMongoConfiguration {
 
-    //@Value("${spring.data.mongodb.uri}")
-    //private String test;
+    @Value("${spring.data.mongodb.uri}")
+    private String test;
 
     @Bean
     public MongoClient mongoClient() {
@@ -31,7 +31,7 @@ public class MongoConfig extends AbstractReactiveMongoConfiguration {
     // TODO: add credentials to Mongo db. we get authentication failure
     /* we do not need that configuration because there is no authentication */
     protected void configureClientSettings(MongoClientSettings.Builder builder) {
-        //System.out.println("#### Mongo DB URI: " + test);
+        System.out.println("#### Mongo DB URI: " + test);
         builder.applyToClusterSettings(settings -> {
             settings.hosts((singletonList(
                 new ServerAddress("127.0.0.1", 32769)

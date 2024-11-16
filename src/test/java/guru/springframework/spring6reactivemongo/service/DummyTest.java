@@ -42,7 +42,6 @@ public class DummyTest {
     @BeforeEach
     void setup() throws Exception {
         System.out.println("################## starting container ####################");
-    
         System.out.println("################## exposedPorts ####################:" + mongoDBContainer.getExposedPorts());
         
         mongoDBContainer.start();
