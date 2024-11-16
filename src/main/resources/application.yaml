@@ -5,4 +5,4 @@ spring:
   
   data:
     mongodb:
-      uri: mongodb://localhost:11111/32769
+      uri: mongodb://localhost:32769/test
