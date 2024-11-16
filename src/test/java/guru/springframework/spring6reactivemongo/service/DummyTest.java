@@ -1,6 +1,7 @@
 package guru.springframework.spring6reactivemongo.service;
 
 import com.mongodb.reactivestreams.client.MongoClient;
+import com.mongodb.reactivestreams.client.MongoClients;
 import com.mongodb.reactivestreams.client.MongoDatabase;
 import guru.springframework.spring6reactivemongo.dto.BeerDto;
 import guru.springframework.spring6reactivemongo.mapper.BeerMapper;
@@ -31,17 +32,18 @@ public class DummyTest {
     MongoClient mongoClient;
 
     @Container
-    // port was 27017
-    static MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo:7.0").withExposedPorts(35999);
+    static MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo:7.0").withExposedPorts(27017);
 
     @BeforeEach
     void setup() throws Exception {
         System.out.println("################## starting container ####################");
         mongoDBContainer.start();
-        String url = mongoDBContainer.getConnectionString();
+        String mongoUri = mongoDBContainer.getConnectionString();
         
-        System.out.println("################## url ####################:" + url);
+        System.out.println("################## url ####################:" + mongoUri);
         MongoDatabase database = mongoClient.getDatabase("sfg");
+
+        mongoClient = MongoClients.create(mongoUri);
         
         System.out.println("################## starting container ####################:" +database.getName());
     }
