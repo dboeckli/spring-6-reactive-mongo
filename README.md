@@ -2,6 +2,7 @@
 Examples of Reactive Programming with Spring Framework.
 
 MongoDB runs on mongodb://localhost:27017
+Runs as a service on port 27017
 
 This repository has examples from my course [Reactive Programming with Spring Framework 5](https://www.udemy.com/reactive-programming-with-spring-framework-5/?couponCode=GITHUB_REPO_SF5B2G)
 
