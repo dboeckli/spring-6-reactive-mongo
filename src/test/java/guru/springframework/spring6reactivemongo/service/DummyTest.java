@@ -42,8 +42,10 @@ public class DummyTest {
         
         System.out.println("################## url ####################:" + mongoUri);
         MongoDatabase database = mongoClient.getDatabase("sfg");
+        MongoDatabase database2 = mongoClient.getDatabase("gaga");
 
         System.out.println("################## starting container ####################:" +database.getName());
+        System.out.println("################## starting container2 ####################:" +database2.getName());
     }
     
     @AfterEach
