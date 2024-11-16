@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.TestPropertySource;
 import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -20,6 +21,11 @@ import java.math.BigDecimal;
 
 @Testcontainers
 @SpringBootTest(properties = "spring.data.mongodb.uri=mongodb://localhost:77777/test")
+@TestPropertySource(properties = { 
+    "spring.data.mongodb.host=localhost", 
+    "spring.data.mongodb.port=12345", 
+    "spring.data.mongodb.database=test",
+    "spring.data.mongodb.uri=mongodb://localhost:77777/test"})
 public class DummyTest {
 
     @Autowired
