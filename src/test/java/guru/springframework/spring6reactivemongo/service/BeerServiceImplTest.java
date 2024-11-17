@@ -99,6 +99,35 @@ class BeerServiceImplTest {
     }
 
     @Test
+    void testFindByBeerStyleWithSubscribe() {
+        BeerDto beer1 = beerMapper.beerToBeerDto(getTestBeer());
+        beer1.setBeerName("beer1 to find");
+        beer1.setBeerStyle("gugustyle");
+        BeerDto beer2 = beerMapper.beerToBeerDto(getTestBeer());
+        beer2.setBeerName("beer2 to find");
+        beer2.setBeerStyle("gugustyle");
+        beerService.saveBeer(Mono.just(beer1)).block();
+        beerService.saveBeer(Mono.just(beer2)).block();
+
+        AtomicBoolean waitingForSearch = new AtomicBoolean(false);
+        AtomicReference<List<BeerDto>> waitingForSearchedBeers = new AtomicReference<>();
+        beerService.findByBeerStyle("gugustyle")
+            .collectList()
+            .subscribe(dtos -> {
+                System.out.println(dtos.toString());
+                waitingForSearch.set(true);
+                waitingForSearchedBeers.set(dtos);
+            });
+
+        await().untilTrue(waitingForSearch);
+
+        List<BeerDto> foundBeers = waitingForSearchedBeers.get();
+        assertNotNull(foundBeers);
+        assertEquals(2, foundBeers.size());
+        assertThat(foundBeers).extracting(BeerDto::getBeerName).contains("beer1 to find", "beer2 to find");
+    }
+
+    @Test
     void listBeers() {
         BeerDto beer1 = beerMapper.beerToBeerDto(getTestBeer());
         beer1.setBeerName("listBeer 1");
