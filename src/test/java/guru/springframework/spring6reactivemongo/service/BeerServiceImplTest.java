@@ -4,12 +4,10 @@ import guru.springframework.spring6reactivemongo.dto.BeerDto;
 import guru.springframework.spring6reactivemongo.mapper.BeerMapper;
 import guru.springframework.spring6reactivemongo.mapper.BeerMapperImpl;
 import guru.springframework.spring6reactivemongo.model.Beer;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.MongoDBContainer;
@@ -28,6 +26,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @Testcontainers
 @SpringBootTest
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class BeerServiceImplTest {
 
     @Autowired
@@ -56,6 +56,17 @@ class BeerServiceImplTest {
     static void tearDown() {
         System.out.println("################## stopping container ####################");
         mongoDBContainer.close();
+    }
+    
+    @Test
+    @Order(1)
+    void testBootstrapData() {
+        List<BeerDto> beers = beerService.listBeers().collectList().block();
+
+        // These are the beers added by BootstrapData
+        assertNotNull(beers);
+        assertEquals(3, beers.size());
+        assertThat(beers).extracting(BeerDto::getBeerName).contains("Galaxy Cat", "Crank", "Sunshine City");
     }
 
     @Test
