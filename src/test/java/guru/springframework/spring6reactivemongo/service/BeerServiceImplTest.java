@@ -24,8 +24,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @Testcontainers
 @SpringBootTest
@@ -67,6 +66,39 @@ class BeerServiceImplTest {
     }
 
     @Test
+    void testFindFirstByBeerNameWithBlock() {
+        BeerDto beer = beerMapper.beerToBeerDto(getTestBeer());
+        beer.setBeerName("beer to find");
+        beerService.saveBeer(Mono.just(beer)).block();
+        
+        BeerDto foundBeer = beerService.findFirstByBeerName(beer.getBeerName()).block();
+
+        assertNotNull(foundBeer);
+        assertEquals(beer.getBeerName(), foundBeer.getBeerName());
+    }
+
+    @Test
+    void testFindFirstByBeerNameWithSubscribe() {
+        BeerDto beer = beerMapper.beerToBeerDto(getTestBeer());
+        beer.setBeerName("beer to find");
+        beerService.saveBeer(Mono.just(beer)).block();
+
+        Mono<BeerDto> foundBeer = beerService.findFirstByBeerName(beer.getBeerName());
+
+        AtomicBoolean waitingForSearch = new AtomicBoolean(false);
+        AtomicReference<BeerDto> waitingForSearchedBeer = new AtomicReference<>();
+        foundBeer.subscribe(foundDto -> {
+            System.out.println("Found Beer ID: " + foundDto.getId());
+            waitingForSearch.set(true);
+            waitingForSearchedBeer.set(foundDto);
+        });
+
+        await().untilTrue(waitingForSearch);
+        assertNotNull(waitingForSearchedBeer.get());
+        assertEquals(beer.getBeerName(), waitingForSearchedBeer.get().getBeerName());
+    }
+
+    @Test
     void listBeers() {
         BeerDto beer1 = beerMapper.beerToBeerDto(getTestBeer());
         beer1.setBeerName("listBeer 1");
@@ -82,6 +114,8 @@ class BeerServiceImplTest {
         assertTrue(beers.size() >= 2);
         assertThat(beers).extracting(BeerDto::getBeerName).contains(beer1.getBeerName(), beer2.getBeerName());
     }
+    
+    
 
     @Test
     void testSaveBeerWithSubscribe() {
@@ -176,6 +210,4 @@ class BeerServiceImplTest {
             .upc("123213")
             .build();
     }
-
-
 }
