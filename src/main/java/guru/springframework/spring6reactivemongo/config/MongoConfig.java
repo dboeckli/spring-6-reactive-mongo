@@ -32,8 +32,6 @@ public class MongoConfig extends AbstractReactiveMongoConfiguration {
     }
 
     //@Override
-    // TODO: add credentials to Mongo db. we get authentication failure
-    /* we do not need that configuration because there is no authentication */
     protected void configureClientSettings(MongoClientSettings.Builder builder) {
         ConnectionDetails connectionDetails = parseMongoUri();
         System.out.println("#### Mongo DB Host: " + connectionDetails.host);
