@@ -49,7 +49,6 @@ class BootstrapDataTest {
         log.info("### Starting container on port: " + mongoDBContainer.getMappedPort(mongoDBContainer.getExposedPorts().getFirst()));
         mongoDBContainer.start();
         System.out.println("### ConnectionString: " + mongoDBContainer.getConnectionString());
-        Map<String, String> env = mongoDBContainer.getEnvMap();
     }
 
     @AfterAll

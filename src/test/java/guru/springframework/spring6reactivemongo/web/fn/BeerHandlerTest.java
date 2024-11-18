@@ -33,7 +33,6 @@ class BeerHandlerTest {
     static MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo").withExposedPorts(27017);
 
     private static final String DATABASE_NAME = BeerHandlerTest.class.getSimpleName();
-
     
     @DynamicPropertySource
     static void setProperties(DynamicPropertyRegistry registry) {
