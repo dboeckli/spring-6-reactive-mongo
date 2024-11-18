@@ -1,0 +1,90 @@
+### List Beers
+GET http://localhost:8080/api/v3/beer
+Accept: application/json
+Content-Type: application/json
+
+### Get Beer by ID
+GET http://localhost:8080/api/v3/beer/673af535e494004d26d886ed
+Accept: application/json
+Content-Type: application/json
+
+### Create Beer
+POST http://localhost:8080/api/v3/beer
+Accept: application/json
+Content-Type: application/json
+
+{
+    "beerName": "presidente",
+    "beerStyle": "LAGER",
+    "upc": "xx",
+    "quantityOnHand": 5,
+    "price": 27.16
+}
+
+### Create Beer returns BAD REQUEST, beerName is to short
+POST http://localhost:8080/api/v3/beer
+Accept: application/json
+Content-Type: application/json
+
+{
+    "beerName": "p",
+    "beerStyle": "LAGER",
+    "upc": "xx",
+    "quantityOnHand": 5,
+    "price": 27.16
+}
+
+### Update Beer by ID
+PUT http://localhost:8080/api/v3/beer/1
+Accept: application/json
+Content-Type: application/json
+
+{
+    "beerName": "presidenteEdited",
+    "beerStyle": "LAGER",
+    "upc": "xx",
+    "quantityOnHand": 5,
+    "price": 27.16
+}
+
+### Update Beer by ID returns BAD REQUEST, beerStyle is empty
+PUT http://localhost:8080/api/v3/beer/1
+Accept: application/json
+Content-Type: application/json
+
+{
+    "beerName": "presidenteEdited",
+    "beerStyle": "",
+    "upc": "xx",
+    "quantityOnHand": 5,
+    "price": 27.16
+}
+
+### Patch Beer by ID
+PUT http://localhost:8080/api/v3/beer/1
+Accept: application/json
+Content-Type: application/json
+
+{
+    "beerName": "presidentePatched",
+    "beerStyle": "LAGER",
+    "upc": "xx",
+    "quantityOnHand": 5,
+    "price": 27.16
+}
+
+### Patch Beer by ID. Beername is missing
+PUT http://localhost:8080/api/v3/beer/1
+Accept: application/json
+Content-Type: application/json
+
+{
+    "beerStyle": "LAGER",
+    "upc": "xx",
+    "quantityOnHand": 5,
+    "price": 27.16
+}
+
+### Delete Beer by ID
+DELETE http://localhost:8080/api/v3/beer/1
+Accept: application/json

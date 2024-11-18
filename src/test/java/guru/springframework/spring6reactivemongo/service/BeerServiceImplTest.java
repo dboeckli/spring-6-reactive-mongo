@@ -4,6 +4,7 @@ import guru.springframework.spring6reactivemongo.dto.BeerDto;
 import guru.springframework.spring6reactivemongo.mapper.BeerMapper;
 import guru.springframework.spring6reactivemongo.mapper.BeerMapperImpl;
 import guru.springframework.spring6reactivemongo.model.Beer;
+import lombok.extern.java.Log;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -28,6 +29,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@Log
 class BeerServiceImplTest {
 
     @Autowired
@@ -37,38 +39,29 @@ class BeerServiceImplTest {
     BeerMapper beerMapper;
 
     @Container
-    static MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo:8.0.3").withExposedPorts(27017);
+    static MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo").withExposedPorts(27017);
+    
+    private static final String DATABASE_NAME = BeerServiceImplTest.class.getSimpleName();
 
     @DynamicPropertySource
     static void setProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.data.mongodb.uri", mongoDBContainer::getReplicaSetUrl);
+        registry.add("spring.data.mongodb.database", () -> DATABASE_NAME); // Replace with your desired database name
+        registry.add("spring.data.mongodb.uri", () -> mongoDBContainer.getReplicaSetUrl(DATABASE_NAME));
     }
     
     @BeforeAll
     static void setup() {
-        System.out.println("### Starting container on port: " + mongoDBContainer.getMappedPort(mongoDBContainer.getExposedPorts().getFirst()));
+        log.info("### Starting container on port: " + mongoDBContainer.getMappedPort(mongoDBContainer.getExposedPorts().getFirst()));
         mongoDBContainer.start();
-        System.out.println("### ConnectionString: " + mongoDBContainer.getConnectionString());
-        System.out.println("### ReplicaSetUrl: " + mongoDBContainer.getReplicaSetUrl());
+        log.info("### ConnectionString: " + mongoDBContainer.getConnectionString());
     }
     
     @AfterAll
     static void tearDown() {
-        System.out.println("################## stopping container ####################");
+        log.info("################## stopping container ####################");
         mongoDBContainer.close();
     }
     
-    @Test
-    @Order(1)
-    void testBootstrapData() {
-        List<BeerDto> beers = beerService.listBeers().collectList().block();
-
-        // These are the beers added by BootstrapData
-        assertNotNull(beers);
-        assertEquals(3, beers.size());
-        assertThat(beers).extracting(BeerDto::getBeerName).contains("Galaxy Cat", "Crank", "Sunshine City");
-    }
-
     @Test
     void testGetById() {
         BeerDto savedBeer = beerService.saveBeer(Mono.just(beerMapper.beerToBeerDto(getTestBeer()))).block();

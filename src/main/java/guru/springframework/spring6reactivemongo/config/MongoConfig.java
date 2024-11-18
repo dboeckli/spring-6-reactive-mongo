@@ -4,6 +4,7 @@ import com.mongodb.MongoClientSettings;
 import com.mongodb.ServerAddress;
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoClients;
+import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,6 +16,7 @@ import java.net.URISyntaxException;
 import static java.util.Collections.singletonList;
 
 @Configuration
+@Log
 public class MongoConfig extends AbstractReactiveMongoConfiguration {
 
     @Value("${spring.data.mongodb.uri}")
@@ -28,14 +30,16 @@ public class MongoConfig extends AbstractReactiveMongoConfiguration {
     @Override
     protected String getDatabaseName() {
         ConnectionDetails connectionDetails = parseMongoUri();
+        log.info("#### Mongo DB Database: " + connectionDetails.databaseName);
         return connectionDetails.databaseName;
     }
 
     //@Override
     protected void configureClientSettings(MongoClientSettings.Builder builder) {
         ConnectionDetails connectionDetails = parseMongoUri();
-        System.out.println("#### Mongo DB Host: " + connectionDetails.host);
-        System.out.println("#### Mongo DB Port: " + connectionDetails.port);
+        log.info("#### Mongo DB Host: " + connectionDetails.host);
+        log.info("#### Mongo DB Port: " + connectionDetails.port);
+        log.info("#### Mongo DB Database: " + connectionDetails.databaseName);
         
         builder.applyToClusterSettings(settings -> {
             settings.hosts((singletonList(
