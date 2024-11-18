@@ -111,6 +111,24 @@ class BeerHandlerTest {
         BeerDto createdBeer = getBeerByLocation(location);
         assertNotNull(createdBeer);
     }
+
+    @Test
+    void testUpdateBeer() {
+        BeerDto beerToUpdate = this.getAnyExistingBeer();
+        beerToUpdate.setBeerName("New");
+
+        webTestClient.put()
+            .uri(BeerRouterConfig.BEER_PATH_ID, beerToUpdate.getId())
+            .body(Mono.just(beerToUpdate), BeerDto.class)
+            .exchange()
+            .expectStatus().isNoContent();
+
+
+        BeerDto updatedBeer = getBeerById(beerToUpdate.getId());
+        assertNotNull(updatedBeer);
+        assertEquals(beerToUpdate.getId(), updatedBeer.getId());
+        assertEquals(beerToUpdate.getBeerName(), updatedBeer.getBeerName());
+    }
     
     private BeerDto getAnyExistingBeer() {
         return webTestClient.get().uri(BeerRouterConfig.BEER_PATH)

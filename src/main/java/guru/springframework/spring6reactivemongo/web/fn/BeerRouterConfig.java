@@ -7,6 +7,7 @@ import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.web.reactive.function.server.RequestPredicates.PUT;
 import static org.springframework.web.reactive.function.server.RequestPredicates.accept;
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
 
@@ -24,8 +25,8 @@ public class BeerRouterConfig {
         return route().
             GET(BEER_PATH, accept(APPLICATION_JSON), beerHandler::listBeers).
             GET(BEER_PATH_ID, accept(APPLICATION_JSON), beerHandler::getBeerById).
-            POST(BEER_PATH, accept(APPLICATION_JSON), beerHandler::createNewBeer)
-            
+            POST(BEER_PATH, accept(APPLICATION_JSON), beerHandler::createNewBeer).
+            PUT(BEER_PATH_ID, accept(APPLICATION_JSON), beerHandler::updateBeerById)
             .build();
     }
     
