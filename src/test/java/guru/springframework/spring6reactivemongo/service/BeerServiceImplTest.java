@@ -39,7 +39,7 @@ class BeerServiceImplTest {
     BeerMapper beerMapper;
 
     @Container
-    static MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo").withExposedPorts(27017);
+    static MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo:8.0.3").withExposedPorts(27017);
     
     private static final String DATABASE_NAME = BeerServiceImplTest.class.getSimpleName();
 
