@@ -2,9 +2,7 @@ package guru.springframework.spring6reactivemongo.web.fn;
 
 import guru.springframework.spring6reactivemongo.dto.BeerDto;
 import lombok.extern.java.Log;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,13 +17,13 @@ import reactor.core.publisher.Mono;
 
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Testcontainers
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @AutoConfigureWebTestClient
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @Log
 class BeerHandlerTest {
 
@@ -58,6 +56,7 @@ class BeerHandlerTest {
     WebTestClient webTestClient;
 
     @Test
+    @Order(1)
     void testListBeers() {
         webTestClient.get().uri(BeerRouterConfig.BEER_PATH)
             .exchange()
@@ -68,6 +67,7 @@ class BeerHandlerTest {
     }
 
     @Test
+    @Order(1)
     void testListBeers2() {
         webTestClient.get().uri(BeerRouterConfig.BEER_PATH)
             .exchange()
@@ -79,6 +79,7 @@ class BeerHandlerTest {
 
 
     @Test
+    @Order(2)
     void testGetBeerById() {
         BeerDto givenBeer = getAnyExistingBeer();
         
@@ -90,8 +91,20 @@ class BeerHandlerTest {
         
         assertEquals(givenBeer.getId(), gotBeer.getId());
     }
-    
+
     @Test
+    @Order(2)
+    void testGetBeerByIdNotFound() {
+        BeerDto givenBeer = getAnyExistingBeer();
+        givenBeer.setId("abcd_DOES_NOT_EXIST");
+
+        webTestClient.get().uri(BeerRouterConfig.BEER_PATH_ID, givenBeer.getId())
+            .exchange()
+            .expectStatus().isNotFound();
+    }
+
+    @Test
+    @Order(3)
     void testCreateBeer() {
         BeerDto beerToCreate = BeerDto.builder().beerName("New Beer").build();
 
@@ -113,11 +126,44 @@ class BeerHandlerTest {
     }
 
     @Test
+    @Order(4)
     void testUpdateBeer() {
         BeerDto beerToUpdate = this.getAnyExistingBeer();
-        beerToUpdate.setBeerName("New");
+        beerToUpdate.setBeerName("UpdatedBeer");
 
         webTestClient.put()
+            .uri(BeerRouterConfig.BEER_PATH_ID, beerToUpdate.getId())
+            .body(Mono.just(beerToUpdate), BeerDto.class)
+            .exchange()
+            .expectStatus().isNoContent();
+
+        BeerDto updatedBeer = getBeerById(beerToUpdate.getId());
+        assertNotNull(updatedBeer);
+        assertEquals(beerToUpdate.getId(), updatedBeer.getId());
+        assertEquals(beerToUpdate.getBeerName(), updatedBeer.getBeerName());
+    }
+
+    @Test
+    @Order(4)
+    void testUpdateBeerNotFound() {
+        BeerDto beerToUpdate = this.getAnyExistingBeer();
+        beerToUpdate.setBeerName("UpdatedBeer");
+        beerToUpdate.setId("9999");
+
+        webTestClient.put()
+            .uri(BeerRouterConfig.BEER_PATH_ID, beerToUpdate.getId())
+            .body(Mono.just(beerToUpdate), BeerDto.class)
+            .exchange()
+            .expectStatus().isNotFound();
+    }
+
+    @Test
+    @Order(5)
+    void testPatchBeer() {
+        BeerDto beerToUpdate = this.getAnyExistingBeer();
+        beerToUpdate.setBeerName("PatchedBeer");
+
+        webTestClient.patch()
             .uri(BeerRouterConfig.BEER_PATH_ID, beerToUpdate.getId())
             .body(Mono.just(beerToUpdate), BeerDto.class)
             .exchange()
@@ -128,6 +174,46 @@ class BeerHandlerTest {
         assertNotNull(updatedBeer);
         assertEquals(beerToUpdate.getId(), updatedBeer.getId());
         assertEquals(beerToUpdate.getBeerName(), updatedBeer.getBeerName());
+    }
+
+    @Test
+    @Order(5)
+    void testPatchBeerNotFound() {
+        BeerDto beerToUpdate = this.getAnyExistingBeer();
+        beerToUpdate.setBeerName("PatchedBeer");
+        beerToUpdate.setId("8888");
+
+        webTestClient.patch()
+            .uri(BeerRouterConfig.BEER_PATH_ID, beerToUpdate.getId())
+            .body(Mono.just(beerToUpdate), BeerDto.class)
+            .exchange()
+            .expectStatus().isNotFound();
+    }
+
+    @Test
+    @Order(99)
+    void testDeleteBeer() {
+        BeerDto beerToDelete = this.getAnyExistingBeer();
+
+        webTestClient.delete()
+            .uri(BeerRouterConfig.BEER_PATH_ID, beerToDelete.getId())
+            .exchange()
+            .expectStatus().isNoContent();
+
+        BeerDto deletedBeer = getBeerById(beerToDelete.getId());
+        assertNull(deletedBeer);
+    }
+
+    @Test
+    @Order(99)
+    void testDeleteBeerNotFound() {
+        BeerDto beerToDelete = this.getAnyExistingBeer();
+        beerToDelete.setId("7777");
+
+        webTestClient.delete()
+            .uri(BeerRouterConfig.BEER_PATH_ID, beerToDelete.getId())
+            .exchange()
+            .expectStatus().isNotFound();
     }
     
     private BeerDto getAnyExistingBeer() {
@@ -143,12 +229,20 @@ class BeerHandlerTest {
             .orElse(null);
     }
 
+
     private BeerDto getBeerById(String id) {
-        return webTestClient.get().uri(BeerRouterConfig.BEER_PATH_ID, id)
-            .exchange()
-            .expectStatus().isOk()
-            .expectHeader().valueEquals("Content-type", "application/json")
-            .expectBody(BeerDto.class).returnResult().getResponseBody();
+        try {
+            return webTestClient.get().uri(BeerRouterConfig.BEER_PATH_ID, id)
+                .exchange()
+                .expectStatus().isOk()
+                .expectHeader().valueEquals("Content-type", "application/json")
+                .expectBody(BeerDto.class).returnResult().getResponseBody();
+        } catch (AssertionError ex) {
+            if (ex.getMessage().contains("Status expected:<200 OK> but was:<404 NOT_FOUND>")) {
+                return null;
+            }
+            throw ex; 
+        }
     }
 
     private BeerDto getBeerByLocation(String location) {
