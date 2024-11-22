@@ -126,6 +126,75 @@ class BeerHandlerTest {
     }
 
     @Test
+    @Order(3)
+    void testCreateBeerBeerNameExactly3Characters() {
+        BeerDto beerToCreate = BeerDto.builder().beerName("123").build();
+
+        String location = webTestClient.post().uri(BeerRouterConfig.BEER_PATH)
+            .body(Mono.just(beerToCreate), BeerDto.class)
+            .exchange()
+            .expectStatus().isCreated()
+            .expectHeader().valueMatches("location", "/api/v3/beer/[a-f0-9]{24}$")
+            .returnResult(BeerDto.class)
+            .getResponseHeaders()
+            .getLocation()
+            .toString();
+
+        System.out.println("Location: " + location);
+        assertNotNull(location);
+
+        BeerDto createdBeer = getBeerByLocation(location);
+        assertNotNull(createdBeer);
+    }
+
+    @Test
+    @Order(3)
+    void testCreateBeerEmptyBeerName() {
+        BeerDto beerToCreate = BeerDto.builder().beerName("").build();
+
+        webTestClient.post().uri(BeerRouterConfig.BEER_PATH)
+            .body(Mono.just(beerToCreate), BeerDto.class)
+            .exchange()
+            .expectStatus().isBadRequest();
+    }
+
+    @Test
+    @Order(3)
+    void testCreateBeerNullBeerName() {
+        BeerDto beerToCreate = BeerDto.builder().beerName(null).build();
+
+        webTestClient.post().uri(BeerRouterConfig.BEER_PATH)
+            .body(Mono.just(beerToCreate), BeerDto.class)
+            .exchange()
+            .expectStatus().isBadRequest();
+    }
+
+    @Test
+    @Order(3)
+    void testCreateBeerToShortBeerName() {
+        BeerDto beerToCreate = BeerDto.builder().beerName("12").build();
+
+        webTestClient.post().uri(BeerRouterConfig.BEER_PATH)
+            .body(Mono.just(beerToCreate), BeerDto.class)
+            .exchange()
+            .expectStatus().isBadRequest();
+    }
+
+    @Test
+    @Order(3)
+    void testCreateBeerToShortBeerStyle() {
+        BeerDto beerToCreate = BeerDto.builder()
+            .beerName("123")
+            .beerStyle("")
+            .build();
+
+        webTestClient.post().uri(BeerRouterConfig.BEER_PATH)
+            .body(Mono.just(beerToCreate), BeerDto.class)
+            .exchange()
+            .expectStatus().isBadRequest();
+    }
+
+    @Test
     @Order(4)
     void testUpdateBeer() {
         BeerDto beerToUpdate = this.getAnyExistingBeer();
@@ -141,6 +210,33 @@ class BeerHandlerTest {
         assertNotNull(updatedBeer);
         assertEquals(beerToUpdate.getId(), updatedBeer.getId());
         assertEquals(beerToUpdate.getBeerName(), updatedBeer.getBeerName());
+    }
+
+    @Test
+    @Order(4)
+    void testUpdateBeerToShortBeerName() {
+        BeerDto beerToUpdate = this.getAnyExistingBeer();
+        beerToUpdate.setBeerName("12");
+
+        webTestClient.put()
+            .uri(BeerRouterConfig.BEER_PATH_ID, beerToUpdate.getId())
+            .body(Mono.just(beerToUpdate), BeerDto.class)
+            .exchange()
+            .expectStatus().isBadRequest();
+    }
+
+    @Test
+    @Order(4)
+    void testUpdateBeerToShortBeerStyle() {
+        BeerDto beerToUpdate = this.getAnyExistingBeer();
+        beerToUpdate.setBeerName("123");
+        beerToUpdate.setBeerName("");
+
+        webTestClient.put()
+            .uri(BeerRouterConfig.BEER_PATH_ID, beerToUpdate.getId())
+            .body(Mono.just(beerToUpdate), BeerDto.class)
+            .exchange()
+            .expectStatus().isBadRequest();
     }
 
     @Test
@@ -174,6 +270,33 @@ class BeerHandlerTest {
         assertNotNull(updatedBeer);
         assertEquals(beerToUpdate.getId(), updatedBeer.getId());
         assertEquals(beerToUpdate.getBeerName(), updatedBeer.getBeerName());
+    }
+
+    @Test
+    @Order(5)
+    void testPatchBeerToShortBeerName() {
+        BeerDto beerToUpdate = this.getAnyExistingBeer();
+        beerToUpdate.setBeerName("12");
+
+        webTestClient.patch()
+            .uri(BeerRouterConfig.BEER_PATH_ID, beerToUpdate.getId())
+            .body(Mono.just(beerToUpdate), BeerDto.class)
+            .exchange()
+            .expectStatus().isBadRequest();
+    }
+
+    @Test
+    @Order(5)
+    void testPatchBeerToShortBeerStyle() {
+        BeerDto beerToUpdate = this.getAnyExistingBeer();
+        beerToUpdate.setBeerName("123");
+        beerToUpdate.setBeerStyle("");
+
+        webTestClient.patch()
+            .uri(BeerRouterConfig.BEER_PATH_ID, beerToUpdate.getId())
+            .body(Mono.just(beerToUpdate), BeerDto.class)
+            .exchange()
+            .expectStatus().isBadRequest();
     }
 
     @Test
