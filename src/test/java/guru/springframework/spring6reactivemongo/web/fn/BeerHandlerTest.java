@@ -10,13 +10,13 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.web.util.UriComponentsBuilder;
 import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import reactor.core.publisher.Mono;
 
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -63,7 +63,7 @@ class BeerHandlerTest {
             .expectStatus().isOk()
             .expectHeader().valueEquals("Content-type", "application/json")
             //.expectBody(BeerDto.class).isEqualTo(BeerDto.builder().beerName("Galaxy Cat").build())
-            .expectBody().jsonPath("$.size()", hasSize(greaterThan(1)));
+            .expectBody().jsonPath("$.size()").value(equalTo(3));
     }
 
     @Test
@@ -75,6 +75,26 @@ class BeerHandlerTest {
             .expectHeader().valueEquals("Content-type", "application/json")
             //.expectBody().jsonPath("$.length()").isEqualTo(3)
             .expectBodyList(BeerDto.class).hasSize(3);
+    }
+
+    @Test
+    @Order(1)
+    void testListBeersByBeerStyle() {
+        BeerDto existingBeer = getAnyExistingBeer();
+        int expectedBeerCount;
+        if (existingBeer.getBeerStyle().equals("IPA")) {
+            expectedBeerCount = 1;
+        } else {
+            expectedBeerCount = 2;
+        }
+
+        webTestClient.get().uri(UriComponentsBuilder
+                .fromPath(BeerRouterConfig.BEER_PATH)
+                .queryParam("beerStyle", existingBeer.getBeerStyle()).build().toUri())
+            .exchange()
+            .expectStatus().isOk()
+            .expectHeader().valueEquals("Content-type", "application/json")
+            .expectBody().jsonPath("$.size()").value(equalTo(expectedBeerCount));
     }
 
 
