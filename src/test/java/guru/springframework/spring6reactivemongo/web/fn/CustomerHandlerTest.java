@@ -14,6 +14,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import reactor.core.publisher.Mono;
 
 import java.util.concurrent.TimeUnit;
 
@@ -114,6 +115,69 @@ class CustomerHandlerTest {
             .expectBody(CustomerDto.class).returnResult().getResponseBody();
 
         assertEquals(givenCustomer.getId(), gotCustomer.getId());
+    }
+
+    @Test
+    @Order(3)
+    void testCreateCustomer() {
+        CustomerDto customerToCreate = CustomerDto.builder().customerName("New Customer").build();
+
+        String location = webTestClient.post().uri(CustomerRouterConfig.CUSTOMER_PATH)
+            .body(Mono.just(customerToCreate), CustomerDto.class)
+            .exchange()
+            .expectStatus().isCreated()
+            .expectHeader().valueMatches("location", "/api/v3/customer/[a-f0-9]{24}$")
+            .returnResult(CustomerDto.class)
+            .getResponseHeaders()
+            .getLocation()
+            .toString();
+
+        System.out.println("Location: " + location);
+        assertNotNull(location);
+
+        CustomerDto createdCustomer = getCustomerByLocation(location);
+        assertNotNull(createdCustomer);
+    }
+
+    @Test
+    @Order(3)
+    void testCreateCustomerEmptyName() {
+        CustomerDto customerToCreate = CustomerDto.builder().customerName("").build();
+
+        webTestClient.post().uri(CustomerRouterConfig.CUSTOMER_PATH)
+            .body(Mono.just(customerToCreate), CustomerDto.class)
+            .exchange()
+            .expectStatus().isBadRequest();
+    }
+
+    @Test
+    @Order(3)
+    void testCreateCustomerTooShortName() {
+        CustomerDto customerToCreate = CustomerDto.builder().customerName("1").build();
+
+        webTestClient.post().uri(CustomerRouterConfig.CUSTOMER_PATH)
+            .body(Mono.just(customerToCreate), CustomerDto.class)
+            .exchange()
+            .expectStatus().isBadRequest();
+    }
+
+    @Test
+    @Order(3)
+    void testCreateCustomerNullName() {
+        CustomerDto customerToCreate = CustomerDto.builder().customerName(null).build();
+
+        webTestClient.post().uri(CustomerRouterConfig.CUSTOMER_PATH)
+            .body(Mono.just(customerToCreate), CustomerDto.class)
+            .exchange()
+            .expectStatus().isBadRequest();
+    }
+
+    private CustomerDto getCustomerByLocation(String location) {
+        return webTestClient.get().uri(location)
+            .exchange()
+            .expectStatus().isOk()
+            .expectHeader().valueEquals("Content-type", "application/json")
+            .expectBody(CustomerDto.class).returnResult().getResponseBody();
     }
 
     private CustomerDto getAnyExistingCustomer() {

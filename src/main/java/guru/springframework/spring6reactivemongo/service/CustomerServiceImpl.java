@@ -18,7 +18,9 @@ public class CustomerServiceImpl implements CustomerService {
     
     @Override
     public Mono<CustomerDto> saveCustomer(Mono<CustomerDto> customerDto) {
-        return null;
+        return customerDto.map(customerMapper::customerDtoToCustomer)
+            .flatMap(customerRepository::save)
+            .map(customerMapper::customerToCustomerDto);
     }
 
     @Override

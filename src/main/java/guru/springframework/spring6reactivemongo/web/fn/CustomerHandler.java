@@ -1,5 +1,6 @@
 package guru.springframework.spring6reactivemongo.web.fn;
 
+import guru.springframework.spring6reactivemongo.dto.BeerDto;
 import guru.springframework.spring6reactivemongo.dto.CustomerDto;
 import guru.springframework.spring6reactivemongo.service.CustomerService;
 import lombok.AllArgsConstructor;
@@ -11,6 +12,7 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.server.ServerWebInputException;
+import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -34,6 +36,15 @@ public class CustomerHandler {
             .body(customerService.getById(request.pathVariable("customerId"))
                     .switchIfEmpty(Mono.error(new ResponseStatusException(NOT_FOUND))),
                 CustomerDto.class);
+    }
+    
+    public Mono<ServerResponse> createCustomer(ServerRequest request) {
+        return customerService.saveCustomer(request.bodyToMono(CustomerDto.class).doOnNext(customerDto -> validate(customerDto)))
+            .flatMap(customerDTO -> ServerResponse
+                .created(UriComponentsBuilder
+                    .fromPath(CustomerRouterConfig.CUSTOMER_PATH_ID)
+                    .build(customerDTO.getId()))
+                .build());
     }
 
     private void validate(CustomerDto customerDto) {
