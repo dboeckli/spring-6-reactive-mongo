@@ -18,6 +18,7 @@ import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -39,7 +40,9 @@ class BeerServiceImplTest {
     BeerMapper beerMapper;
 
     @Container
-    static MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo:8.0.3").withExposedPorts(27017);
+    static MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo:8.0.3")
+        .withExposedPorts(27017)
+        .withReuse(false);
     
     private static final String DATABASE_NAME = BeerServiceImplTest.class.getSimpleName();
 
@@ -53,13 +56,21 @@ class BeerServiceImplTest {
     static void setup() {
         log.info("### Starting container on port: " + mongoDBContainer.getMappedPort(mongoDBContainer.getExposedPorts().getFirst()));
         mongoDBContainer.start();
+        await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> {
+            assertTrue(mongoDBContainer.isRunning());
+            log.info("Container started.");
+        });
         log.info("### ConnectionString: " + mongoDBContainer.getConnectionString());
     }
     
     @AfterAll
     static void tearDown() {
-        log.info("################## stopping container ####################");
+        log.info("Stopping container");
         mongoDBContainer.close();
+        await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> {
+            assertFalse(mongoDBContainer.isRunning());
+            log.info("Container stopped.");
+        });
     }
     
     @Test

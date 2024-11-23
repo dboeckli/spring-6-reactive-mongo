@@ -1,7 +1,9 @@
 package guru.springframework.spring6reactivemongo.bootstrap;
 
 import guru.springframework.spring6reactivemongo.model.Beer;
+import guru.springframework.spring6reactivemongo.model.Customer;
 import guru.springframework.spring6reactivemongo.repository.BeerRepository;
+import guru.springframework.spring6reactivemongo.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.boot.CommandLineRunner;
@@ -16,6 +18,8 @@ import java.time.LocalDateTime;
 public class BootstrapData implements CommandLineRunner {
 
     private final BeerRepository beerRepository;
+    
+    private final CustomerRepository customerRepository;
 
     @Override
     public void run(String... args) {
@@ -24,6 +28,46 @@ public class BootstrapData implements CommandLineRunner {
                 loadBeerData();
             })
             .subscribe();
+
+        customerRepository.deleteAll()
+            .doOnSuccess(success -> {
+                loadCustomerData();
+            })
+            .subscribe();
+    }
+
+    private void loadCustomerData() {
+        log.info("Adding customer data...");
+        if (customerRepository.count().block() == 0) {
+            Customer customer1 = Customer.builder()
+                .customerName("John Doe")
+                .createdDate(LocalDateTime.now())
+                .lastModifiedDate(LocalDateTime.now())
+                .build();
+
+            Customer customer2 = Customer.builder()
+                .customerName("Fridolin Mann")
+                .createdDate(LocalDateTime.now())
+                .lastModifiedDate(LocalDateTime.now())
+                .build();
+
+            Customer customer3 = Customer.builder()
+                .customerName("Hansjörg Riesen")
+                .createdDate(LocalDateTime.now())
+                .lastModifiedDate(LocalDateTime.now())
+                .build();
+
+            customerRepository.save(customer1).block();
+            customerRepository.save(customer2).block();
+            customerRepository.save(customer3).block();
+
+            customerRepository.findAll()
+                .collectList()
+                .block()
+                .forEach(customer -> log.info("Customer added: " + customer));
+
+            log.info("3 Customers added successfully");
+        }
     }
 
     private void loadBeerData() {

@@ -12,6 +12,7 @@ import org.springframework.data.mongodb.config.AbstractReactiveMongoConfiguratio
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.concurrent.TimeUnit;
 
 import static java.util.Collections.singletonList;
 
@@ -41,7 +42,16 @@ public class MongoConfig extends AbstractReactiveMongoConfiguration {
         log.info("#### Mongo DB Port: " + connectionDetails.port);
         log.info("#### Mongo DB Database: " + connectionDetails.databaseName);
         
-        builder.applyToClusterSettings(settings -> {
+        builder
+            .retryWrites(true)
+            .applyToConnectionPoolSettings(poolSettings -> poolSettings
+                .minSize(5)
+                .maxSize(300)
+                .maxConnectionIdleTime(0, TimeUnit.MILLISECONDS))
+            .applyToSocketSettings(socketSettings -> socketSettings
+                .connectTimeout(1, TimeUnit.MINUTES)
+                .readTimeout(1, TimeUnit.MINUTES))
+            .applyToClusterSettings(settings -> {
             settings.hosts((singletonList(
                 new ServerAddress(connectionDetails.host, connectionDetails.port)
             )));
