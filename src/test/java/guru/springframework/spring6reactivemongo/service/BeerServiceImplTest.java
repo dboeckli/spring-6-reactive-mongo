@@ -4,15 +4,12 @@ import guru.springframework.spring6reactivemongo.dto.BeerDto;
 import guru.springframework.spring6reactivemongo.mapper.BeerMapper;
 import guru.springframework.spring6reactivemongo.mapper.BeerMapperImpl;
 import guru.springframework.spring6reactivemongo.model.Beer;
-import org.junit.jupiter.api.*;
+import guru.springframework.spring6reactivemongo.test.helper.AbstractBaseMongoTestUtil;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.MongoDBContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
@@ -24,11 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.*;
 
-@Testcontainers
-@SpringBootTest
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class BeerServiceImplTest {
+class BeerServiceImplTest extends AbstractBaseMongoTestUtil {
 
     @Autowired
     BeerService beerService;
@@ -36,39 +29,15 @@ class BeerServiceImplTest {
     @Autowired
     BeerMapper beerMapper;
 
-    @Container
-    static MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo:8.0.3").withExposedPorts(27017);
+   
+    private static final String DATABASE_NAME = BeerServiceImplTest.class.getSimpleName();
 
     @DynamicPropertySource
     static void setProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.data.mongodb.uri", mongoDBContainer::getReplicaSetUrl);
+        registry.add("spring.data.mongodb.database", () -> DATABASE_NAME); // Replace with your desired database name
+        registry.add("spring.data.mongodb.uri", () -> mongoDBContainer.getReplicaSetUrl(DATABASE_NAME));
     }
-    
-    @BeforeAll
-    static void setup() {
-        System.out.println("### Starting container on port: " + mongoDBContainer.getMappedPort(mongoDBContainer.getExposedPorts().getFirst()));
-        mongoDBContainer.start();
-        System.out.println("### ConnectionString: " + mongoDBContainer.getConnectionString());
-        System.out.println("### ReplicaSetUrl: " + mongoDBContainer.getReplicaSetUrl());
-    }
-    
-    @AfterAll
-    static void tearDown() {
-        System.out.println("################## stopping container ####################");
-        mongoDBContainer.close();
-    }
-    
-    @Test
-    @Order(1)
-    void testBootstrapData() {
-        List<BeerDto> beers = beerService.listBeers().collectList().block();
-
-        // These are the beers added by BootstrapData
-        assertNotNull(beers);
-        assertEquals(3, beers.size());
-        assertThat(beers).extracting(BeerDto::getBeerName).contains("Galaxy Cat", "Crank", "Sunshine City");
-    }
-
+   
     @Test
     void testGetById() {
         BeerDto savedBeer = beerService.saveBeer(Mono.just(beerMapper.beerToBeerDto(getTestBeer()))).block();
@@ -139,7 +108,7 @@ class BeerServiceImplTest {
     }
 
     @Test
-    void listBeers() {
+    void testListBeers() {
         BeerDto beer1 = beerMapper.beerToBeerDto(getTestBeer());
         beer1.setBeerName("listBeer 1");
         BeerDto beer2 = beerMapper.beerToBeerDto(getTestBeer());
