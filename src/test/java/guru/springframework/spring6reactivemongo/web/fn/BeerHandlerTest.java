@@ -125,6 +125,20 @@ class BeerHandlerTest {
             .expectBody().jsonPath("$.size()").value(equalTo(expectedBeerCount));
     }
 
+    @Test
+    @Order(1)
+    void testFindFirstBeerByBeerName() {
+        BeerDto existingBeer = getAnyExistingBeer();
+
+        webTestClient.get().uri(UriComponentsBuilder
+                .fromPath(BeerRouterConfig.BEER_PATH)
+                .queryParam("beerName", existingBeer.getBeerName()).build().toUri())
+            .exchange()
+            .expectStatus().isOk()
+            .expectHeader().valueEquals("Content-type", "application/json")
+            .expectBody().jsonPath("$.size()").value(equalTo(1));
+    }
+
 
     @Test
     @Order(2)

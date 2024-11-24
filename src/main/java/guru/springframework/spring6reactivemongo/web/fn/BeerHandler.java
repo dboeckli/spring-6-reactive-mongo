@@ -27,16 +27,19 @@ public class BeerHandler {
     private Validator validator;
     
     public Mono<ServerResponse> listBeers(ServerRequest request) {
-        Flux<BeerDto> beerDtoFluxflux;
+        Flux<BeerDto> beerDtoFlux;
 
-        if (request.queryParam("beerStyle").isPresent()){
-            beerDtoFluxflux = beerService.findByBeerStyle(request.queryParam("beerStyle").get());
+        if (request.queryParam("beerStyle").isPresent()) {
+            beerDtoFlux = beerService.findByBeerStyle(request.queryParam("beerStyle").get());
+        } else if (request.queryParam("beerName").isPresent()) {
+            Mono<BeerDto> firstBeerMono = beerService.findFirstByBeerName(request.queryParam("beerName").get());
+            beerDtoFlux = Flux.from(firstBeerMono);
         } else {
-            beerDtoFluxflux = beerService.listBeers();
+            beerDtoFlux = beerService.listBeers();
         }
         
         return ServerResponse.ok()
-            .body(beerDtoFluxflux, BeerDto.class);
+            .body(beerDtoFlux, BeerDto.class);
     }
 
     public Mono<ServerResponse> getBeerById(ServerRequest request){

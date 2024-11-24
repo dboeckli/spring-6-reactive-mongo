@@ -11,6 +11,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.web.util.UriComponentsBuilder;
 import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -85,7 +86,7 @@ class CustomerHandlerTest {
 
     @Test
     @Order(1)
-    void listCustomers() {
+    void testListCustomers() {
         webTestClient.get().uri(CustomerRouterConfig.CUSTOMER_PATH)
             .exchange()
             .expectStatus().isOk()
@@ -104,8 +105,22 @@ class CustomerHandlerTest {
     }
 
     @Test
+    @Order(1)
+    void testFindFirstCustomerByCustomerName() {
+        CustomerDto existingCustomer = getAnyExistingCustomer();
+
+        webTestClient.get().uri(UriComponentsBuilder
+                .fromPath(CustomerRouterConfig.CUSTOMER_PATH)
+                .queryParam("customerName", existingCustomer.getCustomerName()).build().toUri())
+            .exchange()
+            .expectStatus().isOk()
+            .expectHeader().valueEquals("Content-type", "application/json")
+            .expectBody().jsonPath("$.size()").value(equalTo(1));
+    }
+
+    @Test
     @Order(2)
-    void getCustomerById() {
+    void testGetCustomerById() {
         CustomerDto givenCustomer = getAnyExistingCustomer();
 
         CustomerDto gotCustomer = webTestClient.get().uri(CustomerRouterConfig.CUSTOMER_PATH_ID, givenCustomer.getId())
@@ -178,6 +193,150 @@ class CustomerHandlerTest {
             .expectStatus().isOk()
             .expectHeader().valueEquals("Content-type", "application/json")
             .expectBody(CustomerDto.class).returnResult().getResponseBody();
+    }
+    
+
+    @Test
+    @Order(4)
+    void testUpdateCustomer() {
+        CustomerDto customerToUpdate = this.getAnyExistingCustomer();
+        customerToUpdate.setCustomerName("UpdatedCustomer");
+
+        webTestClient.put()
+            .uri(CustomerRouterConfig.CUSTOMER_PATH_ID, customerToUpdate.getId())
+            .body(Mono.just(customerToUpdate), CustomerDto.class)
+            .exchange()
+            .expectStatus().isNoContent();
+
+        CustomerDto updatedCustomer = getCustomerById(customerToUpdate.getId());
+        assertNotNull(updatedCustomer);
+        assertEquals(customerToUpdate.getId(), updatedCustomer.getId());
+        assertEquals(customerToUpdate.getCustomerName(), updatedCustomer.getCustomerName());
+    }
+
+    @Test
+    @Order(4)
+    void testUpdateCustomerToShortName() {
+        CustomerDto customerToUpdate = this.getAnyExistingCustomer();
+        customerToUpdate.setCustomerName("1");
+
+        webTestClient.put()
+            .uri(CustomerRouterConfig.CUSTOMER_PATH_ID, customerToUpdate.getId())
+            .body(Mono.just(customerToUpdate), CustomerDto.class)
+            .exchange()
+            .expectStatus().isBadRequest();
+    }
+
+    @Test
+    @Order(4)
+    void testUpdateCustomerCustomerNotFound() {
+        CustomerDto customerToUpdate = this.getAnyExistingCustomer();
+        customerToUpdate.setCustomerName("updatedCustomer");
+        customerToUpdate.setId("9999");
+
+        webTestClient.put()
+            .uri(CustomerRouterConfig.CUSTOMER_PATH_ID, customerToUpdate.getId())
+            .body(Mono.just(customerToUpdate), CustomerDto.class)
+            .exchange()
+            .expectStatus().isNotFound();
+    }
+
+    @Test
+    @Order(5)
+    void testPatchCustomer() {
+        CustomerDto customerToUpdate = this.getAnyExistingCustomer();
+        customerToUpdate.setCustomerName("PatchedCustomer");
+
+        webTestClient.patch()
+            .uri(CustomerRouterConfig.CUSTOMER_PATH_ID, customerToUpdate.getId())
+            .body(Mono.just(customerToUpdate), CustomerDto.class)
+            .exchange()
+            .expectStatus().isNoContent();
+
+        CustomerDto updatedCustomer = getCustomerById(customerToUpdate.getId());
+        assertNotNull(updatedCustomer);
+        assertEquals(customerToUpdate.getId(), updatedCustomer.getId());
+        assertEquals(customerToUpdate.getCustomerName(), updatedCustomer.getCustomerName());
+    }
+
+    @Test
+    @Order(5)
+    void testPatchCustomerEmtpyName() {
+        CustomerDto customerToUpdate = this.getAnyExistingCustomer();
+        customerToUpdate.setCustomerName("");
+
+        webTestClient.patch()
+            .uri(CustomerRouterConfig.CUSTOMER_PATH_ID, customerToUpdate.getId())
+            .body(Mono.just(customerToUpdate), CustomerDto.class)
+            .exchange()
+            .expectStatus().isBadRequest();
+    }
+
+    @Test
+    @Order(5)
+    void testPatchCustomerTooShortName() {
+        CustomerDto customerToUpdate = this.getAnyExistingCustomer();
+        customerToUpdate.setCustomerName("1");
+
+        webTestClient.patch()
+            .uri(CustomerRouterConfig.CUSTOMER_PATH_ID, customerToUpdate.getId())
+            .body(Mono.just(customerToUpdate), CustomerDto.class)
+            .exchange()
+            .expectStatus().isBadRequest();
+    }
+
+    @Test
+    @Order(5)
+    void testPatchCustomerNullNameNotFound() {
+        CustomerDto customerToUpdate = this.getAnyExistingCustomer();
+        customerToUpdate.setId("999999");
+
+        webTestClient.patch()
+            .uri(CustomerRouterConfig.CUSTOMER_PATH_ID, customerToUpdate.getId())
+            .body(Mono.just(customerToUpdate), CustomerDto.class)
+            .exchange()
+            .expectStatus().isNotFound();
+    }
+    
+    private CustomerDto getCustomerById(String id) {
+        try {
+            return webTestClient.get().uri(CustomerRouterConfig.CUSTOMER_PATH_ID, id)
+                .exchange()
+                .expectStatus().isOk()
+                .expectHeader().valueEquals("Content-type", "application/json")
+                .expectBody(CustomerDto.class).returnResult().getResponseBody();
+        } catch (AssertionError ex) {
+            if (ex.getMessage().contains("Status expected:<200 OK> but was:<404 NOT_FOUND>")) {
+                return null;
+            }
+            throw ex;
+        }
+    }
+
+    @Test
+    @Order(99)
+    void testDeleteCustomer() {
+        CustomerDto customerToDelete = this.getAnyExistingCustomer();
+
+        webTestClient.delete()
+            .uri(CustomerRouterConfig.CUSTOMER_PATH_ID, customerToDelete.getId())
+            .exchange()
+            .expectStatus().isNoContent();
+
+        CustomerDto deletedCustomer = getCustomerById(customerToDelete.getId());
+        assertNull(deletedCustomer);
+    }
+
+    @Test
+    @Order(99)
+    void testDeleteCustomerNotFound() {
+        CustomerDto customerToDelete = this.getAnyExistingCustomer();
+        customerToDelete.setId("88888888888888");
+
+        webTestClient.delete()
+            .uri(CustomerRouterConfig.CUSTOMER_PATH_ID, customerToDelete.getId())
+            .exchange()
+            .expectStatus().isNotFound();
     }
 
     private CustomerDto getAnyExistingCustomer() {

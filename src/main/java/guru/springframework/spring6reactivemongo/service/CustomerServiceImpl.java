@@ -5,6 +5,7 @@ import guru.springframework.spring6reactivemongo.mapper.CustomerMapper;
 import guru.springframework.spring6reactivemongo.repository.CustomerRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -37,21 +38,35 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public Mono<CustomerDto> findFirstByCustomerName(String customerName) {
-        return null;
+        return customerRepository.findFirstByCustomerName(customerName)
+            .map(customerMapper::customerToCustomerDto);
     }
 
     @Override
     public Mono<CustomerDto> updateCustomer(String customerId, CustomerDto customerDto) {
-        return null;
+        return customerRepository.findById(customerId)
+            .map(foundCustomer -> {
+                //update properties
+                foundCustomer.setCustomerName(customerDto.getCustomerName());
+                return foundCustomer;
+            }).flatMap(customerRepository::save)
+            .map(customerMapper::customerToCustomerDto);
     }
 
     @Override
     public Mono<CustomerDto> patchCustomer(String customerId, CustomerDto customerDto) {
-        return null;
+        return customerRepository.findById(customerId)
+            .map(foundCustomer -> {
+                if(StringUtils.hasText(customerDto.getCustomerName())){
+                    foundCustomer.setCustomerName(customerDto.getCustomerName());
+                }
+                return foundCustomer;
+            }).flatMap(customerRepository::save)
+            .map(customerMapper::customerToCustomerDto);
     }
 
     @Override
     public Mono<Void> deleteCustomerById(String customerId) {
-        return null;
+        return customerRepository.deleteById(customerId);
     }
 }

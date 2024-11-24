@@ -4,7 +4,9 @@ import guru.springframework.spring6reactivemongo.dto.BeerDto;
 import guru.springframework.spring6reactivemongo.mapper.BeerMapper;
 import guru.springframework.spring6reactivemongo.mapper.BeerMapperImpl;
 import guru.springframework.spring6reactivemongo.model.Beer;
+import guru.springframework.spring6reactivemongo.repository.BeerRepository;
 import lombok.extern.java.Log;
+import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,6 +26,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Testcontainers
@@ -38,6 +41,9 @@ class BeerServiceImplTest {
 
     @Autowired
     BeerMapper beerMapper;
+    
+    @Autowired
+    BeerRepository beerRepository;
 
     @Container
     static MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo:8.0.3")
@@ -71,6 +77,16 @@ class BeerServiceImplTest {
             assertFalse(mongoDBContainer.isRunning());
             log.info("Container stopped.");
         });
+    }
+
+    @BeforeEach
+        // Workaround for MongoDB startup
+    void startUp() {
+        await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> {
+            log.info("Waiting for data to be inserted...");
+            MatcherAssert.assertThat(beerRepository.count().block().intValue(), greaterThan(2));
+        });
+        log.info("Continue....");
     }
     
     @Test
@@ -143,7 +159,7 @@ class BeerServiceImplTest {
     }
 
     @Test
-    void listBeers() {
+    void testListBeers() {
         BeerDto beer1 = beerMapper.beerToBeerDto(getTestBeer());
         beer1.setBeerName("listBeer 1");
         BeerDto beer2 = beerMapper.beerToBeerDto(getTestBeer());
