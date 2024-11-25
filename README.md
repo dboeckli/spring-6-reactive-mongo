@@ -4,7 +4,11 @@ Examples of Reactive Programming with Spring Framework.
 MongoDB runs on mongodb://localhost:27017
 Runs as a service on port 27017
 
+Then we have a second profile which starts the mongo-db with the testContainer feature which use docker. the exposed port is changing at each start.
+You can find the part in the spring boot startup log or via the "docker ps" command
+
 In Unit Test we are using the TestContainer within Docker which requires Docker Desktop installed. In that case the port does change with each test.
+
 
 This repository has examples from my course [Reactive Programming with Spring Framework 5](https://www.udemy.com/reactive-programming-with-spring-framework-5/?couponCode=GITHUB_REPO_SF5B2G)
 

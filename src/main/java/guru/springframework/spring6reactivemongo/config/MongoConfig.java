@@ -5,10 +5,12 @@ import com.mongodb.ServerAddress;
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoClients;
 import lombok.extern.java.Log;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.config.AbstractReactiveMongoConfiguration;
+import org.testcontainers.containers.MongoDBContainer;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -19,6 +21,9 @@ import static java.util.Collections.singletonList;
 @Configuration
 @Log
 public class MongoConfig extends AbstractReactiveMongoConfiguration {
+
+    @Autowired
+    MongoDBContainer mongoDBContainer;
 
     @Value("${spring.data.mongodb.uri}")
     private String mongoUri;
@@ -35,7 +40,7 @@ public class MongoConfig extends AbstractReactiveMongoConfiguration {
         return connectionDetails.databaseName;
     }
 
-    //@Override
+    @Override
     protected void configureClientSettings(MongoClientSettings.Builder builder) {
         ConnectionDetails connectionDetails = parseMongoUri();
         log.info("#### Mongo DB Host: " + connectionDetails.host);
