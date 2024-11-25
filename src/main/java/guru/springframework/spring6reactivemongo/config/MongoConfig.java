@@ -35,7 +35,7 @@ public class MongoConfig extends AbstractReactiveMongoConfiguration {
         return connectionDetails.databaseName;
     }
 
-    //@Override
+    @Override
     protected void configureClientSettings(MongoClientSettings.Builder builder) {
         ConnectionDetails connectionDetails = parseMongoUri();
         log.info("#### Mongo DB Host: " + connectionDetails.host);

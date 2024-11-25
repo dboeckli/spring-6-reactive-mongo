@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: spring-6-reactive-mongo
+  
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/sfg
+      database: sfg
