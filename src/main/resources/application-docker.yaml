@@ -4,5 +4,5 @@ spring:
   
   data:
     mongodb:
-      uri: mongodb://localhost:${MY_VAR:27017}/sfg
+      uri: mongodb://localhost:27017/sfg
       database: sfg
