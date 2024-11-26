@@ -8,7 +8,7 @@ import lombok.extern.java.Log;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -28,6 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @Log
 @Import(TestMongoDockerContainer.class)
+@ExtendWith(MongoExtension.class)
 class Spring6ReactiveMongoApplicationTests {
 
     @Autowired
@@ -35,9 +36,6 @@ class Spring6ReactiveMongoApplicationTests {
     
     @Autowired
     CustomerService customerService;
-
-    @RegisterExtension
-    MongoExtension instanceLevelExtension = new MongoExtension();
 
     @Test
     void contextLoads() {
