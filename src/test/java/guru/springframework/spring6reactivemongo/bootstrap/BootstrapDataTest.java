@@ -4,11 +4,17 @@ import guru.springframework.spring6reactivemongo.dto.BeerDto;
 import guru.springframework.spring6reactivemongo.dto.CustomerDto;
 import guru.springframework.spring6reactivemongo.service.BeerService;
 import guru.springframework.spring6reactivemongo.service.CustomerService;
-import guru.springframework.spring6reactivemongo.test.helper.AbstractBaseMongoTestUtil;
+import guru.springframework.spring6reactivemongo.test.config.AbstractMongoExtension;
+import guru.springframework.spring6reactivemongo.test.config.TestMongoDockerContainer;
+import lombok.extern.java.Log;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.annotation.DirtiesContext;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -18,21 +24,19 @@ import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-class BootstrapDataTest extends AbstractBaseMongoTestUtil {
+@Testcontainers
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
+@AutoConfigureWebTestClient
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@Log
+@Import(TestMongoDockerContainer.class)
+class BootstrapDataTest extends AbstractMongoExtension  {
 
     @Autowired
     BeerService beerService;
     
     @Autowired
     CustomerService customerService;
-
-    private static final String DATABASE_NAME = BootstrapDataTest.class.getSimpleName();
-
-    @DynamicPropertySource
-    static void setProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.data.mongodb.database", () -> DATABASE_NAME); // Replace with your desired database name
-        registry.add("spring.data.mongodb.uri", () -> mongoDBContainer.getReplicaSetUrl(DATABASE_NAME));
-    }
 
     @Test
     void testBootstrapData() {

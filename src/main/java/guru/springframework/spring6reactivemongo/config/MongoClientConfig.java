@@ -18,7 +18,7 @@ import static java.util.Collections.singletonList;
 
 @Configuration
 @Log
-public class MongoConfig extends AbstractReactiveMongoConfiguration {
+public class MongoClientConfig extends AbstractReactiveMongoConfiguration {
 
     @Value("${spring.data.mongodb.uri}")
     private String mongoUri;
