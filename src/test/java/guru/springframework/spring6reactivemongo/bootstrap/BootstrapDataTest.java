@@ -2,16 +2,20 @@ package guru.springframework.spring6reactivemongo.bootstrap;
 
 import guru.springframework.spring6reactivemongo.dto.BeerDto;
 import guru.springframework.spring6reactivemongo.dto.CustomerDto;
+import guru.springframework.spring6reactivemongo.repository.BeerRepository;
+import guru.springframework.spring6reactivemongo.repository.CustomerRepository;
 import guru.springframework.spring6reactivemongo.service.BeerService;
 import guru.springframework.spring6reactivemongo.service.CustomerService;
-import guru.springframework.spring6reactivemongo.test.config.AbstractMongoExtension;
+import guru.springframework.spring6reactivemongo.test.config.MongoExtension;
 import guru.springframework.spring6reactivemongo.test.config.TestMongoDockerContainer;
 import lombok.extern.java.Log;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -24,19 +28,28 @@ import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+@SpringBootTest
 @Testcontainers
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @AutoConfigureWebTestClient
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @Log
 @Import(TestMongoDockerContainer.class)
-class BootstrapDataTest extends AbstractMongoExtension  {
+class BootstrapDataTest {
 
     @Autowired
     BeerService beerService;
     
     @Autowired
     CustomerService customerService;
+
+    @Autowired
+    private CustomerRepository customerRepository;
+    @Autowired
+    private BeerRepository beerRepository;
+
+    @RegisterExtension
+    MongoExtension instanceLevelExtension = new MongoExtension();
 
     @Test
     void testBootstrapData() {

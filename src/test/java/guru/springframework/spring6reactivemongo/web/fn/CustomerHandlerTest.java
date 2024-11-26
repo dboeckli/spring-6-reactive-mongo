@@ -1,13 +1,14 @@
 package guru.springframework.spring6reactivemongo.web.fn;
 
 import guru.springframework.spring6reactivemongo.dto.CustomerDto;
-import guru.springframework.spring6reactivemongo.test.config.AbstractMongoExtension;
+import guru.springframework.spring6reactivemongo.test.config.MongoExtension;
 import guru.springframework.spring6reactivemongo.test.config.TestMongoDockerContainer;
 import lombok.extern.java.Log;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,17 +22,20 @@ import reactor.core.publisher.Mono;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.*;
 
-@Testcontainers
 @SpringBootTest
+@Testcontainers
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @AutoConfigureWebTestClient
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @Log
 @Import(TestMongoDockerContainer.class)
-class CustomerHandlerTest extends AbstractMongoExtension {
+class CustomerHandlerTest {
     
     @Autowired
     WebTestClient webTestClient;
+
+    @RegisterExtension
+    MongoExtension instanceLevelExtension = new MongoExtension();
 
     @Test
     @Order(1)

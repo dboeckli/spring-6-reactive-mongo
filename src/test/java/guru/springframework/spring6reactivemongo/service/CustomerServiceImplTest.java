@@ -2,14 +2,16 @@ package guru.springframework.spring6reactivemongo.service;
 
 import guru.springframework.spring6reactivemongo.dto.CustomerDto;
 import guru.springframework.spring6reactivemongo.mapper.CustomerMapper;
-import guru.springframework.spring6reactivemongo.test.config.AbstractMongoExtension;
+import guru.springframework.spring6reactivemongo.test.config.MongoExtension;
 import guru.springframework.spring6reactivemongo.test.config.TestMongoDockerContainer;
 import lombok.extern.java.Log;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -21,19 +23,23 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+@SpringBootTest
 @Testcontainers
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @AutoConfigureWebTestClient
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @Log
 @Import(TestMongoDockerContainer.class)
-class CustomerServiceImplTest extends AbstractMongoExtension {
+class CustomerServiceImplTest {
 
     @Autowired
     CustomerService customerService;
 
     @Autowired
     CustomerMapper customerMapper;
+
+    @RegisterExtension
+    MongoExtension instanceLevelExtension = new MongoExtension();
 
     @Test
     void listCustomers() {
