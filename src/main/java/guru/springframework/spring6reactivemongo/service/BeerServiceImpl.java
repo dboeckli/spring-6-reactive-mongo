@@ -4,6 +4,7 @@ import guru.springframework.spring6reactivemongo.dto.BeerDto;
 import guru.springframework.spring6reactivemongo.mapper.BeerMapper;
 import guru.springframework.spring6reactivemongo.repository.BeerRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import reactor.core.publisher.Flux;
@@ -11,6 +12,7 @@ import reactor.core.publisher.Mono;
 
 @Service
 @RequiredArgsConstructor
+@Log
 public class BeerServiceImpl implements BeerService {
 
     private final BeerMapper beerMapper;
@@ -100,6 +102,7 @@ public class BeerServiceImpl implements BeerService {
 
     @Override
     public Mono<Void> deleteBeerById(String beerId) {
+        log.info("Deleting beer with id: " + beerId);  
         return beerRepository.deleteById(beerId);
     }
 }

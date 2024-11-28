@@ -1,8 +1,13 @@
 # spring-6-reactive-mongo
 Examples of Reactive Programming with Spring Framework.
 
-MongoDB runs on mongodb://localhost:27017
-Runs as a service on port 27017
+## Getting started
+There are three profiles:
+* default profile: expects a MongoDB installed and running on port 27017
+* docker-with-compose: is using the MongoDB created with docker-compose running on port 27018
+* docker-with-testcontainer: is using the MongoDB provided by testcontainer/docker running on random port
+
+TODO: currently the docker container is created for all profiles. we should avoid that
 
 Then we have a second profile which starts the mongo-db with the testContainer feature which use docker. the exposed port is changing at each start.
 You can find the part in the spring boot startup log or via the "docker ps" command

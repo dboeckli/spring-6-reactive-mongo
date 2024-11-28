@@ -1,0 +1,12 @@
+services:
+  mongodb:
+    image: 'mongo:8.0.3'
+    environment:
+      - 'MONGO_INITDB_DATABASE=sfg'
+      - 'MONGO_INITDB_ROOT_USERNAME=root'
+      - 'MONGO_INITDB_ROOT_PASSWORD=secret'
+    ports:
+      #- '27017'
+      # this expose the port 27018 externally
+      - '27018:27017'
+      

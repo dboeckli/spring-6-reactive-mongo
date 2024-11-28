@@ -29,7 +29,7 @@ public class TestMongoDockerContainer {
             assertTrue(container.isRunning());
             log.info("Container started.");
         });
-       
+        // this will replace the default MongoDB URI, because we are using Docker and the port is changing every time the container is started
         log.info("### Set spring.data.mongodb.uri to: " + container.getConnectionString());
         log.info("### MongoDB Container started Run on port: " + container.getMappedPort(27017));
         System.setProperty("spring.data.mongodb.uri", container.getConnectionString());
