@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: spring-6-reactive-mongo
+  
+  data:
+    mongodb:
+      # uri will be changed to the exposed port when the docker container has started
+      uri: mongodb://localhost:27018/sfg
+      database: sfg
+      username: root
+      password: secret
+      host: localhost
+      port: 27018

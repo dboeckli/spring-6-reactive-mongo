@@ -4,7 +4,7 @@ Accept: application/json
 Content-Type: application/json
 
 ### Get Beer by ID
-GET http://localhost:8080/api/v3/beer/673af535e494004d26d886ed
+GET http://localhost:8080/api/v3/beer/6746d967f74ca306eaa56db3
 Accept: application/json
 Content-Type: application/json
 
@@ -86,5 +86,5 @@ Content-Type: application/json
 }
 
 ### Delete Beer by ID
-DELETE http://localhost:8080/api/v3/beer/1
+DELETE http://localhost:8080/api/v3/beer/6746d967f74ca306eaa56db0
 Accept: application/json
