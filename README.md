@@ -2,6 +2,7 @@
 Examples of Reactive Programming with Spring Framework.
 
 ## Getting started
+Server runs on port 8080. Requires the auth server running on port 9000.
 There are three profiles:
 * default profile: expects a MongoDB installed and running on port 27017
 * docker-with-compose: is using the MongoDB created with docker-compose running on port 27018
