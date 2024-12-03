@@ -10,3 +10,7 @@ spring:
       # uri will be changed to the exposed port when the docker/testcontainer has been started
       uri: mongodb://localhost:27017/sfg
       database: sfg
+      
+logging:
+  level:
+    org.zalando.logbook: TRACE      

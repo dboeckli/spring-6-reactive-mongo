@@ -16,6 +16,10 @@ management:
       probes:
         enabled: true
       show-details: always  
+      
+logging:
+  level:
+    org.zalando.logbook: TRACE
 
 spring:
   application:

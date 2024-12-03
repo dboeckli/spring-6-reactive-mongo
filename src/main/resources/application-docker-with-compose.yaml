@@ -14,3 +14,7 @@ spring:
       password: secret
       host: localhost
       port: 27018
+      
+logging:
+  level:
+    org.zalando.logbook: TRACE      
