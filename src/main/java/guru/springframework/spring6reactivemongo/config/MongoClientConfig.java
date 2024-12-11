@@ -43,6 +43,7 @@ public class MongoClientConfig extends AbstractReactiveMongoConfiguration {
 
     @Override
     protected void configureClientSettings(MongoClientSettings.Builder builder) {
+        log.info("#### Mongo DB URI: " + mongoUri);
         ConnectionDetails connectionDetails = parseMongoUri();
         log.info("#### Mongo DB Host: " + connectionDetails.host);
         log.info("#### Mongo DB Port: " + connectionDetails.port);
@@ -68,6 +69,8 @@ public class MongoClientConfig extends AbstractReactiveMongoConfiguration {
             log.info("#### Mongo DB password: " + password);
             // make sure to specify the authSource=admin query parameter in the connection string if you are using the root account for authentication.
             builder.credential(MongoCredential.createCredential(username, "admin", password.toCharArray()));
+        } else {
+            log.info("#### Mongo DB authentication disabled");
         }
     }
 

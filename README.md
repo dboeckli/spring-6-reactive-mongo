@@ -15,6 +15,35 @@ You can find the part in the spring boot startup log or via the "docker ps" comm
 
 In Unit Test we are using the TestContainer within Docker which requires Docker Desktop installed. In that case the port does change with each test.
 
+## Docker
+
+### create image
+```shell
+.\mvnw clean package spring-boot:build-image
+```
+or just run
+```shell
+.\mvnw clean install
+```
+
+### run image
+
+Hint: remove the daemon flag -d to see what is happening, else it run in background
+
+```shell
+docker run --name mongo -d -e MONGO_INITDB_ROOT_USERNAME=root -e MONGO_INITDB_ROOT_PASSWORD=secret -p 27017:27017 mongo 
+docker stop mongo
+docker rm mongo
+docker start mongo
+docker logs mongo
+
+docker run --name reactive-mongo -d -p 8083:8080 -e SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://auth-server:9000 -e SERVER_PORT=8080 -e SPRING_DATA_MONGODB_URI=mongodb://mongo:27017/sfg -e SPRING_DATA_MONGODB_USERNAME=root -e SPRING_DATA_MONGODB_PASSWORD=secret --link auth-server:auth-server --link mongo:mongo spring-6-reactive-mongo:0.0.1-SNAPSHOT
+ 
+docker stop reactive-mongo
+docker rm reactive-mongo
+docker start reactive-mongo
+docker logs reactive-mongo
+```
 
 This repository has examples from my course [Reactive Programming with Spring Framework 5](https://www.udemy.com/reactive-programming-with-spring-framework-5/?couponCode=GITHUB_REPO_SF5B2G)
 
