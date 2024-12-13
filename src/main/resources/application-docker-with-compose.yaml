@@ -15,6 +15,12 @@ spring:
       host: localhost
       port: 27018
       
+logbook:
+  exclude[1]: '**/actuator/health'
+  exclude[0]: '/actuator/health'
+  exclude[2]: '**/actuator/health/**'
+  exclude[3]: '/actuator/health/**'      
+      
 logging:
   level:
     org.zalando.logbook: TRACE      
