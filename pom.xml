@@ -88,7 +88,7 @@
         <repository>
             <id>github</id>
             <name>GitHub dboeckli Apache Maven Packages</name>
-            <url>https://maven.pkg.github.com/dboeckli/${project.artifactId}</url>
+            <url>https://maven.pkg.github.com/${organization.name}/${project.artifactId}</url>
         </repository>
     </distributionManagement>
 
@@ -170,18 +170,18 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-testcontainers</artifactId>
-            <!--<scope>test</scope>-->
+            <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>testcontainers</artifactId>
-            <!--<scope>test</scope>-->
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>mongodb</artifactId>
-            <!--<scope>test</scope>-->
+            <scope>test</scope>
         </dependency>
         
         <dependency>
