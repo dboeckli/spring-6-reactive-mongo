@@ -22,10 +22,20 @@ logging:
     org.zalando.logbook: TRACE
     
 logbook:
-  exclude[1]: '**/actuator/health'
-  exclude[0]: '/actuator/health'
-  exclude[2]: '**/actuator/health/**'
-  exclude[3]: '/actuator/health/**'
+  filter:
+    enabled: true
+  format:
+    style: http
+  obfuscate:
+    headers:
+      - Authorization
+      - X-Secret
+    parameters:
+      - access_token
+      - password
+  predicate:
+    exclude:
+      - path: /actuator/health
 
 spring:
   application:
