@@ -79,6 +79,19 @@ class CustomerServiceImplDockerComposeIT {
     }
 
     @Test
+    @Order(1)
+    void listCustomers3() {
+        StepVerifier.create(customerService.listCustomers())
+            .thenAwait(Duration.ofSeconds(5))  // Warte 5 Sekunden
+            .expectNextCount(3)
+            .thenConsumeWhile(customer -> true, customer -> {
+                assertThat(customer).isNotNull();
+                assertThat(customer.getCustomerName()).isIn("John Doe", "Fridolin Mann", "Hansjörg Riesen");
+            })
+            .verifyComplete();
+    }
+
+    @Test
     @Order(2)
     void findFirstCustomerByName() {
         CustomerDto customer = customerMapper.customerToCustomerDto(getTestCustomer());
