@@ -30,7 +30,10 @@ public class CustomerHandler {
         Flux<CustomerDto> customerDtoFlux;
 
         if (request.queryParam("customerName").isPresent()) {
-            Mono<CustomerDto> firstCustomerMono = customerService.findFirstByCustomerName(request.queryParam("customerName").get());
+            String customerName = request.queryParam("customerName")
+                .filter(name -> !name.trim().isEmpty())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Customer name must not be empty or contain only whitespace"));
+            Mono<CustomerDto> firstCustomerMono = customerService.findFirstByCustomerName(customerName);
             customerDtoFlux = Flux.from(firstCustomerMono);
         } else {
             customerDtoFlux = customerService.listCustomers();
@@ -48,7 +51,7 @@ public class CustomerHandler {
     }
     
     public Mono<ServerResponse> createCustomer(ServerRequest request) {
-        return customerService.saveCustomer(request.bodyToMono(CustomerDto.class).doOnNext(customerDto -> validate(customerDto)))
+        return customerService.saveCustomer(request.bodyToMono(CustomerDto.class).doOnNext(this::validate))
             .flatMap(customerDTO -> ServerResponse
                 .created(UriComponentsBuilder
                     .fromPath(CustomerRouterConfig.CUSTOMER_PATH_ID)
@@ -58,7 +61,7 @@ public class CustomerHandler {
 
     public Mono<ServerResponse> updateCustomerById(ServerRequest request) {
         return request.bodyToMono(CustomerDto.class)
-            .doOnNext(customerDTO -> validate(customerDTO))
+            .doOnNext(this::validate)
             .flatMap(customerDTO -> customerService
                 .updateCustomer(request.pathVariable("customerId"), customerDTO))
             .switchIfEmpty(Mono.error(new ResponseStatusException(NOT_FOUND, "Customer not found")))
@@ -67,7 +70,7 @@ public class CustomerHandler {
 
     public Mono<ServerResponse> patchCustomerById(ServerRequest request) {
         return request.bodyToMono(CustomerDto.class)
-            .doOnNext(customerDTO -> validate(customerDTO))
+            .doOnNext(this::validate)
             .flatMap(customerDTO -> customerService
                 .patchCustomer(request.pathVariable("customerId"), customerDTO))
             .switchIfEmpty(Mono.error(new ResponseStatusException(NOT_FOUND, "Customer not found")))
