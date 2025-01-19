@@ -31,7 +31,7 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 @Log
 @Import(TestMongoDockerContainer.class)
 @ExtendWith(MongoExtension.class)
-class CustomerHandlerTest {
+class CustomerHandlerIT {
     
     @Autowired
     WebTestClient webTestClient;
