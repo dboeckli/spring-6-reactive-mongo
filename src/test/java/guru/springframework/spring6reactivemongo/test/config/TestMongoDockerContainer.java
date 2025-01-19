@@ -5,6 +5,8 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.DynamicPropertyRegistrar;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.shaded.org.apache.commons.lang3.RandomStringUtils;
 
@@ -17,12 +19,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @Log
 public class TestMongoDockerContainer {
 
+    static MongoDBContainer mongoDBContainer;
+
     @Bean
     @ServiceConnection
     MongoDBContainer mongoDBContainer() {
-        MongoDBContainer container = new MongoDBContainer("mongo:8.0.3")
+        MongoDBContainer container = new MongoDBContainer("mongo:6.0.10")
             .withExposedPorts(27017)
-            .withReuse(false);
+            .withReuse(true);
 
         container.start();
         await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
@@ -36,6 +40,13 @@ public class TestMongoDockerContainer {
         return container;
     }
 
+    @DynamicPropertySource
+    static void setProperties(DynamicPropertyRegistry registry) {
+        log.info("### hallihallo");
+        registry.add("spring.data.mongodb.uri", () -> mongoDBContainer.getReplicaSetUrl("testdb-for-testcontainer"));
+        registry.add("spring.data.mongodb.database", () -> "testdb-for-testcontainer");
+    }
+
     @Bean
     public DynamicPropertyRegistrar mongoDbProperties(MongoDBContainer mongoDBContainer) {
         return (properties) -> {
@@ -44,7 +55,5 @@ public class TestMongoDockerContainer {
             properties.add("spring.data.mongodb.uri", () -> mongoDBContainer.getReplicaSetUrl(databaseName));
         };
     }
-
-
 
 }

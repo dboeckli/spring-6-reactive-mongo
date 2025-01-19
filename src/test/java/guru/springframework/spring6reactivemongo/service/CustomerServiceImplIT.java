@@ -14,6 +14,7 @@ import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWeb
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
+import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import reactor.core.publisher.Mono;
 
@@ -38,6 +39,9 @@ class CustomerServiceImplIT {
 
     @Autowired
     CustomerMapper customerMapper;
+    
+    @Autowired
+    MongoDBContainer mongoDBContainer;
 
     @Test
     void listCustomers() {
