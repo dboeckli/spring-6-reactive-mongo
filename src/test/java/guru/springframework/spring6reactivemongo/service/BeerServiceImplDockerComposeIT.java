@@ -11,6 +11,8 @@ import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWeb
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
@@ -35,6 +37,12 @@ class BeerServiceImplDockerComposeIT {
 
     @Autowired
     BeerMapper beerMapper;
+
+    @DynamicPropertySource
+    static void mongoDbProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.data.mongodb.uri", () -> "mongodb://localhost:27018/sfg");
+        registry.add("spring.data.mongodb.database", () -> "sfg");
+    }
 
     @Test
     @Order(1)
