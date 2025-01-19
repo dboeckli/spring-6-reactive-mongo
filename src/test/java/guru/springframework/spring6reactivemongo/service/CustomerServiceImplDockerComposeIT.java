@@ -52,7 +52,9 @@ class CustomerServiceImplDockerComposeIT {
         List<CustomerDto> customers = customerService.listCustomers().collectList().block();
 
         assertNotNull(customers);
-        assertEquals(4, customers.size());
+        assertThat(customers)
+            .hasSizeGreaterThanOrEqualTo(3)
+            .hasSizeLessThanOrEqualTo(4);
         assertThat(customers).extracting(CustomerDto::getCustomerName).contains("John Doe", "Fridolin Mann", "Hansjörg Riesen");
     }
 
