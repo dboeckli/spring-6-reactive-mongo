@@ -31,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @Log
 @Import(TestMongoDockerContainer.class)
 @ExtendWith(MongoExtension.class)
-class CustomerServiceImplTest {
+class CustomerServiceImplIT {
 
     @Autowired
     CustomerService customerService;

@@ -37,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @Log
 @Import(TestMongoDockerContainer.class)
 @ExtendWith(MongoExtension.class)
-class BeerServiceImplTest {
+class BeerServiceImplIT {
 
     @Autowired
     BeerService beerService;
