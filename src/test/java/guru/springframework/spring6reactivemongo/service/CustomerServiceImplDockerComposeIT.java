@@ -4,6 +4,7 @@ import guru.springframework.spring6reactivemongo.dto.CustomerDto;
 import guru.springframework.spring6reactivemongo.mapper.CustomerMapper;
 import guru.springframework.spring6reactivemongo.model.Customer;
 import lombok.extern.java.Log;
+import org.awaitility.Awaitility;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -17,6 +18,7 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import reactor.core.publisher.Mono;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -47,19 +49,26 @@ class CustomerServiceImplDockerComposeIT {
     }
 
     @Test
-    @Order(2)
+    @Order(1)
     void listCustomers() {
-        List<CustomerDto> customers = customerService.listCustomers().collectList().block();
+        Awaitility.await()
+            .atMost(Duration.ofSeconds(5))
+            .pollInterval(Duration.ofMillis(100))
+            .untilAsserted(() -> {
+                List<CustomerDto> customers = customerService.listCustomers().collectList().block();
 
-        assertNotNull(customers);
-        assertThat(customers)
-            .hasSizeGreaterThanOrEqualTo(3)
-            .hasSizeLessThanOrEqualTo(4);
-        assertThat(customers).extracting(CustomerDto::getCustomerName).contains("John Doe", "Fridolin Mann", "Hansjörg Riesen");
+                assertNotNull(customers);
+                assertThat(customers)
+                    .hasSizeGreaterThanOrEqualTo(3)
+                    .hasSizeLessThanOrEqualTo(4);
+                assertThat(customers)
+                    .extracting(CustomerDto::getCustomerName)
+                    .contains("John Doe", "Fridolin Mann", "Hansjörg Riesen");
+            });
     }
 
     @Test
-    @Order(1)
+    @Order(2)
     void findFirstCustomerByName() {
         CustomerDto customer = customerMapper.customerToCustomerDto(getTestCustomer());
         customer.setCustomerName("customer to find");
