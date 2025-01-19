@@ -17,6 +17,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 import java.time.Duration;
 import java.util.List;
@@ -65,6 +66,18 @@ class CustomerServiceImplDockerComposeIT {
                     .extracting(CustomerDto::getCustomerName)
                     .contains("John Doe", "Fridolin Mann", "Hansjörg Riesen");
             });
+    }
+
+    @Test
+    @Order(1)
+    void listCustomers2() {
+        StepVerifier.create(customerService.listCustomers())
+            .expectNextCount(3)
+            .thenConsumeWhile(customer -> true, customer -> {
+                assertThat(customer).isNotNull();
+                assertThat(customer.getCustomerName()).isIn("John Doe", "Fridolin Mann", "Hansjörg Riesen");
+            })
+            .verifyComplete();
     }
 
     @Test
