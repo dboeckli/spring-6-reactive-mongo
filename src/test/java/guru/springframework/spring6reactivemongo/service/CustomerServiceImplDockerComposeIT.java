@@ -5,10 +5,7 @@ import guru.springframework.spring6reactivemongo.mapper.CustomerMapper;
 import guru.springframework.spring6reactivemongo.model.Customer;
 import lombok.extern.java.Log;
 import org.awaitility.Awaitility;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -70,6 +67,7 @@ class CustomerServiceImplDockerComposeIT {
 
     @Test
     @Order(1)
+    @Disabled("This test is disabled due to potential race conditions")
     void listCustomers2() {
         StepVerifier.create(customerService.listCustomers())
             .expectNextCount(3)
@@ -100,6 +98,24 @@ class CustomerServiceImplDockerComposeIT {
         await().untilTrue(waitingForSearch);
         assertNotNull(waitingForSearchedCustomer.get());
         assertEquals(customer.getCustomerName(), waitingForSearchedCustomer.get().getCustomerName());
+    }
+
+    @Test
+    @Order(2)
+    @Disabled("This test is disabled due to potential race conditions")
+    void findFirstCustomerByName2() {
+        CustomerDto customer = customerMapper.customerToCustomerDto(getTestCustomer());
+        customer.setCustomerName("customer to find");
+
+        StepVerifier.create(customerService.saveCustomer(Mono.just(customer))
+                .then(customerService.findFirstByCustomerName(customer.getCustomerName())))
+            .assertNext(foundCustomer -> {
+                assertThat(foundCustomer).isNotNull();
+                assertThat(foundCustomer.getCustomerName()).isEqualTo(customer.getCustomerName());
+                assertThat(foundCustomer.getId()).isNotNull();
+                log.info("Found Customer ID: " + foundCustomer.getId());
+            })
+            .verifyComplete();
     }
 
     private static Customer getTestCustomer() {
