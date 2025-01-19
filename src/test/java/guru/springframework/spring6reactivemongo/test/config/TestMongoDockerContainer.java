@@ -24,7 +24,7 @@ public class TestMongoDockerContainer {
     @Bean
     @ServiceConnection
     MongoDBContainer mongoDBContainer() {
-        MongoDBContainer container = new MongoDBContainer("mongo:8.0.3")
+        MongoDBContainer container = new MongoDBContainer("mongo:6.0.10")
             .withExposedPorts(27017)
             .withReuse(true);
 
