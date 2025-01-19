@@ -19,8 +19,9 @@ spring:
     compose:
       enabled: true
       stop:
-        command: down  
-      
+        command: down    
+      skip:
+        in-tests: false
   security:
     oauth2:
       resourceserver:
