@@ -66,32 +66,6 @@ class CustomerServiceImplDockerComposeIT {
     }
 
     @Test
-    @Order(1)
-    @Disabled("This test is disabled due to potential race conditions")
-    void listCustomers2() {
-        StepVerifier.create(customerService.listCustomers())
-            .expectNextCount(3)
-            .thenConsumeWhile(customer -> true, customer -> {
-                assertThat(customer).isNotNull();
-                assertThat(customer.getCustomerName()).isIn("John Doe", "Fridolin Mann", "Hansjörg Riesen");
-            })
-            .verifyComplete();
-    }
-
-    @Test
-    @Order(1)
-    void listCustomers3() {
-        StepVerifier.create(customerService.listCustomers())
-            .thenAwait(Duration.ofSeconds(5))  // Warte 5 Sekunden
-            .expectNextCount(3)
-            .thenConsumeWhile(customer -> true, customer -> {
-                assertThat(customer).isNotNull();
-                assertThat(customer.getCustomerName()).isIn("John Doe", "Fridolin Mann", "Hansjörg Riesen");
-            })
-            .verifyComplete();
-    }
-
-    @Test
     @Order(2)
     void findFirstCustomerByName() {
         CustomerDto customer = customerMapper.customerToCustomerDto(getTestCustomer());
@@ -103,7 +77,7 @@ class CustomerServiceImplDockerComposeIT {
         AtomicBoolean waitingForSearch = new AtomicBoolean(false);
         AtomicReference<CustomerDto> waitingForSearchedCustomer = new AtomicReference<>();
         foundCustomer.subscribe(foundDto -> {
-            System.out.println("Found Customer ID: " + foundDto.getId());
+            log.info("Found Customer ID: " + foundDto.getId());
             waitingForSearch.set(true);
             waitingForSearchedCustomer.set(foundDto);
         });
@@ -111,24 +85,6 @@ class CustomerServiceImplDockerComposeIT {
         await().untilTrue(waitingForSearch);
         assertNotNull(waitingForSearchedCustomer.get());
         assertEquals(customer.getCustomerName(), waitingForSearchedCustomer.get().getCustomerName());
-    }
-
-    @Test
-    @Order(2)
-    @Disabled("This test is disabled due to potential race conditions")
-    void findFirstCustomerByName2() {
-        CustomerDto customer = customerMapper.customerToCustomerDto(getTestCustomer());
-        customer.setCustomerName("customer to find");
-
-        StepVerifier.create(customerService.saveCustomer(Mono.just(customer))
-                .then(customerService.findFirstByCustomerName(customer.getCustomerName())))
-            .assertNext(foundCustomer -> {
-                assertThat(foundCustomer).isNotNull();
-                assertThat(foundCustomer.getCustomerName()).isEqualTo(customer.getCustomerName());
-                assertThat(foundCustomer.getId()).isNotNull();
-                log.info("Found Customer ID: " + foundCustomer.getId());
-            })
-            .verifyComplete();
     }
 
     private static Customer getTestCustomer() {
