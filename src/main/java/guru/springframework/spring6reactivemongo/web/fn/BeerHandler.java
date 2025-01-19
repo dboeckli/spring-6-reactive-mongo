@@ -30,9 +30,15 @@ public class BeerHandler {
         Flux<BeerDto> beerDtoFlux;
 
         if (request.queryParam("beerStyle").isPresent()) {
-            beerDtoFlux = beerService.findByBeerStyle(request.queryParam("beerStyle").get());
+            String beerStyle = request.queryParam("beerStyle")
+                .filter(name -> !name.trim().isEmpty())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "BeerStyle must not be empty or contain only whitespace"));
+            beerDtoFlux = beerService.findByBeerStyle(beerStyle);
         } else if (request.queryParam("beerName").isPresent()) {
-            Mono<BeerDto> firstBeerMono = beerService.findFirstByBeerName(request.queryParam("beerName").get());
+            String beerName = request.queryParam("beerName")
+                .filter(name -> !name.trim().isEmpty())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Beer name must not be empty or contain only whitespace"));
+            Mono<BeerDto> firstBeerMono = beerService.findFirstByBeerName(beerName);
             beerDtoFlux = Flux.from(firstBeerMono);
         } else {
             beerDtoFlux = beerService.listBeers();
@@ -51,7 +57,7 @@ public class BeerHandler {
     }
 
     public Mono<ServerResponse> createNewBeer(ServerRequest request){
-        return beerService.saveBeer(request.bodyToMono(BeerDto.class).doOnNext(beerDTO -> validate(beerDTO)))
+        return beerService.saveBeer(request.bodyToMono(BeerDto.class).doOnNext(this::validate))
             .flatMap(beerDTO -> ServerResponse
                 .created(UriComponentsBuilder
                     .fromPath(BeerRouterConfig.BEER_PATH_ID)
@@ -61,7 +67,7 @@ public class BeerHandler {
 
     public Mono<ServerResponse> updateBeerById(ServerRequest request) {
         return request.bodyToMono(BeerDto.class)
-            .doOnNext(beerDTO -> validate(beerDTO))
+            .doOnNext(this::validate)
             .flatMap(beerDto -> beerService
                 .updateBeer(request.pathVariable("beerId"), beerDto))
             .switchIfEmpty(Mono.error(new ResponseStatusException(NOT_FOUND, "Beer not found")))
@@ -70,7 +76,7 @@ public class BeerHandler {
 
     public Mono<ServerResponse> patchBeerById(ServerRequest request) {
         return request.bodyToMono(BeerDto.class)
-            .doOnNext(beerDTO -> validate(beerDTO))
+            .doOnNext(this::validate)
             .flatMap(beerDto -> beerService
                 .patchBeer(request.pathVariable("beerId"), beerDto))
             .switchIfEmpty(Mono.error(new ResponseStatusException(NOT_FOUND, "Beer not found")))
