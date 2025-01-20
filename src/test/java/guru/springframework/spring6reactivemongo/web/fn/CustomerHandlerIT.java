@@ -109,7 +109,7 @@ class CustomerHandlerIT {
             .getLocation()
             .toString();
 
-        System.out.println("Location: " + location);
+        log.info("Location: " + location);
         assertNotNull(location);
 
         CustomerDto createdCustomer = getCustomerByLocation(location);
