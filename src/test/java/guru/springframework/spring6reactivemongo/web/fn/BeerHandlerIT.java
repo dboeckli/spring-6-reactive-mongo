@@ -147,7 +147,7 @@ class BeerHandlerIT {
             .getLocation()
             .toString();
 
-        System.out.println("Location: " + location);
+        log.info("Location: " + location);
         assertNotNull(location);
         
         BeerDto createdBeer = getBeerByLocation(location);
@@ -171,7 +171,7 @@ class BeerHandlerIT {
             .getLocation()
             .toString();
 
-        System.out.println("Location: " + location);
+        log.info("Location: " + location);
         assertNotNull(location);
 
         BeerDto createdBeer = getBeerByLocation(location);

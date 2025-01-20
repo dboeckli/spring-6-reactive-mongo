@@ -82,7 +82,7 @@ class BeerServiceImplDockerComposeIT {
         AtomicBoolean waitingForSearch = new AtomicBoolean(false);
         AtomicReference<BeerDto> waitingForSearchedBeer = new AtomicReference<>();
         foundBeer.subscribe(foundDto -> {
-            System.out.println("Found Beer ID: " + foundDto.getId());
+            log.info("Found Beer ID: " + foundDto.getId());
             waitingForSearch.set(true);
             waitingForSearchedBeer.set(foundDto);
         });
@@ -109,7 +109,7 @@ class BeerServiceImplDockerComposeIT {
         beerService.findByBeerStyle("gugustyle")
             .collectList()
             .subscribe(dtos -> {
-                System.out.println(dtos.toString());
+                log.info(dtos.toString());
                 waitingForSearch.set(true);
                 waitingForSearchedBeers.set(dtos);
             });
@@ -151,7 +151,7 @@ class BeerServiceImplDockerComposeIT {
         Mono<BeerDto> savedMono = beerService.saveBeer(Mono.just(beerMapper.beerToBeerDto(getTestBeer())));
 
         savedMono.subscribe(savedDto -> {
-            System.out.println("Save Beer ID: " + savedDto.getId());
+            log.info("Save Beer ID: " + savedDto.getId());
             waitingForSave.set(true);
             waitingForSavedBeer.set(savedDto);
         });
