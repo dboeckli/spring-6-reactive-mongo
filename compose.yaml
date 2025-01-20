@@ -1,6 +1,6 @@
 services:
   mongodb:
-    image: 'mongo:6.0.10'
+    image: 'mongo:8.0.3'
     environment:
       - 'MONGO_INITDB_DATABASE=sfg'
       - 'MONGO_INITDB_ROOT_USERNAME=root'
@@ -23,5 +23,4 @@ services:
     expose:
       - 9000
     environment:
-      SPRING_SECURITY_OAUTH2_AUTHORIZATION_SERVER_ISSUER: http://localhost:9000 
-      
+      SPRING_SECURITY_OAUTH2_AUTHORIZATION_SERVER_ISSUER: http://localhost:9000
