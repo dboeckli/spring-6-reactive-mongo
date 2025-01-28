@@ -15,6 +15,12 @@ You can find the part in the spring boot startup log or via the "docker ps" comm
 
 In Unit Test we are using the TestContainer within Docker which requires Docker Desktop installed. In that case the port does change with each test.
 
+## Urls
+
+openapi api-docs: http://localhost:8083/v3/api-docs
+openapi gui: http://localhost:8083/swagger-ui/index.html
+openapi-yaml: http://localhost:8083/v3/api-docs.yaml
+
 ## Docker
 
 ### create image

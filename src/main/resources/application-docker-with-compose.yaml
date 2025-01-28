@@ -47,3 +47,6 @@ logbook:
 logging:
   level:
     org.zalando.logbook: TRACE      
+    
+springdoc:
+  show-actuator: false    

@@ -1,6 +1,8 @@
 package guru.springframework.spring6reactivemongo.web.fn;
 
 import lombok.AllArgsConstructor;
+import org.springdoc.core.annotations.RouterOperation;
+import org.springdoc.core.annotations.RouterOperations;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.server.RouterFunction;
@@ -20,6 +22,14 @@ public class BeerRouterConfig {
     private final BeerHandler beerHandler;
 
     @Bean
+    @RouterOperations({
+        @RouterOperation(path = BEER_PATH, beanClass = BeerHandler.class, beanMethod = "listBeers"),
+        @RouterOperation(path = BEER_PATH_ID, beanClass = BeerHandler.class, beanMethod = "getBeerById"),
+        @RouterOperation(path = BEER_PATH, beanClass = BeerHandler.class, beanMethod = "createNewBeer"),
+        @RouterOperation(path = BEER_PATH_ID, beanClass = BeerHandler.class, beanMethod = "updateBeerById"),
+        @RouterOperation(path = BEER_PATH_ID, beanClass = BeerHandler.class, beanMethod = "patchBeerById"),
+        @RouterOperation(path = BEER_PATH_ID, beanClass = BeerHandler.class, beanMethod = "deleteBeerById")
+    })
     public RouterFunction<ServerResponse> beerRoutes() {
         return route()
             .GET(BEER_PATH, accept(APPLICATION_JSON), beerHandler::listBeers)

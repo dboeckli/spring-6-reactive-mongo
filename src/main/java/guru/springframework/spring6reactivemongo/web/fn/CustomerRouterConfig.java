@@ -1,6 +1,8 @@
 package guru.springframework.spring6reactivemongo.web.fn;
 
 import lombok.AllArgsConstructor;
+import org.springdoc.core.annotations.RouterOperation;
+import org.springdoc.core.annotations.RouterOperations;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.server.RouterFunction;
@@ -20,6 +22,14 @@ public class CustomerRouterConfig {
     private final CustomerHandler customerHandler;
 
     @Bean
+    @RouterOperations({ 
+        @RouterOperation(path = CUSTOMER_PATH, beanClass = CustomerHandler.class, beanMethod = "listCustomers"),
+        @RouterOperation(path = CUSTOMER_PATH_ID, beanClass = CustomerHandler.class, beanMethod = "getCustomerById"),
+        @RouterOperation(path = CUSTOMER_PATH, beanClass = CustomerHandler.class, beanMethod = "createCustomer"),
+        @RouterOperation(path = CUSTOMER_PATH_ID, beanClass = CustomerHandler.class, beanMethod = "updateCustomerById"),
+        @RouterOperation(path = CUSTOMER_PATH_ID, beanClass = CustomerHandler.class, beanMethod = "patchCustomerById"),
+        @RouterOperation(path = CUSTOMER_PATH_ID, beanClass = CustomerHandler.class, beanMethod = "deleteCustomerById")
+    })
     public RouterFunction<ServerResponse> customerRoutes() {
         return route()
             .GET(CUSTOMER_PATH, accept(APPLICATION_JSON), customerHandler::listCustomers)

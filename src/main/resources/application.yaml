@@ -58,4 +58,7 @@ spring:
     compose:
       enabled: false
       stop:
-        command: down        
+        command: down       
+          
+springdoc:
+  show-actuator: false          
