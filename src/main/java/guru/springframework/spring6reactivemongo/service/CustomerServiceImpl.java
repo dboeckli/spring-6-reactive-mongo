@@ -3,19 +3,23 @@ package guru.springframework.spring6reactivemongo.service;
 import guru.springframework.spring6reactivemongo.dto.CustomerDto;
 import guru.springframework.spring6reactivemongo.mapper.CustomerMapper;
 import guru.springframework.spring6reactivemongo.repository.CustomerRepository;
-import lombok.AllArgsConstructor;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-@Service
-@AllArgsConstructor
-public class CustomerServiceImpl implements CustomerService {
-    
-    CustomerRepository customerRepository;
+import static guru.springframework.spring6reactivemongo.config.OpenApiConfiguration.SECURITY_SCHEME_NAME;
 
-    CustomerMapper customerMapper;
+@Service
+@RequiredArgsConstructor
+@SecurityRequirement(name = SECURITY_SCHEME_NAME)
+public class CustomerServiceImpl implements CustomerService {
+
+    private final CustomerRepository customerRepository;
+
+    private final CustomerMapper customerMapper;
     
     @Override
     public Mono<CustomerDto> saveCustomer(Mono<CustomerDto> customerDto) {

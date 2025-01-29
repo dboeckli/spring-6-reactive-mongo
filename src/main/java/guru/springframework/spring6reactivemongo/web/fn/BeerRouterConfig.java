@@ -1,5 +1,6 @@
 package guru.springframework.spring6reactivemongo.web.fn;
 
+import guru.springframework.spring6reactivemongo.service.BeerService;
 import lombok.AllArgsConstructor;
 import org.springdoc.core.annotations.RouterOperation;
 import org.springdoc.core.annotations.RouterOperations;
@@ -9,6 +10,7 @@ import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.web.bind.annotation.RequestMethod.*;
 import static org.springframework.web.reactive.function.server.RequestPredicates.accept;
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
 
@@ -23,12 +25,12 @@ public class BeerRouterConfig {
 
     @Bean
     @RouterOperations({
-        @RouterOperation(path = BEER_PATH, beanClass = BeerHandler.class, beanMethod = "listBeers"),
-        @RouterOperation(path = BEER_PATH_ID, beanClass = BeerHandler.class, beanMethod = "getBeerById"),
-        @RouterOperation(path = BEER_PATH, beanClass = BeerHandler.class, beanMethod = "createNewBeer"),
-        @RouterOperation(path = BEER_PATH_ID, beanClass = BeerHandler.class, beanMethod = "updateBeerById"),
-        @RouterOperation(path = BEER_PATH_ID, beanClass = BeerHandler.class, beanMethod = "patchBeerById"),
-        @RouterOperation(path = BEER_PATH_ID, beanClass = BeerHandler.class, beanMethod = "deleteBeerById")
+        @RouterOperation(method = GET, path = BEER_PATH, beanClass = BeerService.class, beanMethod = "listBeers"),
+        @RouterOperation(method = GET, path = BEER_PATH_ID, beanClass = BeerService.class, beanMethod = "getById"),
+        @RouterOperation(method = POST, path = BEER_PATH, beanClass = BeerService.class, beanMethod = "saveBeer"),
+        @RouterOperation(method = PUT, path = BEER_PATH_ID, beanClass = BeerService.class, beanMethod = "updateBeer"),
+        @RouterOperation(method = PATCH, path = BEER_PATH_ID, beanClass = BeerService.class, beanMethod = "patchBeer"),
+        @RouterOperation(method = DELETE, path = BEER_PATH_ID, beanClass = BeerService.class, beanMethod = "deleteBeerById")
     })
     public RouterFunction<ServerResponse> beerRoutes() {
         return route()
