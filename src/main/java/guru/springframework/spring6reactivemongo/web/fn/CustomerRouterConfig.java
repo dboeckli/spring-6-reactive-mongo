@@ -1,5 +1,6 @@
 package guru.springframework.spring6reactivemongo.web.fn;
 
+import guru.springframework.spring6reactivemongo.service.CustomerService;
 import lombok.AllArgsConstructor;
 import org.springdoc.core.annotations.RouterOperation;
 import org.springdoc.core.annotations.RouterOperations;
@@ -9,6 +10,7 @@ import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.web.bind.annotation.RequestMethod.*;
 import static org.springframework.web.reactive.function.server.RequestPredicates.accept;
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
 
@@ -23,12 +25,12 @@ public class CustomerRouterConfig {
 
     @Bean
     @RouterOperations({ 
-        @RouterOperation(path = CUSTOMER_PATH, beanClass = CustomerHandler.class, beanMethod = "listCustomers"),
-        @RouterOperation(path = CUSTOMER_PATH_ID, beanClass = CustomerHandler.class, beanMethod = "getCustomerById"),
-        @RouterOperation(path = CUSTOMER_PATH, beanClass = CustomerHandler.class, beanMethod = "createCustomer"),
-        @RouterOperation(path = CUSTOMER_PATH_ID, beanClass = CustomerHandler.class, beanMethod = "updateCustomerById"),
-        @RouterOperation(path = CUSTOMER_PATH_ID, beanClass = CustomerHandler.class, beanMethod = "patchCustomerById"),
-        @RouterOperation(path = CUSTOMER_PATH_ID, beanClass = CustomerHandler.class, beanMethod = "deleteCustomerById")
+        @RouterOperation(method = GET, path = CUSTOMER_PATH, beanClass = CustomerService.class, beanMethod = "listCustomers"),
+        @RouterOperation(method = GET, path = CUSTOMER_PATH_ID, beanClass = CustomerService.class, beanMethod = "getById"),
+        @RouterOperation(method = POST, path = CUSTOMER_PATH, beanClass = CustomerService.class, beanMethod = "saveCustomer"),
+        @RouterOperation(method = PUT, path = CUSTOMER_PATH_ID, beanClass = CustomerService.class, beanMethod = "updateCustomer"),
+        @RouterOperation(method = PATCH, path = CUSTOMER_PATH_ID, beanClass = CustomerService.class, beanMethod = "patchCustomer"),
+        @RouterOperation(method = DELETE, path = CUSTOMER_PATH_ID, beanClass = CustomerService.class, beanMethod = "deleteCustomerById")
     })
     public RouterFunction<ServerResponse> customerRoutes() {
         return route()

@@ -3,16 +3,20 @@ package guru.springframework.spring6reactivemongo.service;
 import guru.springframework.spring6reactivemongo.dto.BeerDto;
 import guru.springframework.spring6reactivemongo.mapper.BeerMapper;
 import guru.springframework.spring6reactivemongo.repository.BeerRepository;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import static guru.springframework.spring6reactivemongo.config.OpenApiConfiguration.SECURITY_SCHEME_NAME;
+
 @Service
 @RequiredArgsConstructor
-@Log
+@Slf4j
+@SecurityRequirement(name = SECURITY_SCHEME_NAME)
 public class BeerServiceImpl implements BeerService {
 
     private final BeerMapper beerMapper;
@@ -26,11 +30,12 @@ public class BeerServiceImpl implements BeerService {
             .map(beerMapper::beerToBeerDto);
     }
 
+    /*
     @Override
     public Mono<BeerDto> saveBeer(BeerDto beerDto) {
         return beerRepository.save(beerMapper.beerDtoToBeer(beerDto))
             .map(beerMapper::beerToBeerDto);
-    }
+    }*/
 
     @Override
     public Mono<BeerDto> getById(String beerId) {
