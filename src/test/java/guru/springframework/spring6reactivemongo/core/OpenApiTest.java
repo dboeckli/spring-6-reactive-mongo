@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.info.BuildProperties;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
@@ -28,6 +29,9 @@ class OpenApiTest {
     @Autowired
     ObjectMapper objectMapper;
 
+    @Autowired
+    BuildProperties buildProperties;
+
     @Test
     void openapiGetJsonTest() throws JsonProcessingException {
         EntityExchangeResult<byte[]> result = webTestClient.get().uri("/v3/api-docs")
@@ -43,7 +47,7 @@ class OpenApiTest {
         assertThat(jsonNode.has("info")).isTrue();
         JsonNode infoNode = jsonNode.get("info");
         assertThat(infoNode.has("title")).isTrue();
-        assertThat(infoNode.get("title").asText()).isEqualTo("spring-6-reactive-mongo");
+        assertThat(infoNode.get("title").asText()).isEqualTo(buildProperties.getName());
     }
 
 }
