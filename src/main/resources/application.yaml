@@ -72,6 +72,9 @@ springdoc:
       client-secret: secret  
         
 security:
+  authorization-url: http://localhost:9000/oauth2/auth
+  token-url: http://localhost:9000/oauth2/token
+  refresh-url: http://localhost:9000/oauth2/refresh-token
   cors:
     # gateway project runs on port 8080
     allowed-origins: http://localhost:8080,http://127.0.0.1:8080               

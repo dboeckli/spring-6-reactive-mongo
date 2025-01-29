@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.security.OAuthScope;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.customizers.OpenApiCustomizer;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -44,6 +45,13 @@ public class OpenApiConfiguration {
     
     private final BuildProperties buildProperties;
 
+    @Value("${security.authorization-url:http://localhost:9000/oauth2/auth}")
+    private String authorizationUrl;
+    @Value("${security.token-url:http://localhost:9000/oauth2/token}")
+    private String tokenUrl;
+    @Value("${security.refresh-url:http://localhost:9000/oauth2/refresh-token}")
+    private String refreshUrl;
+
     public final static String SECURITY_SCHEME_NAME = "Bearer Authentication";
 
     @Bean
@@ -52,6 +60,19 @@ public class OpenApiConfiguration {
             io.swagger.v3.oas.models.info.Info info = openApi.getInfo();
             info.setTitle(buildProperties.getName());
             info.setVersion(buildProperties.getVersion());
+
+            // Update OAuth URLs
+            openApi.getComponents().getSecuritySchemes().values().stream()
+                .filter(scheme -> scheme.getType() == io.swagger.v3.oas.models.security.SecurityScheme.Type.OAUTH2)
+                .forEach(scheme -> {
+                    io.swagger.v3.oas.models.security.OAuthFlows flows = scheme.getFlows();
+                    if (flows.getClientCredentials() != null) {
+                        flows.getClientCredentials()
+                            .authorizationUrl(authorizationUrl)
+                            .tokenUrl(tokenUrl)
+                            .refreshUrl(refreshUrl);
+                    }
+                });
         };
     }
 }

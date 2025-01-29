@@ -38,13 +38,12 @@ class OpenApiTest {
 
         String jsonResponse = new String(Objects.requireNonNull(result.getResponseBody()));
         JsonNode jsonNode = objectMapper.readTree(jsonResponse);
+        log.info("Response:\n{}", objectMapper.writeValueAsString(jsonNode));
 
         assertThat(jsonNode.has("info")).isTrue();
         JsonNode infoNode = jsonNode.get("info");
         assertThat(infoNode.has("title")).isTrue();
-        assertThat(infoNode.get("title").asText()).isEqualTo("OpenAPI definition");
-        
-        log.info("Response:\n{}", objectMapper.writeValueAsString(jsonNode));
+        assertThat(infoNode.get("title").asText()).isEqualTo("spring-6-reactive-mongo");
     }
 
 }
