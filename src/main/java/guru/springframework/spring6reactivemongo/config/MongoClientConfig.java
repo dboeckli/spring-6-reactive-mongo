@@ -57,11 +57,9 @@ public class MongoClientConfig extends AbstractReactiveMongoConfiguration {
             .applyToSocketSettings(socketSettings -> socketSettings
                 .connectTimeout(1, TimeUnit.MINUTES)
                 .readTimeout(1, TimeUnit.MINUTES))
-            .applyToClusterSettings(settings -> {
-            settings.hosts((singletonList(
+            .applyToClusterSettings(settings -> settings.hosts((singletonList(
                 new ServerAddress(connectionDetails.host, connectionDetails.port)
-            )));
-        });
+            ))));
         // this is only used when we start the application with the docker-compose profile. in that case we connect to the Docker MongoDB instance.
         if (username!= null &&!username.isEmpty()) {
             log.info("#### Mongo DB authentication enabled");

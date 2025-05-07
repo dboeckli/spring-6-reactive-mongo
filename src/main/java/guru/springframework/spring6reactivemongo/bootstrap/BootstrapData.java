@@ -24,15 +24,11 @@ public class BootstrapData implements CommandLineRunner {
     @Override
     public void run(String... args) {
         beerRepository.deleteAll()
-            .doOnSuccess(success -> {
-                loadBeerData();
-            })
+            .doOnSuccess(success -> loadBeerData())
             .subscribe();
 
         customerRepository.deleteAll()
-            .doOnSuccess(success -> {
-                loadCustomerData();
-            })
+            .doOnSuccess(success -> loadCustomerData())
             .subscribe();
     }
 
