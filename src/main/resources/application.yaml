@@ -40,6 +40,7 @@ logbook:
       - path: /h2-console/**  # Exclude H2 console
       - path: /swagger-ui/**  # Exclude Swagger UI if used
       - path: /v3/api-docs/** # Exclude OpenAPI docs if used
+      - path: /favicon.ico
       # Add more exclusions as needed
 
 spring:
