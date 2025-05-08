@@ -18,7 +18,7 @@ spec:
       initContainers:
         - name: wait-for-mongo
           image: busybox:1.37.0
-          command: [ 'sh', '-c', 'until nc -z {{ .Chart.Name }}-mongodb {{ .Values.mongodb.port }}; do echo "[busybox: wait-for-mongodb] waiting for mongodb"; sleep 2; done; echo "[busybox: wait-for-mongodb] mongodb is available"' ]
+          command: [ 'sh', '-c', 'until nc -z {{ include "application-template.fullname" . }}-mongodb {{ .Values.mongodb.port }}; do echo "[busybox: wait-for-mongodb] waiting for mongodb"; sleep 2; done; echo "[busybox: wait-for-mongodb] mongodb is available"' ]
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
@@ -28,6 +28,22 @@ spec:
               value: "{{ .Values.global.timezone }}"
             - name: SPRING_PROFILES_ACTIVE
               value: {{ .Values.spring.profiles.active | default "local" }}
+            - name: SPRING_DATA_MONGODB_HOST
+              value: "{{ include "application-template.fullname" . }}-mongodb"
+            - name: SPRING_DATA_MONGODB_PORT
+              value: "{{ .Values.mongodb.port }}"
+            - name: SPRING_DATA_MONGODB_URI
+              value: "mongodb://{{ include "application-template.fullname" . }}-mongodb:{{ .Values.mongodb.port }}/{{ .Values.mongodb.database }}"
+            - name: SPRING_DATA_MONGODB_DATABASE
+              value: {{ .Values.mongodb.database }}
+            - name: SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI
+              value: "http://{{ include "application-template.fullname" . }}-auth-server:9000"
+            - name: SECURITY_AUTHORIZATION_URL
+              value: "http://localhost:30900/oauth2/auth"
+            - name: SECURITY_TOKEN_URL
+              value: "http://localhost:30900/oauth2/token"
+            - name: SECURITY_REFRESH_URL
+              value: "http://localhost:30900/oauth2/refresh-token"  
           envFrom:
             - secretRef:
                 name: {{ include "application-template.fullname" . }}-mongodb-secrets

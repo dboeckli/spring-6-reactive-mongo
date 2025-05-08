@@ -51,7 +51,7 @@ docker start reactive-mongo
 docker logs reactive-mongo
 ```
 
-### Deployment with Kubernetes
+## Deployment with Kubernetes
 
 To deploy all resources:
 ```bash
@@ -89,10 +89,10 @@ tar -xvf $file.Name
 install
 ```powershell
 $APPLICATION_NAME = Get-ChildItem -Directory | Where-Object { $_.LastWriteTime -ge $file.LastWriteTime } | Select-Object -ExpandProperty Name
-helm upgrade --install $APPLICATION_NAME ./$APPLICATION_NAME --wait --timeout 5m --debug
+helm upgrade --install $APPLICATION_NAME ./$APPLICATION_NAME --namespace spring-6-reactive-mongo --create-namespace --wait --timeout 5m --debug
 ```
 
-show logs
+show logs and show event
 ```powershell
 kubectl get pods -l app.kubernetes.io/name=$APPLICATION_NAME -n spring-6-reactive-mongo
 ```
@@ -101,9 +101,16 @@ replace $POD with pods from the command above
 kubectl logs $POD -n spring-6-reactive-mongo --all-containers
 ```
 
+Show Details and Event
+
+$POD_NAME can be: spring-6-reactive-mongo-mongodb, spring-6-reactive-mongo
+```powershell
+kubectl describe pod $POD_NAME -n spring-6-reactive-mongo
+```
+
 uninstall
 ```powershell
-helm uninstall $APPLICATION_NAME
+helm uninstall $APPLICATION_NAME --namespace spring-6-reactive-mongo
 ```
 
 You can use the actuator rest call to verify via port 30083

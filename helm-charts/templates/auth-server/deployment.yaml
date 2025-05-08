@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "application-template.fullname" . }}-auth-server
+  labels:
+      {{- include "application-template.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "application-template.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "application-template.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: auth-server
+          image: domboeckli/spring-6-auth-server:0.0.3-SNAPSHOT
+          env:
+            - name: SPRING_SECURITY_OAUTH2_AUTHORIZATION_SERVER_ISSUER
+              value: "http://{{ include "application-template.fullname" . }}-auth-server:9000"
+          ports:
+            - name: http
+              containerPort: {{ .Values.authServer.targetPort }}
+          startupProbe:
+            httpGet:
+              path: /actuator/health
+              port: http
+            failureThreshold: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: http
+            #initialDelaySeconds: 300
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 6
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+            #initialDelaySeconds: 300
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 6

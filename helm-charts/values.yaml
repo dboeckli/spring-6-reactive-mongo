@@ -1,7 +1,7 @@
 replicaCount: 1
 
 image:
-  repository: domboeckli/@project.artifactId@
+  repository: @docker.repo@/@project.artifactId@
   tag: @project.version@
 
 # Namespace configuration
@@ -10,9 +10,9 @@ deployment:
   namespace: spring-6-reactive-mongo
 
 service:
-  type: NodePort
   port: 80
-  targetPort: 8080
+  targetPort: 8083
+  nodePort: 30083
 
 resources:
   limits:
@@ -44,5 +44,15 @@ probes:
     timeoutSeconds: 5
     failureThreshold: 6
     
-  mongodb:
-    port: 2222
+mongodb:
+  port: 27017
+  targetPort: 27017
+  nodePort: 30017
+  
+  database: "sfg"
+  
+authServer:
+  port: 9000
+  targetPort: 9000
+  nodePort: 30900
+    

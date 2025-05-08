@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: spring-6-reactive-mongo
+  name: @project.artifactId@
 spec:
   type: NodePort
   ports:
@@ -10,32 +10,32 @@ spec:
       targetPort: 8083
       nodePort: 30083
   selector:
-    app: spring-6-reactive-mongo
+    app: @project.artifactId@
 
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: spring-6-reactive-mongo
+  name: @project.artifactId@
   labels:
-    app: spring-6-reactive-mongo
+    app: @project.artifactId@
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: spring-6-reactive-mongo
+      app: @project.artifactId@
   template:
     metadata:
       labels:
-        app: spring-6-reactive-mongo
+        app: @project.artifactId@
     spec:
       initContainers:
         - name: wait-for-mongo
           image: busybox:1.37.0
           command: [ 'sh', '-c', 'until nc -z mongodb 27017; do echo "[busybox: wait-for-mongodb] waiting for mongodb"; sleep 2; done; echo "[busybox: wait-for-mongodb] mongodb is available"' ]
       containers:
-        - name: spring-6-reactive-mongo
-          image: @docker.repo@/spring-6-reactive-mongo:@project.version@
+        - name: @project.artifactId@
+          image: @docker.repo@/@project.artifactId@:@project.version@
           env:
             - name: SPRING_DATA_MONGODB_HOST
               value: "mongodb"
