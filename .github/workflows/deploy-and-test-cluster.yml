@@ -153,6 +153,7 @@ jobs:
           helm upgrade --install $APPLICATION_NAME ./$APPLICATION_NAME \
           --set image.tag=${APP_VERSION} \
           --namespace ${NAMESPACE} \
+          --create-namespace \
           --wait --timeout 5m \
           --debug
 
