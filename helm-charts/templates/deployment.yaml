@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "application-template.fullname" . }}
+  namespace: {{ .Values.deployment.namespace }}
+  labels:
+    {{- include "application-template.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "application-template.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "application-template.selectorLabels" . | nindent 8 }}
+    spec:
+      initContainers:
+        - name: wait-for-mongo
+          image: busybox:1.37.0
+          command: [ 'sh', '-c', 'until nc -z {{ include "application-template.fullname" . }}-mongodb {{ .Values.mongodb.port }}; do echo "[busybox: wait-for-mongodb] waiting for mongodb"; sleep 2; done; echo "[busybox: wait-for-mongodb] mongodb is available"' ]
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: JAVA_TIMEZONE
+              value: "{{ .Values.global.timezone }}"
+            - name: SPRING_PROFILES_ACTIVE
+              value: {{ .Values.spring.profiles.active | default "local" }}
+            - name: SPRING_DATA_MONGODB_HOST
+              value: "{{ include "application-template.fullname" . }}-mongodb"
+            - name: SPRING_DATA_MONGODB_PORT
+              value: "{{ .Values.mongodb.port }}"
+            - name: SPRING_DATA_MONGODB_URI
+              value: "mongodb://{{ include "application-template.fullname" . }}-mongodb:{{ .Values.mongodb.port }}/{{ .Values.mongodb.database }}"
+            - name: SPRING_DATA_MONGODB_DATABASE
+              value: {{ .Values.mongodb.database }}
+            - name: SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI
+              value: "http://{{ include "application-template.fullname" . }}-auth-server:9000"
+            - name: SECURITY_AUTHORIZATION_URL
+              value: "http://localhost:30900/oauth2/auth"
+            - name: SECURITY_TOKEN_URL
+              value: "http://localhost:30900/oauth2/token"
+            - name: SECURITY_REFRESH_URL
+              value: "http://localhost:30900/oauth2/refresh-token"  
+          envFrom:
+            - secretRef:
+                name: {{ include "application-template.fullname" . }}-mongodb-secrets
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.targetPort }}
+              protocol: TCP
+          startupProbe:
+            httpGet:
+              path: /actuator/health
+              port: http
+            failureThreshold: {{ .Values.probes.startup.failureThreshold }}
+            periodSeconds: {{ .Values.probes.startup.periodSeconds }}
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: http
+            periodSeconds: {{ .Values.probes.readiness.periodSeconds }}
+            timeoutSeconds: {{ .Values.probes.readiness.timeoutSeconds }}
+            failureThreshold: {{ .Values.probes.readiness.failureThreshold }}
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+            periodSeconds: {{ .Values.probes.liveness.periodSeconds }}
+            timeoutSeconds: {{ .Values.probes.liveness.timeoutSeconds }}
+            failureThreshold: {{ .Values.probes.liveness.failureThreshold }}
+          volumeMounts:
+            - mountPath: "{{ .Values.global.timezonePath }}"
+              name: time
+              readOnly: true
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+        - name: time
+          hostPath:
+            path: {{ .Values.global.timezonePath }}
+            type: ""

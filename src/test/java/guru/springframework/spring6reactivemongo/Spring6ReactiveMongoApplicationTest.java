@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @Log
 @Import(TestMongoDockerContainer.class)
 @ExtendWith(MongoExtension.class)
-class Spring6ReactiveMongoApplicationTests {
+class Spring6ReactiveMongoApplicationTest {
 
     @Autowired
     BeerService beerService;
