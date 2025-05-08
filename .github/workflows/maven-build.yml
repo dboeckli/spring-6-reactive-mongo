@@ -211,12 +211,19 @@ jobs:
           echo "### helm chart version is: $HELM_CHART_VERSION"
           echo "HELM_CHART_VERSION=$HELM_CHART_VERSION" >> $GITHUB_OUTPUT
           
-          NAMESPACE=$(grep 'name:' target/helm-templated/$ARTIFACT_ID/templates/namespace.yaml | awk '{print $2}') 
-          if [ -z "$NAMESPACE" ]; then
-            NAMESPACE="default"
+          YAML_FILE="target/helm-templated/$ARTIFACT_ID/templates/deployment.yaml"
+          if [ -f "$YAML_FILE" ]; then
+            NAMESPACE=$(grep '^\s*namespace:' "$YAML_FILE" | awk '{print $2}' | tr -d '"')
+            if [ -z "$NAMESPACE" ]; then
+              echo "::warning::No namespace found in $YAML_FILE, using default"
+              NAMESPACE="default"
+            fi
+          else
+            echo "::error::File $YAML_FILE not found"
+            exit 1
           fi
           echo "### namespace is: $NAMESPACE"
-          echo "NAMESPACE=$NAMESPACE" >> $GITHUB_OUTPUT 
+          echo "NAMESPACE=$NAMESPACE" >> $GITHUB_OUTPUT
           
           echo ":sailboat: Helm Chart Version: $HELM_CHART_VERSION" >> $GITHUB_STEP_SUMMARY
           echo ":sailboat: Namespace: $NAMESPACE" >> $GITHUB_STEP_SUMMARY
