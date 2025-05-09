@@ -10,7 +10,7 @@ metadata:
 spec:
   containers:
     - name: wget
-      image: busybox
+      image: busybox:1.37.0
       command: ['wget']
       args: ['{{ include "application-template.fullname" . }}:{{ .Values.service.port }}/actuator/health']
   restartPolicy: Never
