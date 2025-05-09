@@ -9,6 +9,11 @@ on:
     branches: [ "main", "master" ]
   schedule:
     - cron: '5 3 * * *' 
+      
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false      
+      
 jobs:
 
   setup:
