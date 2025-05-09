@@ -4,7 +4,7 @@ server:
 spring:
   application:
     name: spring-6-reactive-mongo
-  
+    
   data:
     mongodb:
       # uri will be changed to the exposed port when the docker container has started
@@ -64,6 +64,27 @@ springdoc:
       client-id: messaging-client
       client-secret: secret   
       
+management:
+  health:
+    readinessstate:
+      enabled: true
+    livenessstate:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    configprops:
+      # WARNING: SECURITY RISK - DO NOT USE IN PRODUCTION ENVIRONMENT
+      # This configuration exposes sensitive data and should only be used for development or testing purposes.
+      # Ensure this is disabled in any environment where security is a concern.
+      show-values: ALWAYS 
+    health:
+      probes:
+        enabled: true
+      show-details: always
+
 security:
   authorization-url: http://localhost:9000/oauth2/auth
   token-url: http://localhost:9000/oauth2/token
