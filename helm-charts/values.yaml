@@ -10,6 +10,7 @@ deployment:
   namespace: spring-6-reactive-mongo
 
 service:
+  type: NodePort
   port: 80
   targetPort: 8083
   nodePort: 30083
@@ -55,4 +56,6 @@ authServer:
   port: 9000
   targetPort: 9000
   nodePort: 30900
-    
+
+ingress:
+  enabled: false

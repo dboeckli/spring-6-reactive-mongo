@@ -53,6 +53,8 @@ docker logs reactive-mongo
 
 ## Deployment with Kubernetes
 
+Deployment goes into the default namespace.
+
 To deploy all resources:
 ```bash
 kubectl apply -f target/k8s/
