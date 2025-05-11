@@ -27,7 +27,11 @@ global:
   timezone: Europe/Zurich
   timezonePath: /etc/localtime
   springDebug: false
-
+  authServer:
+    port: 9000
+    targetPort: 9000
+    nodePort: 30900
+  
 spring:
   profiles:
     active: local
@@ -52,10 +56,13 @@ mongodb:
   
   database: "sfg"
   
-authServer:
-  port: 9000
-  targetPort: 9000
-  nodePort: 30900
+spring-6-auth-server:
+  deployment:
+    namespace: spring-6-reactive-mongo
+  authServer:
+    port: 9000
+    targetPort: 9000
+    nodePort: 30900  
 
 ingress:
   enabled: false
