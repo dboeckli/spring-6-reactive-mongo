@@ -702,6 +702,13 @@
 
                 <executions>
                     <execution>
+                        <id>execute-helm-dependencies</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>dependency-build</goal>
+                        </goals>
+                    </execution>
+                    <execution>
                         <id>execute-helm-lint</id>
                         <phase>test</phase>
                         <goals>
