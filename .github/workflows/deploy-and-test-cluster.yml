@@ -140,7 +140,7 @@ jobs:
         run: |
           echo "Pulling Helm Chart Version: $HELM_CHART_VERSION"
           helm pull oci://registry-1.docker.io/$DOCKER_USER/$APPLICATION_NAME --version "$HELM_CHART_VERSION"
-          tar -xvf $APPLICATION_NAME-*.tgz  
+          tar -xvf $APPLICATION_NAME-v*.tgz  
 
       - name: Deploy application with Helm
         env:

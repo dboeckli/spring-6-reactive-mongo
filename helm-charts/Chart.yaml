@@ -6,6 +6,6 @@ version: @helm.chart.version@
 appVersion: @project.version@
 
 dependencies:
-  - name: mongodb
+  - name: spring-6-reactive-mongo-mongodb
     version: @helm.chart.version@
-    repository: file://charts/mongodb
+    repository: file://charts/spring-6-reactive-mongo-mongodb

@@ -1,0 +1,6 @@
+apiVersion: v2
+name: spring-6-reactive-mongo-mongodb
+description: A Helm chart for MongoDB used in Spring 6 Reactive MongoDB application
+type: application
+version: @helm.chart.version@
+appVersion: "8.0.9"

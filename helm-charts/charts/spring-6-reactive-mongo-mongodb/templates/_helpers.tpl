@@ -1,7 +1,7 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "application-template.name" -}}
+{{- define "spring-6-reactive-mongo-mongodb.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
@@ -10,7 +10,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "application-template.fullname" -}}
+{{- define "spring-6-reactive-mongo-mongodb.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -26,16 +26,16 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "application-template.chart" -}}
+{{- define "spring-6-reactive-mongo-mongodb.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Common labels
 */}}
-{{- define "application-template.labels" -}}
-helm.sh/chart: {{ include "application-template.chart" . }}
-{{ include "application-template.selectorLabels" . }}
+{{- define "spring-6-reactive-mongo-mongodb.labels" -}}
+helm.sh/chart: {{ include "spring-6-reactive-mongo-mongodb.chart" . }}
+{{ include "spring-6-reactive-mongo-mongodb.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -45,7 +45,7 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Selector labels
 */}}
-{{- define "application-template.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "application-template.name" . }}
+{{- define "spring-6-reactive-mongo-mongodb.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "spring-6-reactive-mongo-mongodb.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}

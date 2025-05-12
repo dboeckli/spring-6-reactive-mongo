@@ -18,7 +18,7 @@ spec:
       initContainers:
         - name: wait-for-mongo
           image: busybox:1.37.0
-          command: [ 'sh', '-c', 'until nc -z mongodb.{{ .Release.Namespace }}.svc.cluster.local {{ .Values.mongodb.port }}; do echo "[busybox: wait-for-mongodb] waiting for mongodb"; sleep 2; done; echo "[busybox: wait-for-mongodb] mongodb is available"' ]
+          command: [ 'sh', '-c', 'until nc -z {{ .Release.Name }}-spring-6-reactive-mongo-mongodb.{{ .Release.Namespace }}.svc.cluster.local {{ .Values.mongodb.port }}; do echo "[busybox: wait-for-mongodb] waiting for mongodb"; sleep 2; done; echo "[busybox: wait-for-mongodb] mongodb is available"' ]
         - name: wait-for-auth-server
           image: busybox:1.37.0
           command: [ 'sh', '-c', 'until nc -z {{ include "application-template.fullname" . }}-auth-server {{ .Values.authServer.port }}; do echo "[busybox: wait-for-auth-server] waiting for auth-server"; sleep 2; done; echo "[busybox: wait-for-auth-server] auth-server is available"' ]
@@ -32,11 +32,11 @@ spec:
             - name: SPRING_PROFILES_ACTIVE
               value: {{ .Values.spring.profiles.active | default "local" }}
             - name: SPRING_DATA_MONGODB_HOST
-              value: "mongodb.{{ .Release.Namespace }}.svc.cluster.local"
+              value: "{{ .Release.Name }}-spring-6-reactive-mongo-mongodb.{{ .Release.Namespace }}.svc.cluster.local"
             - name: SPRING_DATA_MONGODB_PORT
               value: "{{ .Values.mongodb.port }}"
             - name: SPRING_DATA_MONGODB_URI
-              value: "mongodb://mongodb.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.mongodb.port }}/{{ .Values.mongodb.database }}"
+              value: "mongodb://{{ .Release.Name }}-spring-6-reactive-mongo-mongodb.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.mongodb.port }}/{{ .Values.mongodb.database }}"
             - name: SPRING_DATA_MONGODB_DATABASE
               value: {{ .Values.mongodb.database }}
             - name: SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI
