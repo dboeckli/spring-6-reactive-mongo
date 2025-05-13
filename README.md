@@ -110,6 +110,11 @@ $POD_NAME can be: spring-6-reactive-mongo-mongodb, spring-6-reactive-mongo
 kubectl describe pod $POD_NAME -n spring-6-reactive-mongo
 ```
 
+Show Endpoints
+```powershell
+kubectl get endpoints -n spring-6-reactive-mongo
+```
+
 uninstall
 ```powershell
 helm uninstall $APPLICATION_NAME --namespace spring-6-reactive-mongo
