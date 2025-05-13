@@ -6,6 +6,11 @@ Content-Type: application/x-www-form-urlencoded
 
 grant_type=client_credentials&scope=message.read message.write
 
+###
+GET http://localhost:{{auth-server-prt}}/.well-known/openid-configuration
+Authorization: Basic messaging-client secret
+Content-Type: application/x-www-form-urlencoded
+
 ### actuator
 GET http://localhost:{{auth-server-prt}}/actuator/info
 Accept: application/json

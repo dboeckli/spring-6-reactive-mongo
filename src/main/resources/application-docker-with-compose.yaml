@@ -86,6 +86,7 @@ management:
       show-details: always
 
 security:
+  auth-server-health-url: http://localhost:9000
   authorization-url: http://localhost:9000/oauth2/auth
   token-url: http://localhost:9000/oauth2/token
   refresh-url: http://localhost:9000/oauth2/refresh-token

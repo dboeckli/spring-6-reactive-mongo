@@ -52,6 +52,11 @@ authServer:
   port: 9000
   targetPort: 9000
   nodePort: 30900
+  
+spring-6-auth-server:
+  spring:
+    issuer:
+      uri: "http://spring-6-reactive-mongo-spring-6-auth-server.spring-6-reactive-mongo.svc.cluster.local:9000" 
 
 ingress:
   enabled: false

@@ -96,7 +96,7 @@ helm upgrade --install $APPLICATION_NAME ./$APPLICATION_NAME --namespace spring-
 
 show logs and show event
 ```powershell
-kubectl get pods -l app.kubernetes.io/name=$APPLICATION_NAME -n spring-6-reactive-mongo
+kubectl get pods -n spring-6-reactive-mongo
 ```
 replace $POD with pods from the command above
 ```powershell
