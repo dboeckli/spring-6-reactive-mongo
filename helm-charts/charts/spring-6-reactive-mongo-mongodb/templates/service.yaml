@@ -1,14 +1,14 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "application-template.fullname" . }}-mongodb
-  namespace: {{ .Values.deployment.namespace }}
+  name: {{ include "spring-6-reactive-mongo-mongodb.fullname" . }}
+  namespace: {{ .Values.global.namespace }}
   labels:
-    {{- include "application-template.labels" . | nindent 4 }}
+    {{- include "spring-6-reactive-mongo-mongodb.labels" . | nindent 4 }}
     app.kubernetes.io/component: database
 spec:
   selector:
-    {{- include "application-template.selectorLabels" . | nindent 4 }}
+    {{- include "spring-6-reactive-mongo-mongodb.selectorLabels" . | nindent 4 }}
     app.kubernetes.io/component: database
   ports:
     - protocol: TCP

@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "application-template.fullname" . }}-mongodb
-  namespace: {{ .Values.deployment.namespace }}
+  name: {{ include "spring-6-reactive-mongo-mongodb.fullname" . }}
+  namespace: {{ .Values.global.namespace }}
   labels:
-    {{- include "application-template.labels" . | nindent 4 }}
+    {{- include "spring-6-reactive-mongo-mongodb.labels" . | nindent 4 }}
     app.kubernetes.io/component: database
 spec:
   replicas: 1
   selector:
     matchLabels:
-      {{- include "application-template.selectorLabels" . | nindent 6 }}
+      {{- include "spring-6-reactive-mongo-mongodb.selectorLabels" . | nindent 6 }}
       app.kubernetes.io/component: database
   template:
     metadata:
       labels:
-        {{- include "application-template.selectorLabels" . | nindent 8 }}
+        {{- include "spring-6-reactive-mongo-mongodb.selectorLabels" . | nindent 8 }}
         app.kubernetes.io/component: database
     spec:
       containers:
@@ -27,12 +27,22 @@ spec:
               value: "{{ .Values.mongodb.database }}"
           envFrom:
             - secretRef:
-                name: {{ include "application-template.fullname" . }}-mongodb-secrets
+                name: {{ include "spring-6-reactive-mongo-mongodb.fullname" . }}-secrets
           ports:
             - name: mongodb
               containerPort: {{ .Values.mongodb.port }}
               protocol: TCP
           readinessProbe:
+            exec:
+              command:
+                - mongosh
+                - --eval
+                - "db.adminCommand('ping')"
+            initialDelaySeconds: 40
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 5   
+          livenessProbe:
             exec:
               command:
                 - mongosh

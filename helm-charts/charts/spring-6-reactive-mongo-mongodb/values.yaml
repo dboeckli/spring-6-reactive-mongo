@@ -1,0 +1,9 @@
+global:
+  namespace: spring-6-reactive-mongo
+
+mongodb:
+  port: 27017
+  targetPort: 27017
+  nodePort: 30017
+  
+  database: "sfg"

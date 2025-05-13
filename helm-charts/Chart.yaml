@@ -2,5 +2,12 @@ apiVersion: v2
 name: @project.artifactId@
 description: A Helm chart for Spring 6 Project 
 type: application
-version: @helm.chart.version@
+# Disable Sonar warning for invalid semver: This value is set by Maven filtering
+# and will be replaced with a valid version number during the build process.
+version: @helm.chart.version@ 
 appVersion: @project.version@
+
+dependencies:
+  - name: spring-6-reactive-mongo-mongodb
+    version: @helm.chart.version@
+    repository: file://charts/spring-6-reactive-mongo-mongodb

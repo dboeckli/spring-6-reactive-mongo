@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "application-template.fullname" . }}
-  namespace: {{ .Values.deployment.namespace }}
+  namespace: {{ .Values.global.namespace }}
   labels:
     {{- include "application-template.labels" . | nindent 4 }}
 spec:
@@ -18,7 +18,7 @@ spec:
       initContainers:
         - name: wait-for-mongo
           image: busybox:1.37.0
-          command: [ 'sh', '-c', 'until nc -z {{ include "application-template.fullname" . }}-mongodb {{ .Values.mongodb.port }}; do echo "[busybox: wait-for-mongodb] waiting for mongodb"; sleep 2; done; echo "[busybox: wait-for-mongodb] mongodb is available"' ]
+          command: [ 'sh', '-c', 'until nc -z {{ .Release.Name }}-spring-6-reactive-mongo-mongodb.{{ .Release.Namespace }}.svc.cluster.local {{ .Values.mongodb.port }}; do echo "[busybox: wait-for-mongodb] waiting for mongodb"; sleep 2; done; echo "[busybox: wait-for-mongodb] mongodb is available"' ]
         - name: wait-for-auth-server
           image: busybox:1.37.0
           command: [ 'sh', '-c', 'until nc -z {{ include "application-template.fullname" . }}-auth-server {{ .Values.authServer.port }}; do echo "[busybox: wait-for-auth-server] waiting for auth-server"; sleep 2; done; echo "[busybox: wait-for-auth-server] auth-server is available"' ]
@@ -27,29 +27,31 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: IfNotPresent
           env:
+            - name: SPRING_APPLICATION_JSON
+              value: '{"debug":{{ .Values.global.springDebug | default false }}}' 
             - name: JAVA_TIMEZONE
               value: "{{ .Values.global.timezone }}"
             - name: SPRING_PROFILES_ACTIVE
               value: {{ .Values.spring.profiles.active | default "local" }}
             - name: SPRING_DATA_MONGODB_HOST
-              value: "{{ include "application-template.fullname" . }}-mongodb"
+              value: "{{ .Release.Name }}-spring-6-reactive-mongo-mongodb.{{ .Release.Namespace }}.svc.cluster.local"
             - name: SPRING_DATA_MONGODB_PORT
               value: "{{ .Values.mongodb.port }}"
             - name: SPRING_DATA_MONGODB_URI
-              value: "mongodb://{{ include "application-template.fullname" . }}-mongodb:{{ .Values.mongodb.port }}/{{ .Values.mongodb.database }}"
+              value: "mongodb://{{ .Release.Name }}-spring-6-reactive-mongo-mongodb.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.mongodb.port }}/{{ .Values.mongodb.database }}"
             - name: SPRING_DATA_MONGODB_DATABASE
               value: {{ .Values.mongodb.database }}
             - name: SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI
               value: "http://{{ include "application-template.fullname" . }}-auth-server:9000"
             - name: SECURITY_AUTHORIZATION_URL
-              value: "http://localhost:30900/oauth2/auth"
+              value: "http://localhost:{{ .Values.mongodb.nodePort }}/oauth2/auth"
             - name: SECURITY_TOKEN_URL
-              value: "http://localhost:30900/oauth2/token"
+              value: "http://localhost:{{ .Values.mongodb.nodePort }}/oauth2/token"
             - name: SECURITY_REFRESH_URL
-              value: "http://localhost:30900/oauth2/refresh-token"  
+              value: "http://localhost:{{ .Values.mongodb.nodePort }}/oauth2/refresh-token"  
           envFrom:
             - secretRef:
-                name: {{ include "application-template.fullname" . }}-mongodb-secrets
+                name: {{ include "application-template.fullname" . }}-spring-mongodb-secrets
           ports:
             - name: http
               containerPort: {{ .Values.service.targetPort }}
