@@ -9,6 +9,7 @@ import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.mongodb.InvalidMongoDbApiUsageException;
 import org.springframework.data.mongodb.config.AbstractReactiveMongoConfiguration;
 
 import java.net.URI;
@@ -81,7 +82,7 @@ public class MongoClientConfig extends AbstractReactiveMongoConfiguration {
             String databaseName = path != null && path.length() > 1 ? path.substring(1) : "sfg"; // Default to "sfg" if no database is specified
             return new ConnectionDetails(host, port, databaseName);
         } catch (URISyntaxException e) {
-            throw new RuntimeException("Invalid MongoDB URI", e);
+            throw new InvalidMongoDbApiUsageException("Invalid MongoDB URI", e);
         }
     }
 
