@@ -1,6 +1,8 @@
 # spring-6-reactive-mongo
 Examples of Reactive Programming with Spring Framework.
 
+![Architecture Diagram](guru.png)
+
 ## Getting started
 Server runs on port 8083. Requires the auth server running on port 9000.
 There are three profiles:
