@@ -45,14 +45,14 @@ public class OpenApiConfiguration {
     
     private final BuildProperties buildProperties;
 
-    @Value("${security.authorization-url:http://localhost:9000/oauth2/auth}")
+    @Value("${security.authorization-url-for-openapi:http://localhost:9000/oauth2/auth}")
     private String authorizationUrl;
-    @Value("${security.token-url:http://localhost:9000/oauth2/token}")
+    @Value("${security.token-url-for-openapi:http://localhost:9000/oauth2/token}")
     private String tokenUrl;
-    @Value("${security.refresh-url:http://localhost:9000/oauth2/refresh-token}")
+    @Value("${security.refresh-url-for-openapi:http://localhost:9000/oauth2/refresh-token}")
     private String refreshUrl;
 
-    public final static String SECURITY_SCHEME_NAME = "Bearer Authentication";
+    public static final String SECURITY_SCHEME_NAME = "Bearer Authentication";
 
     @Bean
     public OpenApiCustomizer customerGlobalHeaderOpenApiCustomizer() {
