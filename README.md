@@ -1,6 +1,8 @@
 # spring-6-reactive-mongo
 Examples of Reactive Programming with Spring Framework.
 
+![Architecture Diagram](guru.png)
+
 ## Getting started
 Server runs on port 8083. Requires the auth server running on port 9000.
 There are three profiles:
@@ -96,7 +98,7 @@ helm upgrade --install $APPLICATION_NAME ./$APPLICATION_NAME --namespace spring-
 
 show logs and show event
 ```powershell
-kubectl get pods -l app.kubernetes.io/name=$APPLICATION_NAME -n spring-6-reactive-mongo
+kubectl get pods -n spring-6-reactive-mongo
 ```
 replace $POD with pods from the command above
 ```powershell
@@ -108,6 +110,11 @@ Show Details and Event
 $POD_NAME can be: spring-6-reactive-mongo-mongodb, spring-6-reactive-mongo
 ```powershell
 kubectl describe pod $POD_NAME -n spring-6-reactive-mongo
+```
+
+Show Endpoints
+```powershell
+kubectl get endpoints -n spring-6-reactive-mongo
 ```
 
 uninstall

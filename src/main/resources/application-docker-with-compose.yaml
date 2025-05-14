@@ -86,9 +86,10 @@ management:
       show-details: always
 
 security:
-  authorization-url: http://localhost:9000/oauth2/auth
-  token-url: http://localhost:9000/oauth2/token
-  refresh-url: http://localhost:9000/oauth2/refresh-token
+  auth-server-health-url: http://localhost:9000
+  authorization-url-for-openapi: http://localhost:9000/oauth2/auth
+  token-url-for-openapi: http://localhost:9000/oauth2/token
+  refresh-url-for-openapi: http://localhost:9000/oauth2/refresh-token
   cors:
     allowed-origins:
       - http://localhost:8080 # gateway project runs on port 8080

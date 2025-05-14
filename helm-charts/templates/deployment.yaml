@@ -21,7 +21,7 @@ spec:
           command: [ 'sh', '-c', 'until nc -z {{ .Release.Name }}-spring-6-reactive-mongo-mongodb.{{ .Release.Namespace }}.svc.cluster.local {{ .Values.mongodb.port }}; do echo "[busybox: wait-for-mongodb] waiting for mongodb"; sleep 2; done; echo "[busybox: wait-for-mongodb] mongodb is available"' ]
         - name: wait-for-auth-server
           image: busybox:1.37.0
-          command: [ 'sh', '-c', 'until nc -z {{ include "application-template.fullname" . }}-auth-server {{ .Values.authServer.port }}; do echo "[busybox: wait-for-auth-server] waiting for auth-server"; sleep 2; done; echo "[busybox: wait-for-auth-server] auth-server is available"' ]
+          command: [ 'sh', '-c', 'until nc -z {{ .Release.Name }}-spring-6-auth-server.{{ .Release.Namespace }}.svc.cluster.local {{ .Values.authServer.port }}; do echo "[busybox: wait-for-auth-server] waiting for auth-server"; sleep 2; done; echo "[busybox: wait-for-auth-server] auth-server is available"' ]
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
@@ -41,14 +41,16 @@ spec:
               value: "mongodb://{{ .Release.Name }}-spring-6-reactive-mongo-mongodb.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.mongodb.port }}/{{ .Values.mongodb.database }}"
             - name: SPRING_DATA_MONGODB_DATABASE
               value: {{ .Values.mongodb.database }}
+            - name: SECURITY_AUTH_SERVER_HEALTH_URL
+              value: "http://{{ .Release.Name }}-spring-6-auth-server.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.authServer.port }}"
             - name: SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI
-              value: "http://{{ include "application-template.fullname" . }}-auth-server:9000"
+              value: "http://{{ .Release.Name }}-spring-6-auth-server.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.authServer.port }}"
             - name: SECURITY_AUTHORIZATION_URL
-              value: "http://localhost:{{ .Values.mongodb.nodePort }}/oauth2/auth"
+              value: "http://localhost:{{ .Values.authServer.nodePort }}/oauth2/auth"
             - name: SECURITY_TOKEN_URL
-              value: "http://localhost:{{ .Values.mongodb.nodePort }}/oauth2/token"
+              value: "http://localhost:{{ .Values.authServer.nodePort }}/oauth2/token"
             - name: SECURITY_REFRESH_URL
-              value: "http://localhost:{{ .Values.mongodb.nodePort }}/oauth2/refresh-token"  
+              value: "http://localhost:{{ .Values.authServer.nodePort }}/oauth2/refresh-token"  
           envFrom:
             - secretRef:
                 name: {{ include "application-template.fullname" . }}-spring-mongodb-secrets
