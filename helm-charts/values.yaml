@@ -42,6 +42,8 @@ probes:
     failureThreshold: 6
     
 mongodb:
+  enabled: true
+  
   port: 27017
   targetPort: 27017
   nodePort: 30017
@@ -49,14 +51,18 @@ mongodb:
   database: "sfg"
   
 authServer:
+  enabled: true
+  
   port: 9000
   targetPort: 9000
   nodePort: 30900
+  
+ingress:
+  enabled: false  
+  
+# Section for overriding values in subcharts.  
   
 spring-6-auth-server:
   spring:
     issuer:
       uri: "http://spring-6-reactive-mongo-spring-6-auth-server.spring-6-reactive-mongo.svc.cluster.local:9000" 
-
-ingress:
-  enabled: false
