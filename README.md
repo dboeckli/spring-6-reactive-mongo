@@ -57,6 +57,11 @@ docker logs reactive-mongo
 
 Deployment goes into the default namespace.
 
+To run maven filtering for destination target/k8s
+```bash
+mvn clean install -DskipTests 
+```
+
 To deploy all resources:
 ```bash
 kubectl apply -f target/k8s/
@@ -76,6 +81,11 @@ kubectl get pods -o wide
 You can use the actuator rest call to verify via port 30083
 
 ## Deployment with Helm
+
+To run maven filtering for destination target/helm run:
+```bash
+mvn clean install -DskipTests 
+```
 
 Be aware that we are using a different namespace here (not default).
 

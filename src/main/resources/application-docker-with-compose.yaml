@@ -80,6 +80,8 @@ management:
       # This configuration exposes sensitive data and should only be used for development or testing purposes.
       # Ensure this is disabled in any environment where security is a concern.
       show-values: ALWAYS 
+    env:
+      show-values: always
     health:
       probes:
         enabled: true
@@ -93,5 +95,7 @@ security:
   cors:
     allowed-origins:
       - http://localhost:8080 # gateway project runs on port 8080
-      - http://127.0.0.1:8080 # gateway project runs on port 8080          
+      - http://127.0.0.1:8080 # gateway project runs on port 8080      
+      - http://localhost:30080 # gateway project runs on port 30080
+      - http://127.0.0.1:30080 # gateway project runs on port 30080  
     

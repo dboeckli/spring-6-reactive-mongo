@@ -12,9 +12,13 @@ image:
 
 service:
   type: NodePort
-  port: 80
+  port: 8083
   targetPort: 8083
   nodePort: 30083
+  
+externalAccess:
+  host: "localhost"
+  protocol: "http"  
 
 resources:
   limits:
