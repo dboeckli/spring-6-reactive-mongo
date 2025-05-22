@@ -31,6 +31,8 @@ resources:
 spring:
   profiles:
     active: local
+  oauth2ResourceServer:
+    issuerUri: ""  
 
 probes:
   startup:
