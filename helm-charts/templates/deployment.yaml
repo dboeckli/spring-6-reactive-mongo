@@ -44,9 +44,9 @@ spec:
               value: {{ .Values.mongodb.database }}
               
             - name: SECURITY_AUTH_SERVER_HEALTH_URL
-              value: "http://{{ .Release.Name }}-spring-6-auth-server.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.authServer.port }}"
+              value: {{ .Values.spring.oauth2ResourceServer.issuerUri | default (printf "http://%s-spring-6-auth-server.%s.svc.cluster.local:%s" .Release.Name .Release.Namespace (toString .Values.authServer.port)) | quote }}
             - name: SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI
-              value: "http://{{ .Release.Name }}-spring-6-auth-server.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.authServer.port }}"
+              value: {{ .Values.spring.oauth2ResourceServer.issuerUri | default (printf "http://%s-spring-6-auth-server.%s.svc.cluster.local:%s" .Release.Name .Release.Namespace (toString .Values.authServer.port)) | quote }}
               
             - name: SECURITY_AUTHORIZATION_URL_FOR_OPENAPI
               value: "{{ .Values.externalAccess.protocol }}://{{ .Values.externalAccess.host}}:{{ .Values.authServer.nodePort }}/oauth2/auth"

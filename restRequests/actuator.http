@@ -1,5 +1,3 @@
-# use port 30083 when running within kubernetes
-
 ### actuator
 GET http://localhost:{{application-port}}/actuator
 Accept: application/json

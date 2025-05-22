@@ -1,5 +1,3 @@
-# use port 30083 when running within kubernetes
-
 ### List Beers
 GET http://localhost:{{application-port}}/api/v3/beer
 Accept: application/json
