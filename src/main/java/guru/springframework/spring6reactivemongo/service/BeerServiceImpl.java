@@ -11,7 +11,7 @@ import org.springframework.util.StringUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import static guru.springframework.spring6reactivemongo.config.health.OpenApiConfiguration.SECURITY_SCHEME_NAME;
+import static guru.springframework.spring6reactivemongo.config.OpenApiConfiguration.SECURITY_SCHEME_NAME;
 
 @Service
 @RequiredArgsConstructor
