@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "spring-6-reactive-mongo-mongodb.fullname" . }}-test-connection"
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "spring-6-reactive-mongo-mongodb.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: test-mongodb-connection
+      image: alpine:3.14
+      command: [ '/bin/sh', '-c' ]
+      args:
+        - |
+          # Install MongoDB client tools
+          apk add --no-cache mongodb-tools
+
+          echo "### Test: MongoDB Connection using service name: {{ include "spring-6-reactive-mongo-mongodb.fullname" . }}"
+          mongosh --host {{ include "spring-6-reactive-mongo-mongodb.fullname" . }} \
+                  --port {{ .Values.mongodb.port }} \
+                  --username $MONGO_INITDB_ROOT_USERNAME \
+                  --password $MONGO_INITDB_ROOT_PASSWORD \
+                  --eval "db.adminCommand('ping')"
+          echo "Exit code: $?"
+      env:
+        - name: MONGO_INITDB_ROOT_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "spring-6-reactive-mongo-mongodb.fullname" . }}-secrets
+              key: mongodb-root-username
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "spring-6-reactive-mongo-mongodb.fullname" . }}-secrets
+              key: mongodb-root-password
+  restartPolicy: Never

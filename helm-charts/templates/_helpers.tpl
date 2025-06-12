@@ -49,3 +49,11 @@ Selector labels
 app.kubernetes.io/name: {{ include "application-template.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
+
+{{/*
+Use the workflow-cib7-hello-world-ldap service FQDN
+*/}}
+{{- define "application-template.serviceFQDN" -}}
+{{- $fullname := include "application-template.fullname" . -}}
+{{- printf "%s-%s.%s.svc.cluster.local" $fullname "workflow-cib7-hello-world-ldap" .Release.Namespace }}
+{{- end -}}
