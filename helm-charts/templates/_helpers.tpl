@@ -51,9 +51,17 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
-Use the workflow-cib7-hello-world-ldap service FQDN
+Create the FQDN for the service
 */}}
 {{- define "application-template.serviceFQDN" -}}
 {{- $fullname := include "application-template.fullname" . -}}
+{{- printf "%s.%s.svc.cluster.local" $fullname .Release.Namespace }}
+{{- end }}
+
+{{/*
+spring-6-reactive-mongo-mongodb service FQDN
+*/}}
+{{- define "workflow-cib7-hello-world-ldap.serviceFQDN" -}}
+{{- $fullname := include "workflow-cib7-hello-world-ldap.fullname" . -}}
 {{- printf "%s-%s.%s.svc.cluster.local" $fullname "workflow-cib7-hello-world-ldap" .Release.Namespace }}
 {{- end -}}
