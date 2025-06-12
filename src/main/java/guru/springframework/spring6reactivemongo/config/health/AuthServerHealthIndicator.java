@@ -1,4 +1,4 @@
-package guru.springframework.spring6reactivemongo.config;
+package guru.springframework.spring6reactivemongo.config.health;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
