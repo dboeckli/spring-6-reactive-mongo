@@ -129,7 +129,7 @@ kubectl get endpoints -n spring-6-reactive-mongo
 
 test
 ```powershell
-helm test $APPLICATION_NAME --namespace workflow-hello-world --logs
+helm test $APPLICATION_NAME --namespace spring-6-reactive-mongo --logs
 ```
 
 uninstall
