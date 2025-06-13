@@ -620,6 +620,7 @@
                                 <tags>
                                     local/${project.artifactId}:${docker.image.tag}
                                 </tags>
+                                <trustBuilder>true</trustBuilder>
                                 <publish>false</publish>
                             </image>
                         </configuration>
