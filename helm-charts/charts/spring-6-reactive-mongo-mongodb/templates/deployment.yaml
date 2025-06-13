@@ -20,7 +20,10 @@ spec:
     spec:
       containers:
         - name: mongodb
-          image: mongo:8.0.9
+          # We intentionally use this version.
+          # Versions 8.0.9 and 8.0.10 are not pulled correctly and are therefore not usable in Kubernetes.
+          # You can verify this manually via `docker pull` and `docker inspect`.
+          image: mongo:8.0.8
           imagePullPolicy: IfNotPresent
           env:
             - name: MONGO_INITDB_DATABASE

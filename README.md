@@ -127,6 +127,11 @@ Show Endpoints
 kubectl get endpoints -n spring-6-reactive-mongo
 ```
 
+test
+```powershell
+helm test $APPLICATION_NAME --namespace spring-6-reactive-mongo --logs
+```
+
 uninstall
 ```powershell
 helm uninstall $APPLICATION_NAME --namespace spring-6-reactive-mongo

@@ -49,3 +49,11 @@ Selector labels
 app.kubernetes.io/name: {{ include "spring-6-reactive-mongo-mongodb.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
+
+{{/*
+Create the FQDN for the service
+*/}}
+{{- define "spring-6-reactive-mongo-mongodb.serviceFQDN" -}}
+{{- $fullname := include "spring-6-reactive-mongo-mongodb.fullname" . -}}
+{{- printf "%s.%s.svc.cluster.local" $fullname .Release.Namespace }}
+{{- end }}

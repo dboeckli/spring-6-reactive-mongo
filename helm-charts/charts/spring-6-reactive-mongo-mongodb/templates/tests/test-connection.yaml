@@ -1,0 +1,50 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "spring-6-reactive-mongo-mongodb.fullname" . | trunc 63 | trimSuffix "-" }}-test"
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "spring-6-reactive-mongo-mongodb.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: test-mongodb-connection
+      image: debian:bullseye-20250610-slim
+      command: [ "/bin/sh", "-c" ]
+      args:
+        - |
+          set -e
+          apt-get update && apt-get install -y curl gnupg ca-certificates
+
+          # MongoDB GPG-Schlüssel importieren
+          curl -fsSL https://pgp.mongodb.com/server-6.0.asc | \
+            gpg --dearmor -o /usr/share/keyrings/mongodb-server-6.0.gpg
+
+          # MongoDB Repo eintragen
+          echo "deb [ signed-by=/usr/share/keyrings/mongodb-server-6.0.gpg ] https://repo.mongodb.org/apt/debian bullseye/mongodb-org/6.0 main" \
+            > /etc/apt/sources.list.d/mongodb-org-6.0.list
+
+          # mongosh installieren
+          apt-get update && apt-get install -y mongodb-mongosh
+
+          # Verbindung testen
+          echo ">>> Testing MongoDB connection to {{ include "spring-6-reactive-mongo-mongodb.fullname" . }}"
+          mongosh --host {{ include "spring-6-reactive-mongo-mongodb.fullname" . }} \
+                  --port {{ .Values.mongodb.port }} \
+                  --username "$MONGO_INITDB_ROOT_USERNAME" \
+                  --password "$MONGO_INITDB_ROOT_PASSWORD" \
+                  --eval "db.adminCommand('ping')"
+          echo "Exit code: $?"
+      env:
+        - name: MONGO_INITDB_ROOT_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "spring-6-reactive-mongo-mongodb.fullname" . }}-secrets
+              key: MONGO_INITDB_ROOT_USERNAME
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "spring-6-reactive-mongo-mongodb.fullname" . }}-secrets
+              key: MONGO_INITDB_ROOT_PASSWORD
+  restartPolicy: Never
