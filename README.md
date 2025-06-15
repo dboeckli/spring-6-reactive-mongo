@@ -103,7 +103,7 @@ tar -xvf $file.Name
 install
 ```powershell
 $APPLICATION_NAME = Get-ChildItem -Directory | Where-Object { $_.LastWriteTime -ge $file.LastWriteTime } | Select-Object -ExpandProperty Name
-helm upgrade --install $APPLICATION_NAME ./$APPLICATION_NAME --namespace spring-6-reactive-mongo --create-namespace --wait --timeout 5m --debug
+helm upgrade --install $APPLICATION_NAME ./$APPLICATION_NAME --namespace spring-6-reactive-mongo --create-namespace --wait --timeout 5m --debug --render-subchart-notes
 ```
 
 show logs and show event
@@ -125,6 +125,11 @@ kubectl describe pod $POD_NAME -n spring-6-reactive-mongo
 Show Endpoints
 ```powershell
 kubectl get endpoints -n spring-6-reactive-mongo
+```
+
+status
+```powershell
+helm status $APPLICATION_NAME --namespace spring-6-reactive-mongot
 ```
 
 test

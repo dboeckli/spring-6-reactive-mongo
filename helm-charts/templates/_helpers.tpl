@@ -65,11 +65,3 @@ spring-6-reactive-mongo-mongodb service FQDN
 {{- $fullname := include "spring-6-reactive-mongo-mongodb.fullname" . -}}
 {{- printf "%s-%s.%s.svc.cluster.local" $fullname "spring-6-reactive-mongo-mongodb" .Release.Namespace }}
 {{- end -}}
-
-{{/*
-Use the spring-6-auth-server service FQDN
-*/}}
-{{- define "spring-6-auth-server.serviceFQDN" -}}
-{{- $fullname := include "application-template.fullname" . -}}
-{{- printf "%s-%s.%s.svc.cluster.local" $fullname "spring-6-auth-server" .Release.Namespace }}
-{{- end -}}
