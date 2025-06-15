@@ -56,12 +56,16 @@ mongodb:
   
   database: "sfg"
   
+  serviceFQDN: "spring-6-reactive-mongo-spring-6-reactive-mongo-mongodb.spring-6-reactive-mongo.svc.cluster.local"
+  
 authServer:
   enabled: true
   
   port: 9000
   targetPort: 9000
   nodePort: 30900
+  
+  serviceFQDN: "spring-6-reactive-mongo-spring-6-auth-server.spring-6-reactive-mongo.svc.cluster.local"
   
 ingress:
   enabled: false  
