@@ -1,36 +1,33 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "spring-6-reactive-mongo-mongodb.fullname" . }}
+  name: {{ include "mongodb.fullname" . }}
   namespace: {{ .Values.global.namespace }}
   labels:
-    {{- include "spring-6-reactive-mongo-mongodb.labels" . | nindent 4 }}
+    {{- include "mongodb.labels" . | nindent 4 }}
     app.kubernetes.io/component: database
 spec:
   replicas: 1
   selector:
     matchLabels:
-      {{- include "spring-6-reactive-mongo-mongodb.selectorLabels" . | nindent 6 }}
+      {{- include "mongodb.selectorLabels" . | nindent 6 }}
       app.kubernetes.io/component: database
   template:
     metadata:
       labels:
-        {{- include "spring-6-reactive-mongo-mongodb.selectorLabels" . | nindent 8 }}
+        {{- include "mongodb.selectorLabels" . | nindent 8 }}
         app.kubernetes.io/component: database
     spec:
       containers:
         - name: mongodb
-          # We intentionally use this version.
-          # Versions 8.0.9 and 8.0.10 are not pulled correctly and are therefore not usable in Kubernetes.
-          # You can verify this manually via `docker pull` and `docker inspect`.
-          image: mongo:8.0.8
-          imagePullPolicy: IfNotPresent
+          image: {{ .Values.mongoImage.repository }}:{{ .Values.mongoImage.tag }}
+          imagePullPolicy: {{ .Values.mongoImage.pullPolicy }}
           env:
             - name: MONGO_INITDB_DATABASE
               value: "{{ .Values.mongodb.database }}"
           envFrom:
             - secretRef:
-                name: {{ include "spring-6-reactive-mongo-mongodb.fullname" . }}-secrets
+                name: {{ include "mongodb.fullname" . }}-secrets
           ports:
             - name: mongodb
               containerPort: {{ .Values.mongodb.port }}
