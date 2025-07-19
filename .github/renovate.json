@@ -39,6 +39,7 @@
     "helmv3": {
         "managerFilePatterns": [
             "/(^|/)Chart\\.ya?ml$/",
+            "/helm-charts/dependencies-Chart\\.ya?ml$/",
             "/helm-charts/Chart\\.ya?ml$/",
             "/helm-charts/charts/.+/Chart\\.ya?ml$/"
         ]
