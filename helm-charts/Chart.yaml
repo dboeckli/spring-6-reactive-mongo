@@ -6,11 +6,7 @@ version: @helm.chart.version@
 appVersion: @project.version@
 
 dependencies:
-  - name: spring-6-reactive-mongo-mongodb
+  - name: mongodb
     version: @helm.chart.version@
-    repository: file://charts/spring-6-reactive-mongo-mongodb
+    repository: file://charts/mongodb
     condition: mongodb.enabled
-  - name: spring-6-auth-server
-    version: "v0.0.4-SNAPSHOT"
-    repository: "oci://registry-1.docker.io/domboeckli"
-    condition: authServer.enabled  

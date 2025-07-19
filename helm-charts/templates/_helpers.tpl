@@ -57,11 +57,3 @@ Create the FQDN for the service
 {{- $fullname := include "application-template.fullname" . -}}
 {{- printf "%s.%s.svc.cluster.local" $fullname .Release.Namespace }}
 {{- end }}
-
-{{/*
-spring-6-reactive-mongo-mongodb service FQDN
-*/}}
-{{- define "spring-6-reactive-mongo-mongodb.serviceFQDN" -}}
-{{- $fullname := include "spring-6-reactive-mongo-mongodb.fullname" . -}}
-{{- printf "%s-%s.%s.svc.cluster.local" $fullname "spring-6-reactive-mongo-mongodb" .Release.Namespace }}
-{{- end -}}
