@@ -1,5 +1,5 @@
 apiVersion: v2
-name: mongodb
+name: spring-6-reactive-mongo-mongodb
 description: A Helm subchart for MongoDB used in Spring 6 Reactive MongoDB application
 type: application
 # Disable Sonar warning for invalid semver: This value is set by Maven filtering
