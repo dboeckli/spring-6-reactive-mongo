@@ -26,7 +26,7 @@ spec:
           command: [ 'sh', '-c', 'until nc -z {{ .Values.authServer.serviceFQDN  }} {{ .Values.authServer.port }}; do echo "[busybox: wait-for-auth-server] waiting for auth-server"; sleep 2; done; echo "[busybox: wait-for-auth-server] auth-server is available"' ]
       containers:
         - name: {{ .Chart.Name }}
-          image: "{{ .Values.image.registry }}/{{ .Chart.Name }}:{{ .Chart.AppVersion }}"
+          image: "{{ .Values.image.registry }}/@project.artifactId@:{{ .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
             - name: SPRING_APPLICATION_JSON

@@ -8,7 +8,7 @@ on:
   pull_request:
     branches: [ "main", "master" ]
   schedule:
-    - cron: '5 3 * * *' 
+    - cron: '5 21 * * *' 
       
 concurrency:
   group: ${{ github.workflow }}
