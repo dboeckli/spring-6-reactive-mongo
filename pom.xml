@@ -45,7 +45,7 @@
         <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
 
         <!-- https://springdoc.org/#what-is-the-compatibility-matrix-of-springdoc-openapi-with-spring-boot -->
-        <springdoc.openapi.version>2.8.13</springdoc.openapi.version>
+        <springdoc.openapi.version>2.8.14</springdoc.openapi.version>
         <springdoc-openapi-maven-plugin.version>1.5</springdoc-openapi-maven-plugin.version>
 
         <logbook.version>3.12.3</logbook.version>
