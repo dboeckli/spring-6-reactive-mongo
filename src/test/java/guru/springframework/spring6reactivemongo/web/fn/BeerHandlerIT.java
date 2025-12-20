@@ -19,7 +19,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import reactor.core.publisher.Mono;
 
-import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.mockOAuth2Login;
 
@@ -45,8 +44,7 @@ class BeerHandlerIT {
             .exchange()
             .expectStatus().isOk()
             .expectHeader().valueEquals("Content-type", "application/json")
-            //.expectBody(BeerDto.class).isEqualTo(BeerDto.builder().beerName("Galaxy Cat").build())
-            .expectBody().jsonPath("$.size()").value(equalTo(1);
+            .expectBody().jsonPath("$.size()").value(size -> assertEquals(3, size));
     }
 
     @Test
@@ -58,7 +56,6 @@ class BeerHandlerIT {
             .exchange()
             .expectStatus().isOk()
             .expectHeader().valueEquals("Content-type", "application/json")
-            //.expectBody().jsonPath("$.length()").isEqualTo(3)
             .expectBodyList(BeerDto.class).hasSize(3);
     }
 
@@ -81,7 +78,7 @@ class BeerHandlerIT {
             .exchange()
             .expectStatus().isOk()
             .expectHeader().valueEquals("Content-type", "application/json")
-            .expectBody().jsonPath("$.size()").value(equalTo(expectedBeerCount));
+            .expectBody().jsonPath("$.size()").value(size -> assertEquals(expectedBeerCount, size));
     }
 
     @Test
@@ -97,7 +94,7 @@ class BeerHandlerIT {
             .exchange()
             .expectStatus().isOk()
             .expectHeader().valueEquals("Content-type", "application/json")
-            .expectBody().jsonPath("$.size()").value(equalTo(1));
+            .expectBody().jsonPath("$.size()").value(size -> assertEquals(1, size));
     }
 
 
@@ -105,7 +102,7 @@ class BeerHandlerIT {
     @Order(2)
     void testGetBeerById() {
         BeerDto givenBeer = getAnyExistingBeer();
-        
+
         BeerDto gotBeer = webTestClient
             .mutateWith(mockOAuth2Login())
             .get().uri(BeerRouterConfig.BEER_PATH_ID, givenBeer.getId())
@@ -113,7 +110,7 @@ class BeerHandlerIT {
             .expectStatus().isOk()
             .expectHeader().valueEquals("Content-type", "application/json")
             .expectBody(BeerDto.class).returnResult().getResponseBody();
-        
+
         assertEquals(givenBeer.getId(), gotBeer.getId());
     }
 
@@ -149,7 +146,7 @@ class BeerHandlerIT {
 
         log.info("Location: " + location);
         assertNotNull(location);
-        
+
         BeerDto createdBeer = getBeerByLocation(location);
         assertNotNull(createdBeer);
     }
@@ -397,7 +394,7 @@ class BeerHandlerIT {
             .exchange()
             .expectStatus().isNotFound();
     }
-    
+
     private BeerDto getAnyExistingBeer() {
         return webTestClient
             .mutateWith(mockOAuth2Login())
@@ -427,7 +424,7 @@ class BeerHandlerIT {
             if (ex.getMessage().contains("Status expected:<200 OK> but was:<404 NOT_FOUND>")) {
                 return null;
             }
-            throw ex; 
+            throw ex;
         }
     }
 
@@ -440,6 +437,6 @@ class BeerHandlerIT {
             .expectHeader().valueEquals("Content-type", "application/json")
             .expectBody(BeerDto.class).returnResult().getResponseBody();
     }
-    
- 
+
+
 }

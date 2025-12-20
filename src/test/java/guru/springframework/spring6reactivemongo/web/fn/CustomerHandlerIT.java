@@ -20,7 +20,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import reactor.core.publisher.Mono;
 
-import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.mockOAuth2Login;
 
@@ -33,7 +32,7 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 @Import({TestMongoDockerContainer.class, AuthServerDockerContainer.class})
 @ExtendWith(MongoExtension.class)
 class CustomerHandlerIT {
-    
+
     @Autowired
     WebTestClient webTestClient;
 
@@ -46,7 +45,7 @@ class CustomerHandlerIT {
             .exchange()
             .expectStatus().isOk()
             .expectHeader().valueEquals("Content-type", "application/json")
-            .expectBody().jsonPath("$.size()").value(equalTo(3));
+            .expectBody().jsonPath("$.size()").value(size -> assertEquals(3, size));
     }
 
     @Test
@@ -74,7 +73,7 @@ class CustomerHandlerIT {
             .exchange()
             .expectStatus().isOk()
             .expectHeader().valueEquals("Content-type", "application/json")
-            .expectBody().jsonPath("$.size()").value(equalTo(1));
+            .expectBody().jsonPath("$.size()").value(size -> assertEquals(1, size));
     }
 
     @Test
@@ -165,7 +164,7 @@ class CustomerHandlerIT {
             .expectHeader().valueEquals("Content-type", "application/json")
             .expectBody(CustomerDto.class).returnResult().getResponseBody();
     }
-    
+
 
     @Test
     @Order(4)
@@ -282,7 +281,7 @@ class CustomerHandlerIT {
             .exchange()
             .expectStatus().isNotFound();
     }
-    
+
     private CustomerDto getCustomerById(String id) {
         try {
             return webTestClient
