@@ -5,55 +5,29 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.DynamicPropertyRegistrar;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.MongoDBContainer;
-import org.testcontainers.shaded.org.apache.commons.lang3.RandomStringUtils;
-
-import java.util.concurrent.TimeUnit;
-
-import static org.awaitility.Awaitility.await;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @TestConfiguration
 @Log
 public class TestMongoDockerContainer {
 
-    static MongoDBContainer mongoDBContainer;
-
     @Bean
     @ServiceConnection
     MongoDBContainer mongoDBContainer() {
-        MongoDBContainer container = new MongoDBContainer("mongo:8.0.10")
-            .withExposedPorts(27017)
-            .withReuse(true);
-
-        container.start();
-        await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-            assertTrue(container.isRunning());
-            log.info("Container started.");
-        });
-        // this will replace the default MongoDB URI, because we are using Docker and the port is changing every time the container is started
-        log.info("### Set spring.data.mongodb.uri to: " + container.getConnectionString());
-        log.info("### MongoDB Container started Run on port: " + container.getMappedPort(27017));
-        System.setProperty("spring.data.mongodb.uri", container.getConnectionString());
-        return container;
-    }
-
-    @DynamicPropertySource
-    static void setProperties(DynamicPropertyRegistry registry) {
-        log.info("### hallihallo");
-        registry.add("spring.data.mongodb.uri", () -> mongoDBContainer.getReplicaSetUrl("testdb-for-testcontainer"));
-        registry.add("spring.data.mongodb.database", () -> "testdb-for-testcontainer");
+        return new MongoDBContainer("mongo:8.2.1")
     }
 
     @Bean
     public DynamicPropertyRegistrar mongoDbProperties(MongoDBContainer mongoDBContainer) {
         return (properties) -> {
-            String databaseName = RandomStringUtils.randomAlphabetic(10); 
-            properties.add("spring.data.mongodb.database", () -> databaseName); // Replace with your desired database name
-            properties.add("spring.data.mongodb.uri", () -> mongoDBContainer.getReplicaSetUrl(databaseName));
+            String databaseName = "sfg";
+            properties.add("spring.mongodb.database", () -> databaseName);
+            // Nutze getReplicaSetUrl für die korrekte URI (beinhaltet bereits Host und dynamischen Port)
+            properties.add("spring.mongodb.uri", () -> mongoDBContainer.getReplicaSetUrl(databaseName));
+
+            // Falls explizite Host/Port Properties benötigt werden:
+            properties.add("spring.mongodb.host", mongoDBContainer::getHost);
+            properties.add("spring.mongodb.port", () -> mongoDBContainer.getMappedPort(27017));
         };
     }
-
 }

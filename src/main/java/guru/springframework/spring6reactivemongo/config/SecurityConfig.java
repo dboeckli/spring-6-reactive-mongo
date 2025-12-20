@@ -4,14 +4,19 @@ import jakarta.annotation.PostConstruct;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.actuate.autoconfigure.security.reactive.EndpointRequest;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.security.autoconfigure.actuate.web.reactive.EndpointRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.core.env.Environment;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
+
 import org.springframework.security.config.web.server.ServerHttpSecurity;
+import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
+import org.springframework.security.oauth2.jwt.ReactiveJwtDecoders;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.stereotype.Component;
 import org.springframework.web.cors.CorsConfiguration;
@@ -31,38 +36,54 @@ public class SecurityConfig {
 
     private final AllowedOriginConfig allowedOriginConfig;
 
+    private final Environment environment;
+
     @PostConstruct
     public void init() {
         log.info("### Allowed origins: {}", allowedOriginConfig);
     }
 
     @Bean
-    @Order(1)
-    public SecurityWebFilterChain actuatorSecurityFilterChain(ServerHttpSecurity http) {
-        http.securityMatcher(EndpointRequest.toAnyEndpoint())
-            .authorizeExchange(authorize -> authorize.anyExchange().permitAll());
-        return http.build();
+    @Order(Ordered.HIGHEST_PRECEDENCE)
+    SecurityWebFilterChain springSecurityActuator(ServerHttpSecurity http, CorsConfigurationSource corsConfigurationSource) {
+        return http
+            .securityMatcher(EndpointRequest.toAnyEndpoint())
+            .csrf(ServerHttpSecurity.CsrfSpec::disable)
+            .cors(cors -> cors.configurationSource(corsConfigurationSource))
+            .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
+            .formLogin(ServerHttpSecurity.FormLoginSpec::disable)
+            .authorizeExchange(exchange -> exchange.anyExchange().permitAll())
+            .build();
     }
 
     @Bean
-    @Order(2)
-    SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http, CorsConfigurationSource corsConfigurationSource) {
-        http
+    @Order(Ordered.LOWEST_PRECEDENCE)
+    SecurityWebFilterChain springSecurity(ServerHttpSecurity http, CorsConfigurationSource corsConfigurationSource) {
+        return http
             .csrf(ServerHttpSecurity.CsrfSpec::disable)
             .cors(cors -> cors.configurationSource(corsConfigurationSource))
-            .authorizeExchange(authorizeExchange -> authorizeExchange
+            .authorizeExchange(exchange -> exchange
                 .pathMatchers(
                     "/favicon.ico",
                     "/v3/api-docs",
                     "/v3/api-docs.yaml",
                     "/v3/api-docs/**",
                     "/swagger-ui/**",
-                    "/swagger-ui.html").permitAll() // allow Swagger/Openapi endpoints to be accessed without authentication
-                //.pathMatchers("/api/v3/customer/**", "/api/v3/beer/**").hasRole("ADMIN") // FOR FUTURE USE ONLY
+                    "/swagger-ui.html"
+                ).permitAll()
                 .anyExchange().authenticated()
             )
-            .oauth2ResourceServer(oAuth2ResourceServerSpec -> oAuth2ResourceServerSpec.jwt(Customizer.withDefaults()));
-        return http.build();
+            .oauth2ResourceServer(oAuth2 -> oAuth2.jwt(Customizer.withDefaults()))
+            .build();
+    }
+
+    @Bean
+    public ReactiveJwtDecoder reactiveJwtDecoder() {
+        String issuer = environment.getProperty("spring.security.oauth2.resourceserver.jwt.issuer-uri");
+        if (issuer == null || issuer.isBlank()) {
+            throw new IllegalStateException("Property spring.security.oauth2.resourceserver.jwt.issuer-uri must be set");
+        }
+        return ReactiveJwtDecoders.fromIssuerLocation(issuer);
     }
 
     @Bean

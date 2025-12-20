@@ -7,8 +7,8 @@ import guru.springframework.spring6reactivemongo.model.Beer;
 import lombok.extern.java.Log;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -40,8 +40,8 @@ class BeerServiceImplDockerComposeIT {
 
     @DynamicPropertySource
     static void mongoDbProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.data.mongodb.uri", () -> "mongodb://localhost:27018/sfg");
-        registry.add("spring.data.mongodb.database", () -> "sfg");
+        registry.add("spring.mongodb.uri", () -> "mongodb://root:secret@localhost:27018/sfg?authSource=admin");
+        registry.add("spring.mongodb.database", () -> "sfg");
     }
 
     @Test

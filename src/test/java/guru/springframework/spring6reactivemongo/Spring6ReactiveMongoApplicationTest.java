@@ -2,16 +2,15 @@ package guru.springframework.spring6reactivemongo;
 
 import guru.springframework.spring6reactivemongo.service.BeerService;
 import guru.springframework.spring6reactivemongo.service.CustomerService;
+import guru.springframework.spring6reactivemongo.test.config.AuthServerDockerContainer;
 import guru.springframework.spring6reactivemongo.test.config.MongoExtension;
 import guru.springframework.spring6reactivemongo.test.config.TestMongoDockerContainer;
-import lombok.extern.java.Log;
-import org.junit.jupiter.api.MethodOrderer;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -25,15 +24,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @Testcontainers
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @AutoConfigureWebTestClient
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@Log
-@Import(TestMongoDockerContainer.class)
+@Slf4j
+@Import({TestMongoDockerContainer.class, AuthServerDockerContainer.class})
 @ExtendWith(MongoExtension.class)
 class Spring6ReactiveMongoApplicationTest {
 
     @Autowired
     BeerService beerService;
-    
+
     @Autowired
     CustomerService customerService;
 
