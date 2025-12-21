@@ -1,9 +1,0 @@
-<component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Spring6ReactiveMongoApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
-    <module name="spring-6-reactive-mongo" />
-    <option name="SPRING_BOOT_MAIN_CLASS" value="guru.springframework.spring6reactivemongo.Spring6ReactiveMongoApplication" />
-    <method v="2">
-      <option name="Make" enabled="true" />
-    </method>
-  </configuration>
-</component>

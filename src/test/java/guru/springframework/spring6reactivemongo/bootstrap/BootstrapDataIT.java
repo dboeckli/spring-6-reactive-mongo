@@ -4,6 +4,7 @@ import guru.springframework.spring6reactivemongo.dto.BeerDto;
 import guru.springframework.spring6reactivemongo.dto.CustomerDto;
 import guru.springframework.spring6reactivemongo.service.BeerService;
 import guru.springframework.spring6reactivemongo.service.CustomerService;
+import guru.springframework.spring6reactivemongo.test.config.AuthServerDockerContainer;
 import guru.springframework.spring6reactivemongo.test.config.MongoExtension;
 import guru.springframework.spring6reactivemongo.test.config.TestMongoDockerContainer;
 import lombok.extern.java.Log;
@@ -32,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @AutoConfigureWebTestClient
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @Log
-@Import(TestMongoDockerContainer.class)
+@Import({AuthServerDockerContainer.class, TestMongoDockerContainer.class})
 @ExtendWith(MongoExtension.class)
 class BootstrapDataIT {
 

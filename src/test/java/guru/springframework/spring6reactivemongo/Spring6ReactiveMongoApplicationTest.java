@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @AutoConfigureWebTestClient
 @Slf4j
-@Import({TestMongoDockerContainer.class, AuthServerDockerContainer.class})
+@Import({AuthServerDockerContainer.class, TestMongoDockerContainer.class})
 @ExtendWith(MongoExtension.class)
 class Spring6ReactiveMongoApplicationTest {
 

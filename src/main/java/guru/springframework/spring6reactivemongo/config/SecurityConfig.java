@@ -22,8 +22,13 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsConfigurationSource;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import static org.awaitility.Awaitility.await;
 
 @Configuration
 @EnableWebFluxSecurity
@@ -83,6 +88,22 @@ public class SecurityConfig {
         if (issuer == null || issuer.isBlank()) {
             throw new IllegalStateException("Property spring.security.oauth2.resourceserver.jwt.issuer-uri must be set");
         }
+
+        WebClient webClient = WebClient.builder().baseUrl(issuer).build();
+
+        await().atMost(60, TimeUnit.SECONDS)
+            .pollInterval(2, TimeUnit.SECONDS)
+            .ignoreExceptions()
+            .until(() -> {
+                Boolean isUp = webClient.get()
+                    .uri("/.well-known/openid-configuration")
+                    .exchangeToMono(response -> Mono.just(response.statusCode().is2xxSuccessful()))
+                    .block(); // Blockieren ist hier während der Bean-Initialisierung erlaubt und notwendig
+                return Boolean.TRUE.equals(isUp);
+            });
+
+        log.info("Authentication Server ist bereit. Initialisiere ReactiveJwtDecoder.");
+        
         return ReactiveJwtDecoders.fromIssuerLocation(issuer);
     }
 

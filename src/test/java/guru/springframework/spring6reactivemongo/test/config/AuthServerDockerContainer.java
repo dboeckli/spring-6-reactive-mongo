@@ -8,11 +8,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.DynamicPropertyRegistrar;
+import org.springframework.test.util.TestSocketUtils;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
+
+import java.time.Duration;
 
 @TestConfiguration
 @Log
@@ -22,7 +25,8 @@ public class AuthServerDockerContainer {
 
     private static final String AUTH_SERVER_VERSION = "0.0.5-SNAPSHOT";
 
-    static final int AUTH_SERVER_PORT = 9000;
+    static final int AUTH_SERVER_CONTAINER_PORT = 9000;
+    static final int AUTH_SERVER_HOST_PORT = TestSocketUtils.findAvailableTcpPort();
 
     static final Network sharedNetwork = Network.newNetwork();
 
@@ -30,20 +34,31 @@ public class AuthServerDockerContainer {
     static GenericContainer<?> authServer = new GenericContainer<>(DOCKER_REPO + "/spring-6-auth-server:" + AUTH_SERVER_VERSION)
         .withNetworkAliases("auth-server")
         .withNetwork(sharedNetwork)
-        .withEnv("SERVER_PORT", String.valueOf(AUTH_SERVER_PORT))
-        // Da wir den Port fixieren, passt dieser Issuer immer
-        .withEnv("SPRING_SECURITY_OAUTH2_AUTHORIZATION_SERVER_ISSUER", "http://localhost:" + AUTH_SERVER_PORT)
-        .withExposedPorts(AUTH_SERVER_PORT)
-        // Hier erzwingen wir das Mapping von Host 9000 auf Container 9000
+        // Der Container selbst kann intern auf 9000 laufen...
+        .withEnv("SERVER_PORT", String.valueOf(AUTH_SERVER_CONTAINER_PORT))
+        // ...aber wir sagen ihm, dass er von außen über den Host-Port erreichbar ist!
+        .withEnv("SPRING_SECURITY_OAUTH2_AUTHORIZATION_SERVER_ISSUER", "http://localhost:" + AUTH_SERVER_HOST_PORT)
+        // Jetzt binden wir den fixen Host-Zufallsport an den Container-Port
         .withCreateContainerCmdModifier(cmd -> cmd.getHostConfig().withPortBindings(
-            new PortBinding(Ports.Binding.bindPort(AUTH_SERVER_PORT), new ExposedPort(AUTH_SERVER_PORT))))
+            new PortBinding(Ports.Binding.bindPort(AUTH_SERVER_HOST_PORT), new ExposedPort(AUTH_SERVER_CONTAINER_PORT))))
         .withLogConsumer(new Slf4jLogConsumer(LoggerFactory.getLogger("auth-server")))
         .waitingFor(Wait.forHttp("/actuator/health/readiness")
             .forStatusCode(200)
-            .forResponsePredicate(response ->
-                response.contains("\"status\":\"UP\"")
-            )
+            .forResponsePredicate(response -> {
+                log.info("### Readiness Response: " + response);
+                return response.contains("\"status\":\"UP\"");
+            })
+
+        ).waitingFor(Wait.forHttp("/.well-known/openid-configuration")
+            .forStatusCode(200)
+            .forResponsePredicate(response -> {
+                log.info("### OIDC Config Response: " + response);
+                return !response.isEmpty();
+            })
+        )
+        .withStartupTimeout(Duration.ofMinutes(3)
         );
+
 
     @Bean
     public DynamicPropertyRegistrar authServerProperties() {
@@ -52,8 +67,8 @@ public class AuthServerDockerContainer {
         }
 
         return (properties) -> {
-            String issuerUri = "http://localhost:" + AUTH_SERVER_PORT;
-            log.info("### Setting Resource Server Issuer URI (Fixed Port): " + issuerUri);
+            String issuerUri = "http://localhost:" + AUTH_SERVER_HOST_PORT;
+            log.info("### Setting Resource Server Issuer URI (Static Random Port): " + issuerUri);
             properties.add("spring.security.oauth2.resourceserver.jwt.issuer-uri", () -> issuerUri);
         };
     }
