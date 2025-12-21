@@ -15,7 +15,10 @@ import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
 
+import java.io.IOException;
+import java.net.ServerSocket;
 import java.time.Duration;
+import java.util.concurrent.ThreadLocalRandom;
 
 @TestConfiguration
 @Log
@@ -26,9 +29,21 @@ public class AuthServerDockerContainer {
     private static final String AUTH_SERVER_VERSION = "0.0.5-SNAPSHOT";
 
     static final int AUTH_SERVER_CONTAINER_PORT = 9000;
-    static final int AUTH_SERVER_HOST_PORT = TestSocketUtils.findAvailableTcpPort();
+    static final int AUTH_SERVER_HOST_PORT = findPortInRange(49152, 65535);
 
     static final Network sharedNetwork = Network.newNetwork();
+
+    private static int findPortInRange(int min, int max) {
+        for (int i = 0; i < 50; i++) { // 50 Versuche
+            int port = ThreadLocalRandom.current().nextInt(min, max + 1);
+            try (ServerSocket ignored = new ServerSocket(port)) {
+                return port;
+            } catch (IOException e) {
+                // Port belegt, nächster Versuch
+            }
+        }
+        throw new IllegalStateException("Kein freier Port im Bereich " + min + "-" + max + " gefunden.");
+    }
 
     @Container
     static GenericContainer<?> authServer = new GenericContainer<>(DOCKER_REPO + "/spring-6-auth-server:" + AUTH_SERVER_VERSION)
