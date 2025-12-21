@@ -114,6 +114,7 @@ public class SecurityConfig {
                             .block(Duration.ofSeconds(2)); // Timeout für den einzelnen Request
                         return Boolean.TRUE.equals(isUp);
                     } catch (Exception ex) {
+                        log.error("### Readiness-Check fehlgeschlagen", ex);
                         return false;
                     }
                 });
