@@ -25,6 +25,7 @@ import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -88,19 +89,38 @@ public class SecurityConfig {
         if (issuer == null || issuer.isBlank()) {
             throw new IllegalStateException("Property spring.security.oauth2.resourceserver.jwt.issuer-uri must be set");
         }
+        log.info("### Wating for Issuer ready: {}", issuer);
 
         WebClient webClient = WebClient.builder().baseUrl(issuer).build();
 
-        await().atMost(60, TimeUnit.SECONDS)
-            .pollInterval(2, TimeUnit.SECONDS)
-            .ignoreExceptions()
-            .until(() -> {
-                Boolean isUp = webClient.get()
-                    .uri("/.well-known/openid-configuration")
-                    .exchangeToMono(response -> Mono.just(response.statusCode().is2xxSuccessful()))
-                    .block(); // Blockieren ist hier während der Bean-Initialisierung erlaubt und notwendig
-                return Boolean.TRUE.equals(isUp);
-            });
+        try {
+            await()
+                .atMost(120, TimeUnit.SECONDS) // Länger warten (z.B. 2 Minuten)
+                .pollInterval(3, TimeUnit.SECONDS)
+                .ignoreExceptions()
+                .alias("Auth-Server-Readiness-Check")
+                .until(() -> {
+                    try {
+                        Boolean isUp = webClient.get()
+                            .uri("/.well-known/openid-configuration")
+                            .exchangeToMono(response -> {
+                                if (response.statusCode().is2xxSuccessful()) {
+                                    return Mono.just(true);
+                                } else {
+                                    log.warn("### Readiness-Check fehlgeschlagen. Response: {}, Status: {}", response, response.statusCode());
+                                    return Mono.just(false);
+                                }
+                            })
+                            .block(Duration.ofSeconds(2)); // Timeout für den einzelnen Request
+                        return Boolean.TRUE.equals(isUp);
+                    } catch (Exception ex) {
+                        return false;
+                    }
+                });
+        } catch (org.awaitility.core.ConditionTimeoutException e) {
+            log.error("Initialisierung fehlgeschlagen: Der Auth-Server hat nicht rechtzeitig geantwortet.");
+            throw e; // Den Test/Start explizit abbrechen
+        }
 
         log.info("Authentication Server ist bereit. Initialisiere ReactiveJwtDecoder.");
         
