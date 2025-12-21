@@ -13,6 +13,7 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.containers.wait.strategy.Wait;
+import org.testcontainers.containers.wait.strategy.WaitAllStrategy;
 import org.testcontainers.junit.jupiter.Container;
 
 import java.io.IOException;
@@ -57,21 +58,13 @@ public class AuthServerDockerContainer {
         .withCreateContainerCmdModifier(cmd -> cmd.getHostConfig().withPortBindings(
             new PortBinding(Ports.Binding.bindPort(AUTH_SERVER_HOST_PORT), new ExposedPort(AUTH_SERVER_CONTAINER_PORT))))
         .withLogConsumer(new Slf4jLogConsumer(LoggerFactory.getLogger("auth-server")))
-        .waitingFor(Wait.forHttp("/actuator/health/readiness")
-            .forStatusCode(200)
-            .forResponsePredicate(response -> {
-                log.info("### Readiness Response: " + response);
-                return response.contains("\"status\":\"UP\"");
-            })
-
-        ).waitingFor(Wait.forHttp("/.well-known/openid-configuration")
-            .forStatusCode(200)
-            .forResponsePredicate(response -> {
-                log.info("### OIDC Config Response: " + response);
-                return !response.isEmpty();
-            })
-        )
-        .withStartupTimeout(Duration.ofMinutes(3)
+        .waitingFor(new WaitAllStrategy()
+            .withStrategy(Wait.forHttp("/actuator/health/readiness")
+                .forStatusCode(200)
+                .forResponsePredicate(response -> response.contains("\"status\":\"UP\"")))
+            .withStrategy(Wait.forHttp("/.well-known/openid-configuration")
+                .forStatusCode(200))
+            .withStartupTimeout(Duration.ofMinutes(3))
         );
 
 
