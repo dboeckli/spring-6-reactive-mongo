@@ -4,6 +4,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.awaitility.core.ConditionTimeoutException;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.security.autoconfigure.actuate.web.reactive.EndpointRequest;
 import org.springframework.context.annotation.Bean;
@@ -95,30 +96,29 @@ public class SecurityConfig {
 
         try {
             await()
-                .atMost(120, TimeUnit.SECONDS) // Länger warten (z.B. 2 Minuten)
+                .atMost(120, TimeUnit.SECONDS)
                 .pollInterval(3, TimeUnit.SECONDS)
                 .ignoreExceptions()
                 .alias("Auth-Server-Readiness-Check")
                 .until(() -> {
-                    try {
-                        Boolean isUp = webClient.get()
-                            .uri("/.well-known/openid-configuration")
-                            .exchangeToMono(response -> {
-                                if (response.statusCode().is2xxSuccessful()) {
-                                    return Mono.just(true);
-                                } else {
-                                    log.warn("### Readiness-Check fehlgeschlagen. Response: {}, Status: {}", response, response.statusCode());
-                                    return Mono.just(false);
-                                }
-                            })
-                            .block(Duration.ofSeconds(2)); // Timeout für den einzelnen Request
-                        return Boolean.TRUE.equals(isUp);
-                    } catch (Exception ex) {
-                        log.error("### Readiness-Check fehlgeschlagen", ex);
-                        return false;
-                    }
+                    return webClient.get()
+                        .uri("/.well-known/openid-configuration")
+                        .exchangeToMono(response -> {
+                            if (response.statusCode().is2xxSuccessful()) {
+                                return Mono.just(true);
+                            } else {
+                                log.warn("### Readiness-Check fehlgeschlagen. Status: {}", response.statusCode());
+                                return Mono.just(false);
+                            }
+                        })
+                        .onErrorResume(ex -> {
+                            // Hier fangen wir das "Connection refused" ab und loggen es
+                            log.error("### Readiness-Check fehlgeschlagen: {}", ex.getMessage());
+                            return Mono.just(false);
+                        })
+                        .block(Duration.ofSeconds(2));
                 });
-        } catch (org.awaitility.core.ConditionTimeoutException e) {
+        } catch (ConditionTimeoutException e) {
             log.error("Initialisierung fehlgeschlagen: Der Auth-Server hat nicht rechtzeitig geantwortet.");
             throw e; // Den Test/Start explizit abbrechen
         }
