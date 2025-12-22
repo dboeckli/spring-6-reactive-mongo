@@ -669,8 +669,7 @@
                         </goals>
                         <phase>post-integration-test</phase>
                         <configuration>
-                            <skip>true</skip>
-                            <!--<skip>${skip.start.stop.springboot}</skip> -->
+                            <skip>${skip.start.stop.springboot}</skip>
                             <!-- 1000 milliseconds is default -->
                             <wait>1000</wait> 
                             <maxAttempts>120</maxAttempts> <!-- 30 attempts is default, combined with wait it results to 30 sec. We wait 60 seconds. -->

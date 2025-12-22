@@ -90,41 +90,6 @@ public class SecurityConfig {
         if (issuer == null || issuer.isBlank()) {
             throw new IllegalStateException("Property spring.security.oauth2.resourceserver.jwt.issuer-uri must be set");
         }
-        log.info("### Wating for Issuer ready: {}", issuer);
-
-        WebClient webClient = WebClient.builder().baseUrl(issuer).build();
-
-        try {
-            await()
-                .atMost(120, TimeUnit.SECONDS)
-                .pollInterval(3, TimeUnit.SECONDS)
-                .ignoreExceptions()
-                .alias("Auth-Server-Readiness-Check")
-                .until(() -> {
-                    return webClient.get()
-                        .uri("/.well-known/openid-configuration")
-                        .exchangeToMono(response -> {
-                            if (response.statusCode().is2xxSuccessful()) {
-                                return Mono.just(true);
-                            } else {
-                                log.warn("### Readiness-Check fehlgeschlagen. Status: {}", response.statusCode());
-                                return Mono.just(false);
-                            }
-                        })
-                        .onErrorResume(ex -> {
-                            // Hier fangen wir das "Connection refused" ab und loggen es
-                            log.error("### Readiness-Check fehlgeschlagen: {}", ex.getMessage());
-                            return Mono.just(false);
-                        })
-                        .block(Duration.ofSeconds(2));
-                });
-        } catch (ConditionTimeoutException e) {
-            log.error("Initialisierung fehlgeschlagen: Der Auth-Server hat nicht rechtzeitig geantwortet.");
-            throw e; // Den Test/Start explizit abbrechen
-        }
-
-        log.info("Authentication Server ist bereit. Initialisiere ReactiveJwtDecoder.");
-        
         return ReactiveJwtDecoders.fromIssuerLocation(issuer);
     }
 
