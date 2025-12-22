@@ -40,8 +40,10 @@ spec:
               value: "{{ .Values.mongodb.serviceFQDN  }}"
             - name: SPRING_MONGODB_PORT
               value: "{{ .Values.mongodb.port }}"
+            #- name: SPRING_MONGODB_URI
+            #  value: "mongodb://{{ .Values.mongodb.serviceFQDN  }}:{{ .Values.mongodb.port }}/{{ .Values.mongodb.database }}"
             - name: SPRING_MONGODB_URI
-              value: "mongodb://{{ .Values.mongodb.serviceFQDN  }}:{{ .Values.mongodb.port }}/{{ .Values.mongodb.database }}"
+              value: "mongodb://root:secret@{{ .Values.mongodb.serviceFQDN }}:{{ .Values.mongodb.port }}/{{ .Values.mongodb.database }}?authSource=admin"
             - name: SPRING_MONGODB_DATABASE
               value: {{ .Values.mongodb.database }}
               
