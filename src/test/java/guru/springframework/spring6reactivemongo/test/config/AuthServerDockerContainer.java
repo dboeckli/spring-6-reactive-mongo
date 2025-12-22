@@ -46,12 +46,12 @@ public class AuthServerDockerContainer {
         throw new IllegalStateException("Kein freier Port im Bereich " + min + "-" + max + " gefunden.");
     }
 
-    @Container
     static GenericContainer<?> authServer = new GenericContainer<>(DOCKER_REPO + "/spring-6-auth-server:" + AUTH_SERVER_VERSION)
         .withNetworkAliases("auth-server")
         .withNetwork(sharedNetwork)
         // Der Container selbst kann intern auf 9000 laufen...
         .withEnv("SERVER_PORT", String.valueOf(AUTH_SERVER_CONTAINER_PORT))
+        .withExposedPorts(AUTH_SERVER_CONTAINER_PORT)
         // ...aber wir sagen ihm, dass er von außen über den Host-Port erreichbar ist!
         .withEnv("SPRING_SECURITY_OAUTH2_AUTHORIZATION_SERVER_ISSUER", "http://localhost:" + AUTH_SERVER_HOST_PORT)
         // Jetzt binden wir den fixen Host-Zufallsport an den Container-Port
@@ -70,15 +70,15 @@ public class AuthServerDockerContainer {
 
     @Bean
     public DynamicPropertyRegistrar authServerProperties() {
+        log.info("### Starting Auth Server Docker Container");
         if (!authServer.isRunning()) {
             authServer.start();
         }
-
+        int mappedPort = authServer.getMappedPort(AUTH_SERVER_CONTAINER_PORT);
         return (properties) -> {
-            String issuerUri = "http://localhost:" + AUTH_SERVER_HOST_PORT;
+            String issuerUri = "http://localhost:" + mappedPort;
             log.info("### Setting Resource Server Issuer URI (Static Random Port): " + issuerUri);
             properties.add("spring.security.oauth2.resourceserver.jwt.issuer-uri", () -> issuerUri);
         };
     }
-
 }
