@@ -673,7 +673,7 @@
                             <!-- 1000 milliseconds is default -->
                             <wait>1000</wait> 
                             <maxAttempts>120</maxAttempts> <!-- 30 attempts is default, combined with wait it results to 30 sec. We wait 60 seconds. -->
-                            <profiles>local</profiles>
+                            <profiles>docker-with-compose</profiles>
                             <arguments>
                                 <argument>-Xmx1024m</argument>
                                 <argument>--server.port=${tomcat.http.port}</argument>
