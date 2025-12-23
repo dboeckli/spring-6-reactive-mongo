@@ -22,13 +22,13 @@ import static java.util.Collections.singletonList;
 @Log
 public class MongoClientConfig extends AbstractReactiveMongoConfiguration {
 
-    @Value("${spring.data.mongodb.uri}")
+    @Value("${spring.mongodb.uri}")
     private String mongoUri;
 
-    @Value("${spring.data.mongodb.username:}")
+    @Value("${spring.mongodb.username:}")
     private String username;
 
-    @Value("${spring.data.mongodb.password:}")
+    @Value("${spring.mongodb.password:}")
     private String password;
 
     @Bean

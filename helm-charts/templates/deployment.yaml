@@ -32,17 +32,12 @@ spec:
             - name: SPRING_APPLICATION_JSON
               value: '{"debug":{{ .Values.global.springDebug | default false }}}' 
             - name: JAVA_TIMEZONE
-              value: "{{ .Values.global.timezone }}"
-            - name: SPRING_PROFILES_ACTIVE
-              value: {{ .Values.spring.profiles.active | default "local" }}
-              
-            - name: SPRING_DATA_MONGODB_HOST
+              value: "{{ .Values.global.timezone }}"             
+            - name: SPRING_MONGODB_HOST
               value: "{{ .Values.mongodb.serviceFQDN  }}"
-            - name: SPRING_DATA_MONGODB_PORT
+            - name: SPRING_MONGODB_PORT
               value: "{{ .Values.mongodb.port }}"
-            - name: SPRING_DATA_MONGODB_URI
-              value: "mongodb://{{ .Values.mongodb.serviceFQDN  }}:{{ .Values.mongodb.port }}/{{ .Values.mongodb.database }}"
-            - name: SPRING_DATA_MONGODB_DATABASE
+            - name: SPRING_MONGODB_DATABASE
               value: {{ .Values.mongodb.database }}
               
             - name: SECURITY_AUTH_SERVER_HEALTH_URL

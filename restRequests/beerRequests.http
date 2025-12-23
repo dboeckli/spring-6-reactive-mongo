@@ -2,7 +2,6 @@
 GET http://localhost:{{application-port}}/api/v3/beer
 Accept: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}
-
 Content-Type: application/json
 
 ### Get Beer by ID
