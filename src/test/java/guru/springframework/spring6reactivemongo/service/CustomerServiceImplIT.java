@@ -2,6 +2,7 @@ package guru.springframework.spring6reactivemongo.service;
 
 import guru.springframework.spring6reactivemongo.dto.CustomerDto;
 import guru.springframework.spring6reactivemongo.mapper.CustomerMapper;
+import guru.springframework.spring6reactivemongo.test.config.AuthServerDockerContainer;
 import guru.springframework.spring6reactivemongo.test.config.MongoExtension;
 import guru.springframework.spring6reactivemongo.test.config.TestMongoDockerContainer;
 import lombok.extern.java.Log;
@@ -10,11 +11,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
-import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import reactor.core.publisher.Mono;
 
@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @AutoConfigureWebTestClient
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @Log
-@Import(TestMongoDockerContainer.class)
+@Import({TestMongoDockerContainer.class, AuthServerDockerContainer.class})
 @ExtendWith(MongoExtension.class)
 class CustomerServiceImplIT {
 
@@ -39,9 +39,6 @@ class CustomerServiceImplIT {
 
     @Autowired
     CustomerMapper customerMapper;
-    
-    @Autowired
-    MongoDBContainer mongoDBContainer;
 
     @Test
     void listCustomers() {
@@ -54,10 +51,10 @@ class CustomerServiceImplIT {
 
     @Test
     void findFirstCustomerByName() {
-        Mono<CustomerDto> firstCustomer =  customerService.findFirstByCustomerName("John Doe");
-        
+        Mono<CustomerDto> firstCustomer = customerService.findFirstByCustomerName("John Doe");
+
         assertNotNull(firstCustomer);
         assertEquals("John Doe", firstCustomer.block().getCustomerName());
     }
-    
+
 }

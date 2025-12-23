@@ -5,16 +5,9 @@ spring:
   application:
     name: spring-6-reactive-mongo
     
-  data:
-    mongodb:
-      # uri will be changed to the exposed port when the docker container has started
-      uri: mongodb://localhost:27018/sfg
-      database: sfg
-      username: root
-      password: secret
-      host: localhost
-      port: 27018
-      
+  main:
+    allow-bean-definition-overriding: true  
+    
   docker:
     compose:
       enabled: true
@@ -22,36 +15,21 @@ spring:
         command: down    
       skip:
         in-tests: false
+        
   security:
     oauth2:
       resourceserver:
         jwt:
           issuer-uri: http://localhost:9000    
-      
-logbook:
-  filter:
-    enabled: true
-  format:
-    style: http
-  obfuscate:
-    headers:
-      - Authorization
-      - X-Secret
-    parameters:
-      - access_token
-      - password
-  predicate:
-    exclude:
-      # Exclude HTML-related calls and specific endpoints that Logbook doesn't handle correctly
-      - path: /actuator/health/**
-      - path: /h2-console/**  # Exclude H2 console
-      - path: /swagger-ui/**  # Exclude Swagger UI if used
-      - path: /v3/api-docs/** # Exclude OpenAPI docs if used
-      # Add more exclusions as needed
-
-logging:
-  level:
-    org.zalando.logbook: TRACE      
+  
+  mongodb:
+    uri: mongodb://root:secret@localhost:27018/sfg?authSource=admin
+    database: sfg
+    username: root
+    password: secret
+    host: localhost
+    port: 27018
+    authentication-database: admin
     
 springdoc:
   show-actuator: false
@@ -79,13 +57,54 @@ management:
       # WARNING: SECURITY RISK - DO NOT USE IN PRODUCTION ENVIRONMENT
       # This configuration exposes sensitive data and should only be used for development or testing purposes.
       # Ensure this is disabled in any environment where security is a concern.
-      show-values: ALWAYS 
-    env:
-      show-values: always
+      show-values: ALWAYS
     health:
       probes:
         enabled: true
       show-details: always
+  info:
+    build:
+      enabled: true
+    env:
+      enabled: true
+    java:
+      enabled: true
+    os:
+      enabled: true
+    git:
+      enabled: true
+      mode: full
+  httpexchanges:
+    recording:
+      enabled: true
+      include: request_headers, response_headers, session_id, time_taken
+  observations:
+    http:
+      server:
+        requests:
+          name: http.server.requests
+      client:
+        requests:
+          name: http-client-requests
+  otlp:
+    metrics:
+      export:
+        enabled: false
+  tracing:
+    export:
+      otlp:
+        enabled: false
+    sampling:
+      probability: 1.0
+  logging:
+    export:
+      enabled: false
+      otlp:
+        enabled: false
+  simple:
+    metrics:
+      export:
+        enabled: false
 
 security:
   auth-server-health-url: http://localhost:9000
