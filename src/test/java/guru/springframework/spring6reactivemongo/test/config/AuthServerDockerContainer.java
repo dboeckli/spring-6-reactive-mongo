@@ -30,20 +30,17 @@ public class AuthServerDockerContainer {
     private static final String AUTH_SERVER_VERSION = "0.0.5-SNAPSHOT";
 
     static final int AUTH_SERVER_CONTAINER_PORT = 9000;
-    static final int AUTH_SERVER_HOST_PORT = findPortInRange(49152, 65535);
+    static final int AUTH_SERVER_HOST_PORT = findRandomOpenPort();
 
     static final Network sharedNetwork = Network.newNetwork();
 
-    private static int findPortInRange(int min, int max) {
-        for (int i = 0; i < 50; i++) { // 50 Versuche
-            int port = ThreadLocalRandom.current().nextInt(min, max + 1);
-            try (ServerSocket ignored = new ServerSocket(port)) {
-                return port;
-            } catch (IOException e) {
-                // Port belegt, nächster Versuch
-            }
+    private static int findRandomOpenPort() {
+        try (ServerSocket socket = new ServerSocket(0)) {
+            socket.setReuseAddress(true);
+            return socket.getLocalPort();
+        } catch (IOException e) {
+            throw new RuntimeException("Kein freier Port verfügbar", e);
         }
-        throw new IllegalStateException("Kein freier Port im Bereich " + min + "-" + max + " gefunden.");
     }
 
     static GenericContainer<?> authServer = new GenericContainer<>(DOCKER_REPO + "/spring-6-auth-server:" + AUTH_SERVER_VERSION)
