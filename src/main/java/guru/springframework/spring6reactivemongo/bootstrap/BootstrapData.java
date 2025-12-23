@@ -6,11 +6,13 @@ import guru.springframework.spring6reactivemongo.repository.BeerRepository;
 import guru.springframework.spring6reactivemongo.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
+import org.jspecify.annotations.NonNull;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Component
 @RequiredArgsConstructor
@@ -22,7 +24,7 @@ public class BootstrapData implements CommandLineRunner {
     private final CustomerRepository customerRepository;
 
     @Override
-    public void run(String... args) {
+    public void run(String @NonNull ... args) {
         beerRepository.deleteAll()
             .doOnSuccess(success -> loadBeerData())
             .subscribe();
@@ -57,9 +59,9 @@ public class BootstrapData implements CommandLineRunner {
             customerRepository.save(customer2).block();
             customerRepository.save(customer3).block();
 
-            customerRepository.findAll()
-                .collectList()
-                .block()
+            Objects.requireNonNull(customerRepository.findAll()
+                    .collectList()
+                    .block())
                 .forEach(customer -> log.info("Customer added: " + customer));
 
             log.info("3 Customers added successfully");
