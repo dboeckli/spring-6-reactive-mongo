@@ -13,7 +13,7 @@ mongodb:
 # You can verify this manually via `docker pull` and `docker inspect`.
 mongoImage:
   repository: mongo
-  tag: "8.2.1"
+  tag: "8.2.3"
   pullPolicy: IfNotPresent
 debianSlimImage:
   repository: debian
