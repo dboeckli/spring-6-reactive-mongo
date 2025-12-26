@@ -21,6 +21,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import reactor.core.publisher.Mono;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.mockJwt;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.mockOAuth2Login;
 
 @SpringBootTest
@@ -29,7 +30,7 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 @AutoConfigureWebTestClient
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @Log
-@Import({TestMongoDockerContainer.class, AuthServerDockerContainer.class})
+@Import({TestMongoDockerContainer.class})
 @ExtendWith(MongoExtension.class)
 class CustomerHandlerIT {
 
@@ -40,7 +41,7 @@ class CustomerHandlerIT {
     @Order(1)
     void testListCustomers() {
         webTestClient
-            .mutateWith(mockOAuth2Login())
+            .mutateWith(mockJwt())
             .get().uri(CustomerRouterConfig.CUSTOMER_PATH)
             .exchange()
             .expectStatus().isOk()
@@ -52,7 +53,7 @@ class CustomerHandlerIT {
     @Order(1)
     void testListCustomers2() {
         webTestClient
-            .mutateWith(mockOAuth2Login())
+            .mutateWith(mockJwt())
             .get().uri(CustomerRouterConfig.CUSTOMER_PATH)
             .exchange()
             .expectStatus().isOk()
@@ -66,7 +67,7 @@ class CustomerHandlerIT {
         CustomerDto existingCustomer = getAnyExistingCustomer();
 
         webTestClient
-            .mutateWith(mockOAuth2Login())
+            .mutateWith(mockJwt())
             .get().uri(UriComponentsBuilder
                 .fromPath(CustomerRouterConfig.CUSTOMER_PATH)
                 .queryParam("customerName", existingCustomer.getCustomerName()).build().toUri())
@@ -82,7 +83,7 @@ class CustomerHandlerIT {
         CustomerDto givenCustomer = getAnyExistingCustomer();
 
         CustomerDto gotCustomer = webTestClient
-            .mutateWith(mockOAuth2Login())
+            .mutateWith(mockJwt())
             .get().uri(CustomerRouterConfig.CUSTOMER_PATH_ID, givenCustomer.getId())
             .exchange()
             .expectStatus().isOk()
@@ -98,7 +99,7 @@ class CustomerHandlerIT {
         CustomerDto customerToCreate = CustomerDto.builder().customerName("New Customer").build();
 
         String location = webTestClient
-            .mutateWith(mockOAuth2Login())
+            .mutateWith(mockJwt())
             .post().uri(CustomerRouterConfig.CUSTOMER_PATH)
             .body(Mono.just(customerToCreate), CustomerDto.class)
             .exchange()
@@ -122,7 +123,7 @@ class CustomerHandlerIT {
         CustomerDto customerToCreate = CustomerDto.builder().customerName("").build();
 
         webTestClient
-            .mutateWith(mockOAuth2Login())
+            .mutateWith(mockJwt())
             .post().uri(CustomerRouterConfig.CUSTOMER_PATH)
             .body(Mono.just(customerToCreate), CustomerDto.class)
             .exchange()
@@ -135,7 +136,7 @@ class CustomerHandlerIT {
         CustomerDto customerToCreate = CustomerDto.builder().customerName("1").build();
 
         webTestClient
-            .mutateWith(mockOAuth2Login())
+            .mutateWith(mockJwt())
             .post().uri(CustomerRouterConfig.CUSTOMER_PATH)
             .body(Mono.just(customerToCreate), CustomerDto.class)
             .exchange()
@@ -148,7 +149,7 @@ class CustomerHandlerIT {
         CustomerDto customerToCreate = CustomerDto.builder().customerName(null).build();
 
         webTestClient
-            .mutateWith(mockOAuth2Login())
+            .mutateWith(mockJwt())
             .post().uri(CustomerRouterConfig.CUSTOMER_PATH)
             .body(Mono.just(customerToCreate), CustomerDto.class)
             .exchange()
@@ -157,7 +158,7 @@ class CustomerHandlerIT {
 
     private CustomerDto getCustomerByLocation(String location) {
         return webTestClient
-            .mutateWith(mockOAuth2Login())
+            .mutateWith(mockJwt())
             .get().uri(location)
             .exchange()
             .expectStatus().isOk()
@@ -173,7 +174,7 @@ class CustomerHandlerIT {
         customerToUpdate.setCustomerName("UpdatedCustomer");
 
         webTestClient
-            .mutateWith(mockOAuth2Login())
+            .mutateWith(mockJwt())
             .put()
             .uri(CustomerRouterConfig.CUSTOMER_PATH_ID, customerToUpdate.getId())
             .body(Mono.just(customerToUpdate), CustomerDto.class)
@@ -193,7 +194,7 @@ class CustomerHandlerIT {
         customerToUpdate.setCustomerName("1");
 
         webTestClient
-            .mutateWith(mockOAuth2Login())
+            .mutateWith(mockJwt())
             .put()
             .uri(CustomerRouterConfig.CUSTOMER_PATH_ID, customerToUpdate.getId())
             .body(Mono.just(customerToUpdate), CustomerDto.class)
@@ -209,7 +210,7 @@ class CustomerHandlerIT {
         customerToUpdate.setId("9999");
 
         webTestClient
-            .mutateWith(mockOAuth2Login())
+            .mutateWith(mockJwt())
             .put()
             .uri(CustomerRouterConfig.CUSTOMER_PATH_ID, customerToUpdate.getId())
             .body(Mono.just(customerToUpdate), CustomerDto.class)
@@ -224,7 +225,7 @@ class CustomerHandlerIT {
         customerToUpdate.setCustomerName("PatchedCustomer");
 
         webTestClient
-            .mutateWith(mockOAuth2Login())
+            .mutateWith(mockJwt())
             .patch()
             .uri(CustomerRouterConfig.CUSTOMER_PATH_ID, customerToUpdate.getId())
             .body(Mono.just(customerToUpdate), CustomerDto.class)
@@ -244,7 +245,7 @@ class CustomerHandlerIT {
         customerToUpdate.setCustomerName("");
 
         webTestClient
-            .mutateWith(mockOAuth2Login())
+            .mutateWith(mockJwt())
             .patch()
             .uri(CustomerRouterConfig.CUSTOMER_PATH_ID, customerToUpdate.getId())
             .body(Mono.just(customerToUpdate), CustomerDto.class)
@@ -259,7 +260,7 @@ class CustomerHandlerIT {
         customerToUpdate.setCustomerName("1");
 
         webTestClient
-            .mutateWith(mockOAuth2Login())
+            .mutateWith(mockJwt())
             .patch()
             .uri(CustomerRouterConfig.CUSTOMER_PATH_ID, customerToUpdate.getId())
             .body(Mono.just(customerToUpdate), CustomerDto.class)
@@ -274,7 +275,7 @@ class CustomerHandlerIT {
         customerToUpdate.setId("999999");
 
         webTestClient
-            .mutateWith(mockOAuth2Login())
+            .mutateWith(mockJwt())
             .patch()
             .uri(CustomerRouterConfig.CUSTOMER_PATH_ID, customerToUpdate.getId())
             .body(Mono.just(customerToUpdate), CustomerDto.class)
@@ -285,7 +286,7 @@ class CustomerHandlerIT {
     private CustomerDto getCustomerById(String id) {
         try {
             return webTestClient
-                .mutateWith(mockOAuth2Login())
+                .mutateWith(mockJwt())
                 .get().uri(CustomerRouterConfig.CUSTOMER_PATH_ID, id)
                 .exchange()
                 .expectStatus().isOk()
@@ -305,7 +306,7 @@ class CustomerHandlerIT {
         CustomerDto customerToDelete = this.getAnyExistingCustomer();
 
         webTestClient
-            .mutateWith(mockOAuth2Login())
+            .mutateWith(mockJwt())
             .delete()
             .uri(CustomerRouterConfig.CUSTOMER_PATH_ID, customerToDelete.getId())
             .exchange()
@@ -322,7 +323,7 @@ class CustomerHandlerIT {
         customerToDelete.setId("88888888888888");
 
         webTestClient
-            .mutateWith(mockOAuth2Login())
+            .mutateWith(mockJwt())
             .delete()
             .uri(CustomerRouterConfig.CUSTOMER_PATH_ID, customerToDelete.getId())
             .exchange()
@@ -331,7 +332,7 @@ class CustomerHandlerIT {
 
     private CustomerDto getAnyExistingCustomer() {
         return webTestClient
-            .mutateWith(mockOAuth2Login())
+            .mutateWith(mockJwt())
             .get().uri(CustomerRouterConfig.CUSTOMER_PATH)
             .exchange()
             .expectStatus().isOk()
