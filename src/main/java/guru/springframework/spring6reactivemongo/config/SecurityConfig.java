@@ -4,7 +4,6 @@ import jakarta.annotation.PostConstruct;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.awaitility.core.ConditionTimeoutException;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.security.autoconfigure.actuate.web.reactive.EndpointRequest;
 import org.springframework.context.annotation.Bean;
@@ -14,23 +13,14 @@ import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
-
 import org.springframework.security.config.web.server.ServerHttpSecurity;
-import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
-import org.springframework.security.oauth2.jwt.ReactiveJwtDecoders;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.stereotype.Component;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsConfigurationSource;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
-import java.time.Duration;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import static org.awaitility.Awaitility.await;
 
 @Configuration
 @EnableWebFluxSecurity
@@ -82,15 +72,6 @@ public class SecurityConfig {
             )
             .oauth2ResourceServer(oAuth2 -> oAuth2.jwt(Customizer.withDefaults()))
             .build();
-    }
-
-    @Bean
-    public ReactiveJwtDecoder reactiveJwtDecoder() {
-        String issuer = environment.getProperty("spring.security.oauth2.resourceserver.jwt.issuer-uri");
-        if (issuer == null || issuer.isBlank()) {
-            throw new IllegalStateException("Property spring.security.oauth2.resourceserver.jwt.issuer-uri must be set");
-        }
-        return ReactiveJwtDecoders.fromIssuerLocation(issuer);
     }
 
     @Bean
