@@ -15,7 +15,9 @@ spec:
       command: [ "/bin/sh", "-c" ]
       args:
         - |
-          set -e
+          set +o errexit
+          echo ">>> Start Test MongoDB"
+          
           apt-get update && apt-get install -y curl gnupg ca-certificates
 
           # MongoDB GPG-Schlüssel importieren
@@ -37,6 +39,8 @@ spec:
                   --password "$MONGO_INITDB_ROOT_PASSWORD" \
                   --eval "db.adminCommand('ping')"
           echo "Exit code: $?"
+
+          echo ">>> End Test MongoDB"
       env:
         - name: MONGO_INITDB_ROOT_USERNAME
           valueFrom:
