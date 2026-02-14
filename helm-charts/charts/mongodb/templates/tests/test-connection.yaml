@@ -4,9 +4,7 @@ metadata:
   name: "{{ include "mongodb.fullname" . | trunc 63 | trimSuffix "-" }}-test"
   namespace: {{ .Values.global.namespace }}
   labels:
-    app.kubernetes.io/component: helm-test
-    app.kubernetes.io/name: "{{ include "application-template.fullname" . }}-test"
-    app.kubernetes.io/instance: "{{ .Release.Name }}-test"
+    {{- include "mongodb.labels" . | nindent 4 }}
   annotations:
     "helm.sh/hook": test
 spec:
