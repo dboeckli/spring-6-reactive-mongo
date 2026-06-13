@@ -1,6 +1,6 @@
 server:
   port: 8083
-  
+
 management:
   health:
     readinessstate:
@@ -64,32 +64,32 @@ management:
     metrics:
       export:
         enabled: false
-    
+
 spring:
   application:
     name: spring-6-reactive-mongo
-  
+
   main:
     allow-bean-definition-overriding: true
-      
+
   security:
     oauth2:
       resourceserver:
         jwt:
           issuer-uri: http://localhost:9000
-          
+
   docker:
     compose:
       enabled: false
       stop:
         command: down
-  
+
   mongodb:
     host: localhost
     port: 27017
     uri: mongodb://localhost:27017/sfg
     database: sfg
-    
+
 springdoc:
   show-actuator: false
   show-oauth2-endpoints: true
@@ -99,8 +99,8 @@ springdoc:
     oauth:
       # do that not on production!
       client-id: messaging-client
-      client-secret: secret  
-        
+      client-secret: secret
+
 security:
   auth-server-health-url: http://localhost:9000
   authorization-url-for-openapi: http://localhost:9000/oauth2/auth
@@ -109,6 +109,6 @@ security:
   cors:
     allowed-origins:
       - http://localhost:8080 # gateway project runs on port 8080
-      - http://127.0.0.1:8080 # gateway project runs on port 8080      
+      - http://127.0.0.1:8080 # gateway project runs on port 8080
       - http://localhost:30080 # gateway project runs on port 30080
-      - http://127.0.0.1:30080 # gateway project runs on port 30080  
+      - http://127.0.0.1:30080 # gateway project runs on port 30080

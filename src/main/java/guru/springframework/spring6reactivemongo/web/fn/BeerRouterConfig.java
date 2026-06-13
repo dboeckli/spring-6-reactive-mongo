@@ -19,22 +19,24 @@ import static org.springframework.web.reactive.function.server.RouterFunctions.r
 public class BeerRouterConfig {
 
     public static final String BEER_PATH = "/api/v3/beer";
+
     public static final String BEER_PATH_ID = BEER_PATH + "/{beerId}";
 
     private final BeerHandler beerHandler;
 
     @Bean
     @RouterOperations({
-        @RouterOperation(method = GET, path = BEER_PATH, beanClass = BeerService.class, beanMethod = "listBeers"),
-        @RouterOperation(method = GET, path = BEER_PATH_ID, beanClass = BeerService.class, beanMethod = "getById"),
-        @RouterOperation(method = POST, path = BEER_PATH, beanClass = BeerService.class, beanMethod = "saveBeer"),
-        @RouterOperation(method = PUT, path = BEER_PATH_ID, beanClass = BeerService.class, beanMethod = "updateBeer"),
-        @RouterOperation(method = PATCH, path = BEER_PATH_ID, beanClass = BeerService.class, beanMethod = "patchBeer"),
-        @RouterOperation(method = DELETE, path = BEER_PATH_ID, beanClass = BeerService.class, beanMethod = "deleteBeerById")
-    })
+            @RouterOperation(method = GET, path = BEER_PATH, beanClass = BeerService.class, beanMethod = "listBeers"),
+            @RouterOperation(method = GET, path = BEER_PATH_ID, beanClass = BeerService.class, beanMethod = "getById"),
+            @RouterOperation(method = POST, path = BEER_PATH, beanClass = BeerService.class, beanMethod = "saveBeer"),
+            @RouterOperation(method = PUT, path = BEER_PATH_ID, beanClass = BeerService.class,
+                    beanMethod = "updateBeer"),
+            @RouterOperation(method = PATCH, path = BEER_PATH_ID, beanClass = BeerService.class,
+                    beanMethod = "patchBeer"),
+            @RouterOperation(method = DELETE, path = BEER_PATH_ID, beanClass = BeerService.class,
+                    beanMethod = "deleteBeerById") })
     public RouterFunction<ServerResponse> beerRoutes() {
-        return route()
-            .GET(BEER_PATH, accept(APPLICATION_JSON), beerHandler::listBeers)
+        return route().GET(BEER_PATH, accept(APPLICATION_JSON), beerHandler::listBeers)
             .GET(BEER_PATH_ID, accept(APPLICATION_JSON), beerHandler::getBeerById)
             .POST(BEER_PATH, accept(APPLICATION_JSON), beerHandler::createNewBeer)
             .PUT(BEER_PATH_ID, accept(APPLICATION_JSON), beerHandler::updateBeerById)
@@ -42,5 +44,5 @@ public class BeerRouterConfig {
             .DELETE(BEER_PATH_ID, accept(APPLICATION_JSON), beerHandler::deleteBeerById)
             .build();
     }
-    
+
 }

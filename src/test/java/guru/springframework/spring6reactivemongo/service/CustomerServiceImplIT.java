@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @AutoConfigureWebTestClient
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @Log
-@Import({TestMongoDockerContainer.class, AuthServerDockerContainer.class})
+@Import({ TestMongoDockerContainer.class, AuthServerDockerContainer.class })
 @ExtendWith(MongoExtension.class)
 class CustomerServiceImplIT {
 
@@ -46,7 +46,8 @@ class CustomerServiceImplIT {
 
         assertNotNull(customers);
         assertEquals(3, customers.size());
-        assertThat(customers).extracting(CustomerDto::getCustomerName).contains("John Doe", "Fridolin Mann", "Hansjörg Riesen");
+        assertThat(customers).extracting(CustomerDto::getCustomerName)
+            .contains("John Doe", "Fridolin Mann", "Hansjörg Riesen");
     }
 
     @Test

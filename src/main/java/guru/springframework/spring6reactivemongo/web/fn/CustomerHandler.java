@@ -32,38 +32,35 @@ public class CustomerHandler {
         if (request.queryParam("customerName").isPresent()) {
             String customerName = request.queryParam("customerName")
                 .filter(name -> !name.trim().isEmpty())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Customer name must not be empty or contain only whitespace"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "Customer name must not be empty or contain only whitespace"));
             Mono<CustomerDto> firstCustomerMono = customerService.findFirstByCustomerName(customerName);
             customerDtoFlux = Flux.from(firstCustomerMono);
-        } else {
+        }
+        else {
             customerDtoFlux = customerService.listCustomers();
         }
-        return ServerResponse.ok()
-            .body(customerDtoFlux, CustomerDto.class);
+        return ServerResponse.ok().body(customerDtoFlux, CustomerDto.class);
     }
 
-    public Mono<ServerResponse> getCustomerById(ServerRequest request){
-        return ServerResponse
-            .ok()
+    public Mono<ServerResponse> getCustomerById(ServerRequest request) {
+        return ServerResponse.ok()
             .body(customerService.getById(request.pathVariable("customerId"))
-                    .switchIfEmpty(Mono.error(new ResponseStatusException(NOT_FOUND))),
-                CustomerDto.class);
+                .switchIfEmpty(Mono.error(new ResponseStatusException(NOT_FOUND))), CustomerDto.class);
     }
-    
+
     public Mono<ServerResponse> createCustomer(ServerRequest request) {
         return customerService.saveCustomer(request.bodyToMono(CustomerDto.class).doOnNext(this::validate))
             .flatMap(customerDTO -> ServerResponse
-                .created(UriComponentsBuilder
-                    .fromPath(CustomerRouterConfig.CUSTOMER_PATH_ID)
-                    .build(customerDTO.getId()))
+                .created(
+                        UriComponentsBuilder.fromPath(CustomerRouterConfig.CUSTOMER_PATH_ID).build(customerDTO.getId()))
                 .build());
     }
 
     public Mono<ServerResponse> updateCustomerById(ServerRequest request) {
         return request.bodyToMono(CustomerDto.class)
             .doOnNext(this::validate)
-            .flatMap(customerDTO -> customerService
-                .updateCustomer(request.pathVariable("customerId"), customerDTO))
+            .flatMap(customerDTO -> customerService.updateCustomer(request.pathVariable("customerId"), customerDTO))
             .switchIfEmpty(Mono.error(new ResponseStatusException(NOT_FOUND, "Customer not found")))
             .flatMap(savedDto -> ServerResponse.noContent().build());
     }
@@ -71,13 +68,12 @@ public class CustomerHandler {
     public Mono<ServerResponse> patchCustomerById(ServerRequest request) {
         return request.bodyToMono(CustomerDto.class)
             .doOnNext(this::validate)
-            .flatMap(customerDTO -> customerService
-                .patchCustomer(request.pathVariable("customerId"), customerDTO))
+            .flatMap(customerDTO -> customerService.patchCustomer(request.pathVariable("customerId"), customerDTO))
             .switchIfEmpty(Mono.error(new ResponseStatusException(NOT_FOUND, "Customer not found")))
             .flatMap(savedDto -> ServerResponse.noContent().build());
     }
 
-    public Mono<ServerResponse> deleteCustomerById(ServerRequest request){
+    public Mono<ServerResponse> deleteCustomerById(ServerRequest request) {
         return customerService.getById(request.pathVariable("customerId"))
             .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
             .flatMap(customerDTO -> customerService.deleteCustomerById(customerDTO.getId()))
@@ -89,7 +85,8 @@ public class CustomerHandler {
         validator.validate(customerDto, errors);
 
         if (errors.hasErrors()) {
-            throw new ServerWebInputException(errors.toString());        }
+            throw new ServerWebInputException(errors.toString());
+        }
     }
-    
+
 }

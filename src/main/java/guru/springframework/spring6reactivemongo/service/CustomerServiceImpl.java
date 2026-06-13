@@ -20,7 +20,7 @@ public class CustomerServiceImpl implements CustomerService {
     private final CustomerRepository customerRepository;
 
     private final CustomerMapper customerMapper;
-    
+
     @Override
     public Mono<CustomerDto> saveCustomer(Mono<CustomerDto> customerDto) {
         return customerDto.map(customerMapper::customerDtoToCustomer)
@@ -30,47 +30,41 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public Mono<CustomerDto> getById(String customerId) {
-        return customerRepository.findById(customerId)
-            .map(customerMapper::customerToCustomerDto);
+        return customerRepository.findById(customerId).map(customerMapper::customerToCustomerDto);
     }
 
     @Override
     public Flux<CustomerDto> listCustomers() {
-        return customerRepository.findAll()
-            .map(customerMapper::customerToCustomerDto);
+        return customerRepository.findAll().map(customerMapper::customerToCustomerDto);
     }
 
     @Override
     public Mono<CustomerDto> findFirstByCustomerName(String customerName) {
-        return customerRepository.findFirstByCustomerName(customerName)
-            .map(customerMapper::customerToCustomerDto);
+        return customerRepository.findFirstByCustomerName(customerName).map(customerMapper::customerToCustomerDto);
     }
 
     @Override
     public Mono<CustomerDto> updateCustomer(String customerId, CustomerDto customerDto) {
-        return customerRepository.findById(customerId)
-            .map(foundCustomer -> {
-                //update properties
-                foundCustomer.setCustomerName(customerDto.getCustomerName());
-                return foundCustomer;
-            }).flatMap(customerRepository::save)
-            .map(customerMapper::customerToCustomerDto);
+        return customerRepository.findById(customerId).map(foundCustomer -> {
+            // update properties
+            foundCustomer.setCustomerName(customerDto.getCustomerName());
+            return foundCustomer;
+        }).flatMap(customerRepository::save).map(customerMapper::customerToCustomerDto);
     }
 
     @Override
     public Mono<CustomerDto> patchCustomer(String customerId, CustomerDto customerDto) {
-        return customerRepository.findById(customerId)
-            .map(foundCustomer -> {
-                if(StringUtils.hasText(customerDto.getCustomerName())){
-                    foundCustomer.setCustomerName(customerDto.getCustomerName());
-                }
-                return foundCustomer;
-            }).flatMap(customerRepository::save)
-            .map(customerMapper::customerToCustomerDto);
+        return customerRepository.findById(customerId).map(foundCustomer -> {
+            if (StringUtils.hasText(customerDto.getCustomerName())) {
+                foundCustomer.setCustomerName(customerDto.getCustomerName());
+            }
+            return foundCustomer;
+        }).flatMap(customerRepository::save).map(customerMapper::customerToCustomerDto);
     }
 
     @Override
     public Mono<Void> deleteCustomerById(String customerId) {
         return customerRepository.deleteById(customerId);
     }
+
 }

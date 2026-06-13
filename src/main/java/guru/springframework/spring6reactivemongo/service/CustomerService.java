@@ -5,6 +5,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public interface CustomerService {
+
     Mono<CustomerDto> saveCustomer(Mono<CustomerDto> customerDto);
 
     Mono<CustomerDto> getById(String customerId);
@@ -18,5 +19,5 @@ public interface CustomerService {
     Mono<CustomerDto> patchCustomer(String customerId, CustomerDto customerDto);
 
     Mono<Void> deleteCustomerById(String customerId);
-    
+
 }

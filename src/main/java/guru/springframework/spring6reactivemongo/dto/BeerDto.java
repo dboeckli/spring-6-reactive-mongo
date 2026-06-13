@@ -27,9 +27,13 @@ public class BeerDto {
 
     @Size(max = 25)
     private String upc;
+
     private Integer quantityOnHand;
+
     private BigDecimal price;
+
     private LocalDateTime createdDate;
+
     private LocalDateTime lastModifiedDate;
-    
+
 }

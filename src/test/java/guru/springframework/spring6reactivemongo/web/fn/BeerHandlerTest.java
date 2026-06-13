@@ -16,19 +16,20 @@ import static org.mockito.Mockito.mock;
 class BeerHandlerTest {
 
     BeerService beerServiceMock;
+
     Validator validatorMock;
 
     BeerRouterConfig beerRouterConfig;
-    
+
     BeerHandler beerHandler;
-    
+
     WebTestClient webTestClient;
 
     @BeforeEach
     void setUp() {
         beerServiceMock = mock(BeerService.class);
         validatorMock = mock(Validator.class);
-        
+
         beerHandler = new BeerHandler(beerServiceMock, validatorMock);
         beerRouterConfig = new BeerRouterConfig(beerHandler);
 
@@ -39,57 +40,62 @@ class BeerHandlerTest {
     void testListBeersNoParams() {
         given(beerServiceMock.listBeers()).willReturn(Flux.just(BeerDto.builder().build()));
 
-        webTestClient.get().uri(BeerRouterConfig.BEER_PATH)
+        webTestClient.get()
+            .uri(BeerRouterConfig.BEER_PATH)
             .exchange()
-            .expectStatus().isOk()
-            .expectBody().jsonPath("$.length()").isEqualTo(1);
+            .expectStatus()
+            .isOk()
+            .expectBody()
+            .jsonPath("$.length()")
+            .isEqualTo(1);
     }
 
     @Test
     void testListBeersByStyle() {
         given(beerServiceMock.findByBeerStyle(any())).willReturn(Flux.just(BeerDto.builder().build()));
 
-        webTestClient.get().uri(BeerRouterConfig.BEER_PATH + "?beerStyle=IPA")
+        webTestClient.get()
+            .uri(BeerRouterConfig.BEER_PATH + "?beerStyle=IPA")
             .exchange()
-            .expectStatus().isOk()
-            .expectBody().jsonPath("$.length()").isEqualTo(1);
+            .expectStatus()
+            .isOk()
+            .expectBody()
+            .jsonPath("$.length()")
+            .isEqualTo(1);
     }
 
     @Test
     void testListBeersByStyleEmpty() {
-        webTestClient.get().uri(BeerRouterConfig.BEER_PATH + "?beerStyle=")
-            .exchange()
-            .expectStatus().isBadRequest();
+        webTestClient.get().uri(BeerRouterConfig.BEER_PATH + "?beerStyle=").exchange().expectStatus().isBadRequest();
     }
 
     @Test
     void testListBeersByStyleBlank() {
-        webTestClient.get().uri(BeerRouterConfig.BEER_PATH + "?beerStyle=   ")
-            .exchange()
-            .expectStatus().isBadRequest();
+        webTestClient.get().uri(BeerRouterConfig.BEER_PATH + "?beerStyle=   ").exchange().expectStatus().isBadRequest();
     }
 
     @Test
     void testListBeersByName() {
         given(beerServiceMock.findFirstByBeerName(any())).willReturn(Mono.just(BeerDto.builder().build()));
 
-        webTestClient.get().uri(BeerRouterConfig.BEER_PATH + "?beerName=Test Beer")
+        webTestClient.get()
+            .uri(BeerRouterConfig.BEER_PATH + "?beerName=Test Beer")
             .exchange()
-            .expectStatus().isOk()
-            .expectBody().jsonPath("$.length()").isEqualTo(1);
+            .expectStatus()
+            .isOk()
+            .expectBody()
+            .jsonPath("$.length()")
+            .isEqualTo(1);
     }
 
     @Test
     void testListBeersByNameEmpty() {
-        webTestClient.get().uri(BeerRouterConfig.BEER_PATH + "?beerName=")
-            .exchange()
-            .expectStatus().isBadRequest();
+        webTestClient.get().uri(BeerRouterConfig.BEER_PATH + "?beerName=").exchange().expectStatus().isBadRequest();
     }
 
     @Test
     void testListBeersByNameBlank() {
-        webTestClient.get().uri(BeerRouterConfig.BEER_PATH + "?beerName=   ")
-            .exchange()
-            .expectStatus().isBadRequest();
+        webTestClient.get().uri(BeerRouterConfig.BEER_PATH + "?beerName=   ").exchange().expectStatus().isBadRequest();
     }
+
 }

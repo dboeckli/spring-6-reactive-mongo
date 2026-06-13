@@ -16,6 +16,7 @@ import static org.mockito.Mockito.mock;
 class CustomerHandlerTest {
 
     CustomerService customerServiceMock;
+
     Validator validatorMock;
 
     CustomerRouterConfig customerRouterConfig;
@@ -42,15 +43,22 @@ class CustomerHandlerTest {
 
         given(customerServiceMock.listCustomers()).willReturn(Flux.just(customer1, customer2));
 
-        webTestClient.get().uri(CustomerRouterConfig.CUSTOMER_PATH)
+        webTestClient.get()
+            .uri(CustomerRouterConfig.CUSTOMER_PATH)
             .exchange()
-            .expectStatus().isOk()
+            .expectStatus()
+            .isOk()
             .expectBody()
-            .jsonPath("$.size()").isEqualTo(2)
-            .jsonPath("$[0].id").isEqualTo("1")
-            .jsonPath("$[0].customerName").isEqualTo("Customer 1")
-            .jsonPath("$[1].id").isEqualTo("2")
-            .jsonPath("$[1].customerName").isEqualTo("Customer 2");
+            .jsonPath("$.size()")
+            .isEqualTo(2)
+            .jsonPath("$[0].id")
+            .isEqualTo("1")
+            .jsonPath("$[0].customerName")
+            .isEqualTo("Customer 1")
+            .jsonPath("$[1].id")
+            .isEqualTo("2")
+            .jsonPath("$[1].customerName")
+            .isEqualTo("Customer 2");
     }
 
     @Test
@@ -59,55 +67,65 @@ class CustomerHandlerTest {
 
         given(customerServiceMock.findFirstByCustomerName(any())).willReturn(Mono.just(customer));
 
-        webTestClient.get().uri(uriBuilder ->
-                uriBuilder.path(CustomerRouterConfig.CUSTOMER_PATH)
-                    .queryParam("customerName", "Test Customer")
-                    .build())
+        webTestClient.get()
+            .uri(uriBuilder -> uriBuilder.path(CustomerRouterConfig.CUSTOMER_PATH)
+                .queryParam("customerName", "Test Customer")
+                .build())
             .exchange()
-            .expectStatus().isOk()
+            .expectStatus()
+            .isOk()
             .expectBody()
-            .jsonPath("$.size()").isEqualTo(1)
-            .jsonPath("$[0].id").isEqualTo("1")
-            .jsonPath("$[0].customerName").isEqualTo("Test Customer");
+            .jsonPath("$.size()")
+            .isEqualTo(1)
+            .jsonPath("$[0].id")
+            .isEqualTo("1")
+            .jsonPath("$[0].customerName")
+            .isEqualTo("Test Customer");
     }
 
     @Test
     void testListCustomersByNameNotFound() {
         given(customerServiceMock.findFirstByCustomerName(any())).willReturn(Mono.empty());
 
-        webTestClient.get().uri(uriBuilder ->
-                uriBuilder.path(CustomerRouterConfig.CUSTOMER_PATH)
-                    .queryParam("customerName", "Non-existent Customer")
-                    .build())
+        webTestClient.get()
+            .uri(uriBuilder -> uriBuilder.path(CustomerRouterConfig.CUSTOMER_PATH)
+                .queryParam("customerName", "Non-existent Customer")
+                .build())
             .exchange()
-            .expectStatus().isOk()
+            .expectStatus()
+            .isOk()
             .expectBody()
-            .jsonPath("$.size()").isEqualTo(0);
+            .jsonPath("$.size()")
+            .isEqualTo(0);
     }
 
     @Test
     void testListCustomersEmptyName() {
-        webTestClient.get().uri(uriBuilder ->
-                uriBuilder.path(CustomerRouterConfig.CUSTOMER_PATH)
-                    .queryParam("customerName", "")
-                    .build())
+        webTestClient.get()
+            .uri(uriBuilder -> uriBuilder.path(CustomerRouterConfig.CUSTOMER_PATH)
+                .queryParam("customerName", "")
+                .build())
             .exchange()
-            .expectStatus().isBadRequest();
+            .expectStatus()
+            .isBadRequest();
     }
 
     @Test
     void testListCustomersByNameEmpty() {
-        webTestClient.get().uri(CustomerRouterConfig.CUSTOMER_PATH + "?customerName=")
+        webTestClient.get()
+            .uri(CustomerRouterConfig.CUSTOMER_PATH + "?customerName=")
             .exchange()
-            .expectStatus().isBadRequest();
+            .expectStatus()
+            .isBadRequest();
     }
 
     @Test
     void testListCustomersByNameBlank() {
-        webTestClient.get().uri(CustomerRouterConfig.CUSTOMER_PATH + "?customerName=   ")
+        webTestClient.get()
+            .uri(CustomerRouterConfig.CUSTOMER_PATH + "?customerName=   ")
             .exchange()
-            .expectStatus().isBadRequest();
+            .expectStatus()
+            .isBadRequest();
     }
 
-    
 }

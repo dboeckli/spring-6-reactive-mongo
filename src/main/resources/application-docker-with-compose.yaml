@@ -4,24 +4,24 @@ server:
 spring:
   application:
     name: spring-6-reactive-mongo
-    
+
   main:
-    allow-bean-definition-overriding: true  
-    
+    allow-bean-definition-overriding: true
+
   docker:
     compose:
       enabled: true
       stop:
-        command: down    
+        command: down
       skip:
         in-tests: false
-        
+
   security:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:9000    
-  
+          issuer-uri: http://localhost:9000
+
   mongodb:
     uri: mongodb://root:secret@localhost:27018/sfg?authSource=admin
     database: sfg
@@ -30,7 +30,7 @@ spring:
     host: localhost
     port: 27018
     authentication-database: admin
-    
+
 springdoc:
   show-actuator: false
   show-oauth2-endpoints: true
@@ -40,8 +40,8 @@ springdoc:
     oauth:
       # do that not on production!
       client-id: messaging-client
-      client-secret: secret   
-      
+      client-secret: secret
+
 management:
   health:
     readinessstate:
@@ -114,7 +114,7 @@ security:
   cors:
     allowed-origins:
       - http://localhost:8080 # gateway project runs on port 8080
-      - http://127.0.0.1:8080 # gateway project runs on port 8080      
+      - http://127.0.0.1:8080 # gateway project runs on port 8080
       - http://localhost:30080 # gateway project runs on port 30080
-      - http://127.0.0.1:30080 # gateway project runs on port 30080  
-    
+      - http://127.0.0.1:30080 # gateway project runs on port 30080
+

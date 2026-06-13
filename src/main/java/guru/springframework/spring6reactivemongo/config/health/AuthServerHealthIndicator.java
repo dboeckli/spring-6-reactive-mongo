@@ -13,18 +13,18 @@ import reactor.core.publisher.Mono;
 public class AuthServerHealthIndicator implements ReactiveHealthIndicator {
 
     private final WebClient webClient;
+
     private final String authServerUrl;
 
     public AuthServerHealthIndicator(WebClient.Builder webClientBuilder,
-                                     @Value("${security.auth-server-health-url}") String authServerUrl) {
+            @Value("${security.auth-server-health-url}") String authServerUrl) {
         this.webClient = webClientBuilder.build();
         this.authServerUrl = authServerUrl;
     }
 
     @Override
     public Mono<Health> health() {
-        return checkAuthServerHealth()
-            .map(status -> status ? Health.up().build() : Health.down().build())
+        return checkAuthServerHealth().map(status -> status ? Health.up().build() : Health.down().build())
             .doOnNext(health -> {
                 if (health.getStatus().equals(Health.down().build().getStatus())) {
                     log.warn("Auth server is not reachable at {}", authServerUrl);
@@ -40,4 +40,5 @@ public class AuthServerHealthIndicator implements ReactiveHealthIndicator {
             .map(response -> response.contains("\"status\":\"UP\""))
             .onErrorResume(e -> Mono.just(false));
     }
+
 }

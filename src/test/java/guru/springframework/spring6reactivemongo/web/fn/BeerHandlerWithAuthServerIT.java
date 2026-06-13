@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @AutoConfigureWebTestClient
 @Slf4j
-@Import({TestMongoDockerContainer.class, AuthServerDockerContainer.class})
+@Import({ TestMongoDockerContainer.class, AuthServerDockerContainer.class })
 @ExtendWith(MongoExtension.class)
 class BeerHandlerWithAuthServerIT {
 
@@ -39,20 +39,20 @@ class BeerHandlerWithAuthServerIT {
 
     @Test
     void testListBeers() {
-        String accessToken = AuthTokenUtil.fetchClientCredentialsAccessToken(
-            objectMapper,
-            issuerUri,
-            "messaging-client",
-            "secret",
-            "message.read message.write"
-        );
+        String accessToken = AuthTokenUtil.fetchClientCredentialsAccessToken(objectMapper, issuerUri,
+                "messaging-client", "secret", "message.read message.write");
 
-        webTestClient
-            .get().uri(BeerRouterConfig.BEER_PATH)
+        webTestClient.get()
+            .uri(BeerRouterConfig.BEER_PATH)
             .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
             .exchange()
-            .expectStatus().isOk()
-            .expectHeader().valueEquals("Content-type", "application/json")
-            .expectBody().jsonPath("$.size()").value(size -> assertEquals(3, size));
+            .expectStatus()
+            .isOk()
+            .expectHeader()
+            .valueEquals("Content-type", "application/json")
+            .expectBody()
+            .jsonPath("$.size()")
+            .value(size -> assertEquals(3, size));
     }
+
 }

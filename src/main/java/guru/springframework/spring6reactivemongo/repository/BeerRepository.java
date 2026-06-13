@@ -10,5 +10,5 @@ public interface BeerRepository extends ReactiveMongoRepository<Beer, String> {
     Mono<Beer> findFirstByBeerName(String beerName);
 
     Flux<Beer> findByBeerStyle(String beerStyle);
-    
+
 }

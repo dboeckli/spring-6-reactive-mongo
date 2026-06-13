@@ -27,7 +27,7 @@ public class AuthServerDockerContainer {
 
     private static final String DOCKER_REPO = "domboeckli";
 
-    private static final String AUTH_SERVER_VERSION = "0.0.5-SNAPSHOT";
+    private static final String AUTH_SERVER_VERSION = "0.0.7-SNAPSHOT";
 
     static final int AUTH_SERVER_CONTAINER_PORT = 9000;
     static final int AUTH_SERVER_HOST_PORT = findRandomOpenPort();
@@ -38,12 +38,14 @@ public class AuthServerDockerContainer {
         try (ServerSocket socket = new ServerSocket(0)) {
             socket.setReuseAddress(true);
             return socket.getLocalPort();
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             throw new RuntimeException("Kein freier Port verfügbar", e);
         }
     }
 
-    static GenericContainer<?> authServer = new GenericContainer<>(DOCKER_REPO + "/spring-6-auth-server:" + AUTH_SERVER_VERSION)
+    static GenericContainer<?> authServer = new GenericContainer<>(
+            DOCKER_REPO + "/spring-6-auth-server:" + AUTH_SERVER_VERSION)
         .withNetworkAliases("auth-server")
         .withNetwork(sharedNetwork)
         // Der Container selbst kann intern auf 9000 laufen...
@@ -52,18 +54,16 @@ public class AuthServerDockerContainer {
         // ...aber wir sagen ihm, dass er von außen über den Host-Port erreichbar ist!
         .withEnv("SPRING_SECURITY_OAUTH2_AUTHORIZATION_SERVER_ISSUER", "http://localhost:" + AUTH_SERVER_HOST_PORT)
         // Jetzt binden wir den fixen Host-Zufallsport an den Container-Port
-        .withCreateContainerCmdModifier(cmd -> cmd.getHostConfig().withPortBindings(
-            new PortBinding(Ports.Binding.bindPort(AUTH_SERVER_HOST_PORT), new ExposedPort(AUTH_SERVER_CONTAINER_PORT))))
+        .withCreateContainerCmdModifier(cmd -> cmd.getHostConfig()
+            .withPortBindings(new PortBinding(Ports.Binding.bindPort(AUTH_SERVER_HOST_PORT),
+                    new ExposedPort(AUTH_SERVER_CONTAINER_PORT))))
         .withLogConsumer(new Slf4jLogConsumer(LoggerFactory.getLogger("auth-server")))
         .waitingFor(new WaitAllStrategy()
             .withStrategy(Wait.forHttp("/actuator/health/readiness")
                 .forStatusCode(200)
                 .forResponsePredicate(response -> response.contains("\"status\":\"UP\"")))
-            .withStrategy(Wait.forHttp("/.well-known/openid-configuration")
-                .forStatusCode(200))
-            .withStartupTimeout(Duration.ofMinutes(3))
-        );
-
+            .withStrategy(Wait.forHttp("/.well-known/openid-configuration").forStatusCode(200))
+            .withStartupTimeout(Duration.ofMinutes(3)));
 
     @Bean
     public DynamicPropertyRegistrar authServerProperties() {
@@ -78,4 +78,5 @@ public class AuthServerDockerContainer {
             properties.add("spring.security.oauth2.resourceserver.jwt.issuer-uri", () -> issuerUri);
         };
     }
+
 }
