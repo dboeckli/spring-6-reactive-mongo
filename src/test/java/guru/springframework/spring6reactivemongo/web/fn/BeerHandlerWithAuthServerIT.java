@@ -1,6 +1,7 @@
 package guru.springframework.spring6reactivemongo.web.fn;
 
 import guru.springframework.spring6reactivemongo.test.config.AuthServerDockerContainer;
+import guru.springframework.spring6reactivemongo.web.rest.BeerController;
 import guru.springframework.spring6reactivemongo.test.config.MongoExtension;
 import guru.springframework.spring6reactivemongo.test.config.TestMongoDockerContainer;
 import lombok.extern.slf4j.Slf4j;
@@ -43,7 +44,7 @@ class BeerHandlerWithAuthServerIT {
                 "messaging-client", "secret", "message.read message.write");
 
         webTestClient.get()
-            .uri(BeerRouterConfig.BEER_PATH)
+            .uri(BeerController.BEER_PATH)
             .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
             .exchange()
             .expectStatus()

@@ -1,6 +1,7 @@
 package guru.springframework.spring6reactivemongo.web.fn;
 
 import guru.springframework.spring6reactivemongo.test.config.AuthServerDockerContainer;
+import guru.springframework.spring6reactivemongo.web.rest.CustomerController;
 import guru.springframework.spring6reactivemongo.test.config.MongoExtension;
 import guru.springframework.spring6reactivemongo.test.config.TestMongoDockerContainer;
 import lombok.extern.slf4j.Slf4j;
@@ -46,7 +47,7 @@ class CustomerHandlerWithAuthServerIT {
                 "messaging-client", "secret", "message.read message.write");
 
         webTestClient.get()
-            .uri(CustomerRouterConfig.CUSTOMER_PATH)
+            .uri(CustomerController.CUSTOMER_PATH)
             .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
             .exchange()
             .expectStatus()

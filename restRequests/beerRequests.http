@@ -5,7 +5,7 @@ Authorization: Bearer {{$auth.token("auth-id")}}
 Content-Type: application/json
 
 ### Get Beer by ID
-GET http://localhost:{{application-port}}/api/v3/beer/6797e0873f23337365d7f08a
+GET http://localhost:{{application-port}}/api/v3/beer/6a2d83ecab4742f4bea391a6
 Accept: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}
 Content-Type: application/json

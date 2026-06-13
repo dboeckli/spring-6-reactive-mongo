@@ -8,6 +8,9 @@ spring:
   main:
     allow-bean-definition-overriding: true
 
+  reactor:
+    context-propagation: AUTO
+
   docker:
     compose:
       enabled: true
@@ -121,4 +124,4 @@ security:
       - http://127.0.0.1:30080 # gateway project runs on port 30080
 logging:
   level:
-    guru.springframework.spring6reactivemongo.log..RequestLoggingFilter: DEBUG
+    guru.springframework.spring6reactivemongo.log.RequestLoggingFilter: DEBUG

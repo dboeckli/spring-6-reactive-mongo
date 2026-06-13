@@ -1,9 +1,9 @@
 package guru.springframework.spring6reactivemongo.web.fn;
 
 import guru.springframework.spring6reactivemongo.dto.CustomerDto;
-import guru.springframework.spring6reactivemongo.test.config.AuthServerDockerContainer;
 import guru.springframework.spring6reactivemongo.test.config.MongoExtension;
 import guru.springframework.spring6reactivemongo.test.config.TestMongoDockerContainer;
+import guru.springframework.spring6reactivemongo.web.rest.CustomerController;
 import lombok.extern.java.Log;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -22,7 +22,6 @@ import reactor.core.publisher.Mono;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.mockJwt;
-import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.mockOAuth2Login;
 
 @SpringBootTest
 @Testcontainers
@@ -42,7 +41,7 @@ class CustomerHandlerIT {
     void testListCustomers() {
         webTestClient.mutateWith(mockJwt())
             .get()
-            .uri(CustomerRouterConfig.CUSTOMER_PATH)
+            .uri(CustomerController.CUSTOMER_PATH)
             .exchange()
             .expectStatus()
             .isOk()
@@ -58,7 +57,7 @@ class CustomerHandlerIT {
     void testListCustomers2() {
         webTestClient.mutateWith(mockJwt())
             .get()
-            .uri(CustomerRouterConfig.CUSTOMER_PATH)
+            .uri(CustomerController.CUSTOMER_PATH)
             .exchange()
             .expectStatus()
             .isOk()
@@ -75,7 +74,7 @@ class CustomerHandlerIT {
 
         webTestClient.mutateWith(mockJwt())
             .get()
-            .uri(UriComponentsBuilder.fromPath(CustomerRouterConfig.CUSTOMER_PATH)
+            .uri(UriComponentsBuilder.fromPath(CustomerController.CUSTOMER_PATH)
                 .queryParam("customerName", existingCustomer.getCustomerName())
                 .build()
                 .toUri())
@@ -96,7 +95,7 @@ class CustomerHandlerIT {
 
         CustomerDto gotCustomer = webTestClient.mutateWith(mockJwt())
             .get()
-            .uri(CustomerRouterConfig.CUSTOMER_PATH_ID, givenCustomer.getId())
+            .uri(CustomerController.CUSTOMER_PATH_ID, givenCustomer.getId())
             .exchange()
             .expectStatus()
             .isOk()
@@ -116,7 +115,7 @@ class CustomerHandlerIT {
 
         String location = webTestClient.mutateWith(mockJwt())
             .post()
-            .uri(CustomerRouterConfig.CUSTOMER_PATH)
+            .uri(CustomerController.CUSTOMER_PATH)
             .body(Mono.just(customerToCreate), CustomerDto.class)
             .exchange()
             .expectStatus()
@@ -142,7 +141,7 @@ class CustomerHandlerIT {
 
         webTestClient.mutateWith(mockJwt())
             .post()
-            .uri(CustomerRouterConfig.CUSTOMER_PATH)
+            .uri(CustomerController.CUSTOMER_PATH)
             .body(Mono.just(customerToCreate), CustomerDto.class)
             .exchange()
             .expectStatus()
@@ -156,7 +155,7 @@ class CustomerHandlerIT {
 
         webTestClient.mutateWith(mockJwt())
             .post()
-            .uri(CustomerRouterConfig.CUSTOMER_PATH)
+            .uri(CustomerController.CUSTOMER_PATH)
             .body(Mono.just(customerToCreate), CustomerDto.class)
             .exchange()
             .expectStatus()
@@ -170,7 +169,7 @@ class CustomerHandlerIT {
 
         webTestClient.mutateWith(mockJwt())
             .post()
-            .uri(CustomerRouterConfig.CUSTOMER_PATH)
+            .uri(CustomerController.CUSTOMER_PATH)
             .body(Mono.just(customerToCreate), CustomerDto.class)
             .exchange()
             .expectStatus()
@@ -199,7 +198,7 @@ class CustomerHandlerIT {
 
         webTestClient.mutateWith(mockJwt())
             .put()
-            .uri(CustomerRouterConfig.CUSTOMER_PATH_ID, customerToUpdate.getId())
+            .uri(CustomerController.CUSTOMER_PATH_ID, customerToUpdate.getId())
             .body(Mono.just(customerToUpdate), CustomerDto.class)
             .exchange()
             .expectStatus()
@@ -219,7 +218,7 @@ class CustomerHandlerIT {
 
         webTestClient.mutateWith(mockJwt())
             .put()
-            .uri(CustomerRouterConfig.CUSTOMER_PATH_ID, customerToUpdate.getId())
+            .uri(CustomerController.CUSTOMER_PATH_ID, customerToUpdate.getId())
             .body(Mono.just(customerToUpdate), CustomerDto.class)
             .exchange()
             .expectStatus()
@@ -235,7 +234,7 @@ class CustomerHandlerIT {
 
         webTestClient.mutateWith(mockJwt())
             .put()
-            .uri(CustomerRouterConfig.CUSTOMER_PATH_ID, customerToUpdate.getId())
+            .uri(CustomerController.CUSTOMER_PATH_ID, customerToUpdate.getId())
             .body(Mono.just(customerToUpdate), CustomerDto.class)
             .exchange()
             .expectStatus()
@@ -250,7 +249,7 @@ class CustomerHandlerIT {
 
         webTestClient.mutateWith(mockJwt())
             .patch()
-            .uri(CustomerRouterConfig.CUSTOMER_PATH_ID, customerToUpdate.getId())
+            .uri(CustomerController.CUSTOMER_PATH_ID, customerToUpdate.getId())
             .body(Mono.just(customerToUpdate), CustomerDto.class)
             .exchange()
             .expectStatus()
@@ -270,7 +269,7 @@ class CustomerHandlerIT {
 
         webTestClient.mutateWith(mockJwt())
             .patch()
-            .uri(CustomerRouterConfig.CUSTOMER_PATH_ID, customerToUpdate.getId())
+            .uri(CustomerController.CUSTOMER_PATH_ID, customerToUpdate.getId())
             .body(Mono.just(customerToUpdate), CustomerDto.class)
             .exchange()
             .expectStatus()
@@ -285,7 +284,7 @@ class CustomerHandlerIT {
 
         webTestClient.mutateWith(mockJwt())
             .patch()
-            .uri(CustomerRouterConfig.CUSTOMER_PATH_ID, customerToUpdate.getId())
+            .uri(CustomerController.CUSTOMER_PATH_ID, customerToUpdate.getId())
             .body(Mono.just(customerToUpdate), CustomerDto.class)
             .exchange()
             .expectStatus()
@@ -300,7 +299,7 @@ class CustomerHandlerIT {
 
         webTestClient.mutateWith(mockJwt())
             .patch()
-            .uri(CustomerRouterConfig.CUSTOMER_PATH_ID, customerToUpdate.getId())
+            .uri(CustomerController.CUSTOMER_PATH_ID, customerToUpdate.getId())
             .body(Mono.just(customerToUpdate), CustomerDto.class)
             .exchange()
             .expectStatus()
@@ -311,7 +310,7 @@ class CustomerHandlerIT {
         try {
             return webTestClient.mutateWith(mockJwt())
                 .get()
-                .uri(CustomerRouterConfig.CUSTOMER_PATH_ID, id)
+                .uri(CustomerController.CUSTOMER_PATH_ID, id)
                 .exchange()
                 .expectStatus()
                 .isOk()
@@ -336,7 +335,7 @@ class CustomerHandlerIT {
 
         webTestClient.mutateWith(mockJwt())
             .delete()
-            .uri(CustomerRouterConfig.CUSTOMER_PATH_ID, customerToDelete.getId())
+            .uri(CustomerController.CUSTOMER_PATH_ID, customerToDelete.getId())
             .exchange()
             .expectStatus()
             .isNoContent();
@@ -353,7 +352,7 @@ class CustomerHandlerIT {
 
         webTestClient.mutateWith(mockJwt())
             .delete()
-            .uri(CustomerRouterConfig.CUSTOMER_PATH_ID, customerToDelete.getId())
+            .uri(CustomerController.CUSTOMER_PATH_ID, customerToDelete.getId())
             .exchange()
             .expectStatus()
             .isNotFound();
@@ -362,7 +361,7 @@ class CustomerHandlerIT {
     private CustomerDto getAnyExistingCustomer() {
         return webTestClient.mutateWith(mockJwt())
             .get()
-            .uri(CustomerRouterConfig.CUSTOMER_PATH)
+            .uri(CustomerController.CUSTOMER_PATH)
             .exchange()
             .expectStatus()
             .isOk()

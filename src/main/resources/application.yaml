@@ -74,6 +74,9 @@ spring:
   main:
     allow-bean-definition-overriding: true
 
+  reactor:
+    context-propagation: AUTO
+
   security:
     oauth2:
       resourceserver:
@@ -117,4 +120,4 @@ security:
 
 logging:
   level:
-    guru.springframework.spring6reactivemongo.log..RequestLoggingFilter: DEBUG
+    guru.springframework.spring6reactivemongo.log.RequestLoggingFilter: DEBUG
