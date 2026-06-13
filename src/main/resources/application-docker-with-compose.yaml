@@ -121,4 +121,4 @@ security:
       - http://127.0.0.1:30080 # gateway project runs on port 30080
 logging:
   level:
-    org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG
+    guru.springframework.spring6reactivemongo.log..RequestLoggingFilter: DEBUG

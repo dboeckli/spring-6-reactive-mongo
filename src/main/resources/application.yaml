@@ -117,4 +117,4 @@ security:
 
 logging:
   level:
-    org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG
+    guru.springframework.spring6reactivemongo.log..RequestLoggingFilter: DEBUG
