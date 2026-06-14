@@ -77,6 +77,10 @@ spring:
   reactor:
     context-propagation: AUTO
 
+  threads:
+    virtual:
+      enabled: true
+
   security:
     oauth2:
       resourceserver:

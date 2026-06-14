@@ -11,6 +11,10 @@ spring:
   reactor:
     context-propagation: AUTO
 
+  threads:
+    virtual:
+      enabled: true
+
   docker:
     compose:
       enabled: true
