@@ -23,7 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DirtiesContext
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Testcontainers
-@Import({TestMongoDockerContainer.class, AuthServerDockerContainer.class})
+@Import({ TestMongoDockerContainer.class, AuthServerDockerContainer.class })
 @AutoConfigureWebTestClient
 @Slf4j
 class OpenApiTest {
@@ -39,9 +39,11 @@ class OpenApiTest {
 
     @Test
     void openapiGetJsonTest() {
-        EntityExchangeResult<byte[]> result = webTestClient.get().uri("/v3/api-docs")
+        EntityExchangeResult<byte[]> result = webTestClient.get()
+            .uri("/v3/api-docs")
             .exchange()
-            .expectStatus().isOk()
+            .expectStatus()
+            .isOk()
             .expectBody()
             .returnResult();
 

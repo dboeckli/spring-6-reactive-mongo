@@ -20,18 +20,14 @@ import java.util.Objects;
 public class BootstrapData implements CommandLineRunner {
 
     private final BeerRepository beerRepository;
-    
+
     private final CustomerRepository customerRepository;
 
     @Override
     public void run(String @NonNull ... args) {
-        beerRepository.deleteAll()
-            .doOnSuccess(success -> loadBeerData())
-            .subscribe();
+        beerRepository.deleteAll().doOnSuccess(success -> loadBeerData()).subscribe();
 
-        customerRepository.deleteAll()
-            .doOnSuccess(success -> loadCustomerData())
-            .subscribe();
+        customerRepository.deleteAll().doOnSuccess(success -> loadCustomerData()).subscribe();
     }
 
     private void loadCustomerData() {
@@ -59,9 +55,7 @@ public class BootstrapData implements CommandLineRunner {
             customerRepository.save(customer2).block();
             customerRepository.save(customer3).block();
 
-            Objects.requireNonNull(customerRepository.findAll()
-                    .collectList()
-                    .block())
+            Objects.requireNonNull(customerRepository.findAll().collectList().block())
                 .forEach(customer -> log.info("Customer added: " + customer));
 
             log.info("3 Customers added successfully");
@@ -105,12 +99,10 @@ public class BootstrapData implements CommandLineRunner {
             beerRepository.save(beer2).block();
             beerRepository.save(beer3).block();
 
-            beerRepository.findAll()
-                .collectList()
-                .block()
-                .forEach(beer -> log.info("Beer added: " + beer));
+            beerRepository.findAll().collectList().block().forEach(beer -> log.info("Beer added: " + beer));
 
             log.info("3 Beers added successfully");
         }
     }
+
 }

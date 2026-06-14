@@ -12,22 +12,19 @@ import java.util.Map;
 @UtilityClass
 public class AuthTokenUtil {
 
-    public static String fetchClientCredentialsAccessToken(ObjectMapper objectMapper,
-                                                           String issuerBaseUrl,
-                                                           String clientId,
-                                                           String clientSecret,
-                                                           String scope) {
+    public static String fetchClientCredentialsAccessToken(ObjectMapper objectMapper, String issuerBaseUrl,
+            String clientId, String clientSecret, String scope) {
 
-        WebTestClient authClient = WebTestClient.bindToServer()
-            .baseUrl(issuerBaseUrl)
-            .build();
+        WebTestClient authClient = WebTestClient.bindToServer().baseUrl(issuerBaseUrl).build();
 
         // 1) OIDC discovery -> token_endpoint
         byte[] discoveryBody = authClient.get()
             .uri("/.well-known/openid-configuration")
             .exchange()
-            .expectStatus().is2xxSuccessful()
-            .expectHeader().contentTypeCompatibleWith(MediaType.APPLICATION_JSON)
+            .expectStatus()
+            .is2xxSuccessful()
+            .expectHeader()
+            .contentTypeCompatibleWith(MediaType.APPLICATION_JSON)
             .expectBody()
             .returnResult()
             .getResponseBodyContent();
@@ -53,8 +50,10 @@ public class AuthTokenUtil {
             .contentType(MediaType.APPLICATION_FORM_URLENCODED)
             .bodyValue(form)
             .exchange()
-            .expectStatus().is2xxSuccessful()
-            .expectHeader().contentTypeCompatibleWith(MediaType.APPLICATION_JSON)
+            .expectStatus()
+            .is2xxSuccessful()
+            .expectHeader()
+            .contentTypeCompatibleWith(MediaType.APPLICATION_JSON)
             .expectBody()
             .returnResult()
             .getResponseBodyContent();

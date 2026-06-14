@@ -1,9 +1,9 @@
 package guru.springframework.spring6reactivemongo.web.fn;
 
 import guru.springframework.spring6reactivemongo.dto.CustomerDto;
-import guru.springframework.spring6reactivemongo.test.config.AuthServerDockerContainer;
 import guru.springframework.spring6reactivemongo.test.config.MongoExtension;
 import guru.springframework.spring6reactivemongo.test.config.TestMongoDockerContainer;
+import guru.springframework.spring6reactivemongo.web.rest.CustomerController;
 import lombok.extern.java.Log;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -22,7 +22,6 @@ import reactor.core.publisher.Mono;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.mockJwt;
-import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.mockOAuth2Login;
 
 @SpringBootTest
 @Testcontainers
@@ -30,7 +29,7 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 @AutoConfigureWebTestClient
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @Log
-@Import({TestMongoDockerContainer.class})
+@Import({ TestMongoDockerContainer.class })
 @ExtendWith(MongoExtension.class)
 class CustomerHandlerIT {
 
@@ -40,25 +39,32 @@ class CustomerHandlerIT {
     @Test
     @Order(1)
     void testListCustomers() {
-        webTestClient
-            .mutateWith(mockJwt())
-            .get().uri(CustomerRouterConfig.CUSTOMER_PATH)
+        webTestClient.mutateWith(mockJwt())
+            .get()
+            .uri(CustomerController.CUSTOMER_PATH)
             .exchange()
-            .expectStatus().isOk()
-            .expectHeader().valueEquals("Content-type", "application/json")
-            .expectBody().jsonPath("$.size()").value(size -> assertEquals(3, size));
+            .expectStatus()
+            .isOk()
+            .expectHeader()
+            .valueEquals("Content-type", "application/json")
+            .expectBody()
+            .jsonPath("$.size()")
+            .value(size -> assertEquals(3, size));
     }
 
     @Test
     @Order(1)
     void testListCustomers2() {
-        webTestClient
-            .mutateWith(mockJwt())
-            .get().uri(CustomerRouterConfig.CUSTOMER_PATH)
+        webTestClient.mutateWith(mockJwt())
+            .get()
+            .uri(CustomerController.CUSTOMER_PATH)
             .exchange()
-            .expectStatus().isOk()
-            .expectHeader().valueEquals("Content-type", "application/json")
-            .expectBodyList(CustomerDto.class).hasSize(3);
+            .expectStatus()
+            .isOk()
+            .expectHeader()
+            .valueEquals("Content-type", "application/json")
+            .expectBodyList(CustomerDto.class)
+            .hasSize(3);
     }
 
     @Test
@@ -66,15 +72,20 @@ class CustomerHandlerIT {
     void testFindFirstCustomerByCustomerName() {
         CustomerDto existingCustomer = getAnyExistingCustomer();
 
-        webTestClient
-            .mutateWith(mockJwt())
-            .get().uri(UriComponentsBuilder
-                .fromPath(CustomerRouterConfig.CUSTOMER_PATH)
-                .queryParam("customerName", existingCustomer.getCustomerName()).build().toUri())
+        webTestClient.mutateWith(mockJwt())
+            .get()
+            .uri(UriComponentsBuilder.fromPath(CustomerController.CUSTOMER_PATH)
+                .queryParam("customerName", existingCustomer.getCustomerName())
+                .build()
+                .toUri())
             .exchange()
-            .expectStatus().isOk()
-            .expectHeader().valueEquals("Content-type", "application/json")
-            .expectBody().jsonPath("$.size()").value(size -> assertEquals(1, size));
+            .expectStatus()
+            .isOk()
+            .expectHeader()
+            .valueEquals("Content-type", "application/json")
+            .expectBody()
+            .jsonPath("$.size()")
+            .value(size -> assertEquals(1, size));
     }
 
     @Test
@@ -82,13 +93,17 @@ class CustomerHandlerIT {
     void testGetCustomerById() {
         CustomerDto givenCustomer = getAnyExistingCustomer();
 
-        CustomerDto gotCustomer = webTestClient
-            .mutateWith(mockJwt())
-            .get().uri(CustomerRouterConfig.CUSTOMER_PATH_ID, givenCustomer.getId())
+        CustomerDto gotCustomer = webTestClient.mutateWith(mockJwt())
+            .get()
+            .uri(CustomerController.CUSTOMER_PATH_ID, givenCustomer.getId())
             .exchange()
-            .expectStatus().isOk()
-            .expectHeader().valueEquals("Content-type", "application/json")
-            .expectBody(CustomerDto.class).returnResult().getResponseBody();
+            .expectStatus()
+            .isOk()
+            .expectHeader()
+            .valueEquals("Content-type", "application/json")
+            .expectBody(CustomerDto.class)
+            .returnResult()
+            .getResponseBody();
 
         assertEquals(givenCustomer.getId(), gotCustomer.getId());
     }
@@ -98,13 +113,15 @@ class CustomerHandlerIT {
     void testCreateCustomer() {
         CustomerDto customerToCreate = CustomerDto.builder().customerName("New Customer").build();
 
-        String location = webTestClient
-            .mutateWith(mockJwt())
-            .post().uri(CustomerRouterConfig.CUSTOMER_PATH)
+        String location = webTestClient.mutateWith(mockJwt())
+            .post()
+            .uri(CustomerController.CUSTOMER_PATH)
             .body(Mono.just(customerToCreate), CustomerDto.class)
             .exchange()
-            .expectStatus().isCreated()
-            .expectHeader().valueMatches("location", "/api/v3/customer/[a-f0-9]{24}$")
+            .expectStatus()
+            .isCreated()
+            .expectHeader()
+            .valueMatches("location", "/api/v3/customer/[a-f0-9]{24}$")
             .returnResult(CustomerDto.class)
             .getResponseHeaders()
             .getLocation()
@@ -122,12 +139,13 @@ class CustomerHandlerIT {
     void testCreateCustomerEmptyName() {
         CustomerDto customerToCreate = CustomerDto.builder().customerName("").build();
 
-        webTestClient
-            .mutateWith(mockJwt())
-            .post().uri(CustomerRouterConfig.CUSTOMER_PATH)
+        webTestClient.mutateWith(mockJwt())
+            .post()
+            .uri(CustomerController.CUSTOMER_PATH)
             .body(Mono.just(customerToCreate), CustomerDto.class)
             .exchange()
-            .expectStatus().isBadRequest();
+            .expectStatus()
+            .isBadRequest();
     }
 
     @Test
@@ -135,12 +153,13 @@ class CustomerHandlerIT {
     void testCreateCustomerTooShortName() {
         CustomerDto customerToCreate = CustomerDto.builder().customerName("1").build();
 
-        webTestClient
-            .mutateWith(mockJwt())
-            .post().uri(CustomerRouterConfig.CUSTOMER_PATH)
+        webTestClient.mutateWith(mockJwt())
+            .post()
+            .uri(CustomerController.CUSTOMER_PATH)
             .body(Mono.just(customerToCreate), CustomerDto.class)
             .exchange()
-            .expectStatus().isBadRequest();
+            .expectStatus()
+            .isBadRequest();
     }
 
     @Test
@@ -148,24 +167,28 @@ class CustomerHandlerIT {
     void testCreateCustomerNullName() {
         CustomerDto customerToCreate = CustomerDto.builder().customerName(null).build();
 
-        webTestClient
-            .mutateWith(mockJwt())
-            .post().uri(CustomerRouterConfig.CUSTOMER_PATH)
+        webTestClient.mutateWith(mockJwt())
+            .post()
+            .uri(CustomerController.CUSTOMER_PATH)
             .body(Mono.just(customerToCreate), CustomerDto.class)
             .exchange()
-            .expectStatus().isBadRequest();
+            .expectStatus()
+            .isBadRequest();
     }
 
     private CustomerDto getCustomerByLocation(String location) {
-        return webTestClient
-            .mutateWith(mockJwt())
-            .get().uri(location)
+        return webTestClient.mutateWith(mockJwt())
+            .get()
+            .uri(location)
             .exchange()
-            .expectStatus().isOk()
-            .expectHeader().valueEquals("Content-type", "application/json")
-            .expectBody(CustomerDto.class).returnResult().getResponseBody();
+            .expectStatus()
+            .isOk()
+            .expectHeader()
+            .valueEquals("Content-type", "application/json")
+            .expectBody(CustomerDto.class)
+            .returnResult()
+            .getResponseBody();
     }
-
 
     @Test
     @Order(4)
@@ -173,13 +196,13 @@ class CustomerHandlerIT {
         CustomerDto customerToUpdate = this.getAnyExistingCustomer();
         customerToUpdate.setCustomerName("UpdatedCustomer");
 
-        webTestClient
-            .mutateWith(mockJwt())
+        webTestClient.mutateWith(mockJwt())
             .put()
-            .uri(CustomerRouterConfig.CUSTOMER_PATH_ID, customerToUpdate.getId())
+            .uri(CustomerController.CUSTOMER_PATH_ID, customerToUpdate.getId())
             .body(Mono.just(customerToUpdate), CustomerDto.class)
             .exchange()
-            .expectStatus().isNoContent();
+            .expectStatus()
+            .isNoContent();
 
         CustomerDto updatedCustomer = getCustomerById(customerToUpdate.getId());
         assertNotNull(updatedCustomer);
@@ -193,13 +216,13 @@ class CustomerHandlerIT {
         CustomerDto customerToUpdate = this.getAnyExistingCustomer();
         customerToUpdate.setCustomerName("1");
 
-        webTestClient
-            .mutateWith(mockJwt())
+        webTestClient.mutateWith(mockJwt())
             .put()
-            .uri(CustomerRouterConfig.CUSTOMER_PATH_ID, customerToUpdate.getId())
+            .uri(CustomerController.CUSTOMER_PATH_ID, customerToUpdate.getId())
             .body(Mono.just(customerToUpdate), CustomerDto.class)
             .exchange()
-            .expectStatus().isBadRequest();
+            .expectStatus()
+            .isBadRequest();
     }
 
     @Test
@@ -209,13 +232,13 @@ class CustomerHandlerIT {
         customerToUpdate.setCustomerName("updatedCustomer");
         customerToUpdate.setId("9999");
 
-        webTestClient
-            .mutateWith(mockJwt())
+        webTestClient.mutateWith(mockJwt())
             .put()
-            .uri(CustomerRouterConfig.CUSTOMER_PATH_ID, customerToUpdate.getId())
+            .uri(CustomerController.CUSTOMER_PATH_ID, customerToUpdate.getId())
             .body(Mono.just(customerToUpdate), CustomerDto.class)
             .exchange()
-            .expectStatus().isNotFound();
+            .expectStatus()
+            .isNotFound();
     }
 
     @Test
@@ -224,13 +247,13 @@ class CustomerHandlerIT {
         CustomerDto customerToUpdate = this.getAnyExistingCustomer();
         customerToUpdate.setCustomerName("PatchedCustomer");
 
-        webTestClient
-            .mutateWith(mockJwt())
+        webTestClient.mutateWith(mockJwt())
             .patch()
-            .uri(CustomerRouterConfig.CUSTOMER_PATH_ID, customerToUpdate.getId())
+            .uri(CustomerController.CUSTOMER_PATH_ID, customerToUpdate.getId())
             .body(Mono.just(customerToUpdate), CustomerDto.class)
             .exchange()
-            .expectStatus().isNoContent();
+            .expectStatus()
+            .isNoContent();
 
         CustomerDto updatedCustomer = getCustomerById(customerToUpdate.getId());
         assertNotNull(updatedCustomer);
@@ -244,13 +267,13 @@ class CustomerHandlerIT {
         CustomerDto customerToUpdate = this.getAnyExistingCustomer();
         customerToUpdate.setCustomerName("");
 
-        webTestClient
-            .mutateWith(mockJwt())
+        webTestClient.mutateWith(mockJwt())
             .patch()
-            .uri(CustomerRouterConfig.CUSTOMER_PATH_ID, customerToUpdate.getId())
+            .uri(CustomerController.CUSTOMER_PATH_ID, customerToUpdate.getId())
             .body(Mono.just(customerToUpdate), CustomerDto.class)
             .exchange()
-            .expectStatus().isBadRequest();
+            .expectStatus()
+            .isBadRequest();
     }
 
     @Test
@@ -259,13 +282,13 @@ class CustomerHandlerIT {
         CustomerDto customerToUpdate = this.getAnyExistingCustomer();
         customerToUpdate.setCustomerName("1");
 
-        webTestClient
-            .mutateWith(mockJwt())
+        webTestClient.mutateWith(mockJwt())
             .patch()
-            .uri(CustomerRouterConfig.CUSTOMER_PATH_ID, customerToUpdate.getId())
+            .uri(CustomerController.CUSTOMER_PATH_ID, customerToUpdate.getId())
             .body(Mono.just(customerToUpdate), CustomerDto.class)
             .exchange()
-            .expectStatus().isBadRequest();
+            .expectStatus()
+            .isBadRequest();
     }
 
     @Test
@@ -274,25 +297,30 @@ class CustomerHandlerIT {
         CustomerDto customerToUpdate = this.getAnyExistingCustomer();
         customerToUpdate.setId("999999");
 
-        webTestClient
-            .mutateWith(mockJwt())
+        webTestClient.mutateWith(mockJwt())
             .patch()
-            .uri(CustomerRouterConfig.CUSTOMER_PATH_ID, customerToUpdate.getId())
+            .uri(CustomerController.CUSTOMER_PATH_ID, customerToUpdate.getId())
             .body(Mono.just(customerToUpdate), CustomerDto.class)
             .exchange()
-            .expectStatus().isNotFound();
+            .expectStatus()
+            .isNotFound();
     }
 
     private CustomerDto getCustomerById(String id) {
         try {
-            return webTestClient
-                .mutateWith(mockJwt())
-                .get().uri(CustomerRouterConfig.CUSTOMER_PATH_ID, id)
+            return webTestClient.mutateWith(mockJwt())
+                .get()
+                .uri(CustomerController.CUSTOMER_PATH_ID, id)
                 .exchange()
-                .expectStatus().isOk()
-                .expectHeader().valueEquals("Content-type", "application/json")
-                .expectBody(CustomerDto.class).returnResult().getResponseBody();
-        } catch (AssertionError ex) {
+                .expectStatus()
+                .isOk()
+                .expectHeader()
+                .valueEquals("Content-type", "application/json")
+                .expectBody(CustomerDto.class)
+                .returnResult()
+                .getResponseBody();
+        }
+        catch (AssertionError ex) {
             if (ex.getMessage().contains("Status expected:<200 OK> but was:<404 NOT_FOUND>")) {
                 return null;
             }
@@ -305,12 +333,12 @@ class CustomerHandlerIT {
     void testDeleteCustomer() {
         CustomerDto customerToDelete = this.getAnyExistingCustomer();
 
-        webTestClient
-            .mutateWith(mockJwt())
+        webTestClient.mutateWith(mockJwt())
             .delete()
-            .uri(CustomerRouterConfig.CUSTOMER_PATH_ID, customerToDelete.getId())
+            .uri(CustomerController.CUSTOMER_PATH_ID, customerToDelete.getId())
             .exchange()
-            .expectStatus().isNoContent();
+            .expectStatus()
+            .isNoContent();
 
         CustomerDto deletedCustomer = getCustomerById(customerToDelete.getId());
         assertNull(deletedCustomer);
@@ -322,21 +350,23 @@ class CustomerHandlerIT {
         CustomerDto customerToDelete = this.getAnyExistingCustomer();
         customerToDelete.setId("88888888888888");
 
-        webTestClient
-            .mutateWith(mockJwt())
+        webTestClient.mutateWith(mockJwt())
             .delete()
-            .uri(CustomerRouterConfig.CUSTOMER_PATH_ID, customerToDelete.getId())
+            .uri(CustomerController.CUSTOMER_PATH_ID, customerToDelete.getId())
             .exchange()
-            .expectStatus().isNotFound();
+            .expectStatus()
+            .isNotFound();
     }
 
     private CustomerDto getAnyExistingCustomer() {
-        return webTestClient
-            .mutateWith(mockJwt())
-            .get().uri(CustomerRouterConfig.CUSTOMER_PATH)
+        return webTestClient.mutateWith(mockJwt())
+            .get()
+            .uri(CustomerController.CUSTOMER_PATH)
             .exchange()
-            .expectStatus().isOk()
-            .expectHeader().valueEquals("Content-type", "application/json")
+            .expectStatus()
+            .isOk()
+            .expectHeader()
+            .valueEquals("Content-type", "application/json")
             .expectBodyList(CustomerDto.class)
             .returnResult()
             .getResponseBody()
@@ -344,4 +374,5 @@ class CustomerHandlerIT {
             .findFirst()
             .orElse(null);
     }
+
 }

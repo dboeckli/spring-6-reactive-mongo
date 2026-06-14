@@ -49,26 +49,25 @@ public class MongoClientConfig extends AbstractReactiveMongoConfiguration {
         log.info("#### Mongo DB Host: " + connectionDetails.host);
         log.info("#### Mongo DB Port: " + connectionDetails.port);
         log.info("#### Mongo DB Database: " + connectionDetails.databaseName);
-        builder
-            .retryWrites(true)
-            .applyToConnectionPoolSettings(poolSettings -> poolSettings
-                .minSize(5)
+        builder.retryWrites(true)
+            .applyToConnectionPoolSettings(poolSettings -> poolSettings.minSize(5)
                 .maxSize(300)
                 .maxConnectionIdleTime(0, TimeUnit.MILLISECONDS))
-            .applyToSocketSettings(socketSettings -> socketSettings
-                .connectTimeout(1, TimeUnit.MINUTES)
+            .applyToSocketSettings(socketSettings -> socketSettings.connectTimeout(1, TimeUnit.MINUTES)
                 .readTimeout(1, TimeUnit.MINUTES))
-            .applyToClusterSettings(settings -> settings.hosts((singletonList(
-                new ServerAddress(connectionDetails.host, connectionDetails.port)
-            ))));
-        // this is only used when we start the application with the docker-compose profile. in that case we connect to the Docker MongoDB instance.
-        if (username!= null &&!username.isEmpty()) {
+            .applyToClusterSettings(settings -> settings
+                .hosts((singletonList(new ServerAddress(connectionDetails.host, connectionDetails.port)))));
+        // this is only used when we start the application with the docker-compose
+        // profile. in that case we connect to the Docker MongoDB instance.
+        if (username != null && !username.isEmpty()) {
             log.info("#### Mongo DB authentication enabled");
             log.info("#### Mongo DB username: " + username);
             log.info("#### Mongo DB password: " + password);
-            // make sure to specify the authSource=admin query parameter in the connection string if you are using the root account for authentication.
+            // make sure to specify the authSource=admin query parameter in the connection
+            // string if you are using the root account for authentication.
             builder.credential(MongoCredential.createCredential(username, "admin", password.toCharArray()));
-        } else {
+        }
+        else {
             log.info("#### Mongo DB authentication disabled");
         }
     }
@@ -79,16 +78,27 @@ public class MongoClientConfig extends AbstractReactiveMongoConfiguration {
             String host = uri.getHost();
             int port = uri.getPort();
             String path = uri.getPath();
-            String databaseName = path != null && path.length() > 1 ? path.substring(1) : "sfg"; // Default to "sfg" if no database is specified
+            String databaseName = path != null && path.length() > 1 ? path.substring(1) : "sfg"; // Default
+                                                                                                 // to
+                                                                                                 // "sfg"
+                                                                                                 // if
+                                                                                                 // no
+                                                                                                 // database
+                                                                                                 // is
+                                                                                                 // specified
             return new ConnectionDetails(host, port, databaseName);
-        } catch (URISyntaxException e) {
+        }
+        catch (URISyntaxException e) {
             throw new InvalidMongoDbApiUsageException("Invalid MongoDB URI", e);
         }
     }
 
     private static class ConnectionDetails {
+
         String host;
+
         int port;
+
         String databaseName;
 
         ConnectionDetails(String host, int port, String databaseName) {
@@ -96,6 +106,7 @@ public class MongoClientConfig extends AbstractReactiveMongoConfiguration {
             this.port = port;
             this.databaseName = databaseName;
         }
-    } 
-    
+
+    }
+
 }

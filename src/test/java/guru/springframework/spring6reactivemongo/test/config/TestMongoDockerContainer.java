@@ -22,7 +22,8 @@ public class TestMongoDockerContainer {
         return (properties) -> {
             String databaseName = "sfg";
             properties.add("spring.mongodb.database", () -> databaseName);
-            // Nutze getReplicaSetUrl für die korrekte URI (beinhaltet bereits Host und dynamischen Port)
+            // Nutze getReplicaSetUrl für die korrekte URI (beinhaltet bereits Host und
+            // dynamischen Port)
             properties.add("spring.mongodb.uri", () -> mongoDBContainer.getReplicaSetUrl(databaseName));
 
             // Falls explizite Host/Port Properties benötigt werden:
@@ -30,4 +31,5 @@ public class TestMongoDockerContainer {
             properties.add("spring.mongodb.port", () -> mongoDBContainer.getMappedPort(27017));
         };
     }
+
 }

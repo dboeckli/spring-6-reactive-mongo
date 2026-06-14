@@ -1,9 +1,11 @@
 # spring-6-reactive-mongo
+
 Examples of Reactive Programming with Spring Framework.
 
 ![Architecture Diagram](guru.png)
 
 ## Getting started
+
 Server runs on port 8083. Requires the auth server running on port 9000.
 There are three profiles:
 * default profile: expects a MongoDB installed and running on port 27017
@@ -26,10 +28,13 @@ In Unit Test we are using the TestContainer within Docker which requires Docker 
 ## Docker
 
 ### create image
+
 ```shell
 .\mvnw clean package spring-boot:build-image
 ```
+
 or just run
+
 ```shell
 .\mvnw clean install
 ```
@@ -58,21 +63,25 @@ docker logs reactive-mongo
 Deployment goes into the default namespace.
 
 To run maven filtering for destination target/k8s
+
 ```bash
 mvn clean install -DskipTests 
 ```
 
 To deploy all resources:
+
 ```bash
 kubectl apply -f target/k8s/
 ```
 
 To remove all resources:
+
 ```bash
 kubectl delete -f target/k8s/
 ```
 
 Check
+
 ```bash
 kubectl get deployments -o wide
 kubectl get pods -o wide
@@ -83,6 +92,7 @@ You can use the actuator rest call to verify via port 30083
 ## Deployment with Helm
 
 To run maven filtering for destination target/helm run:
+
 ```bash
 mvn clean install -DskipTests 
 ```
@@ -90,27 +100,33 @@ mvn clean install -DskipTests
 Be aware that we are using a different namespace here (not default).
 
 Go to the directory where the tgz file has been created after 'mvn install'
+
 ```powershell
 cd target/helm/repo
 ```
 
 unpack
+
 ```powershell
 $file = Get-ChildItem -Filter spring-6-reactive-mongo-v*.tgz | Select-Object -First 1
 tar -xvf $file.Name
 ```
 
 install
+
 ```powershell
 $APPLICATION_NAME = Get-ChildItem -Directory | Where-Object { $_.LastWriteTime -ge $file.LastWriteTime } | Select-Object -ExpandProperty Name
 helm upgrade --install $APPLICATION_NAME ./$APPLICATION_NAME --namespace spring-6-reactive-mongo --create-namespace --wait --timeout 5m --debug --render-subchart-notes
 ```
 
 show logs and show event
+
 ```powershell
 kubectl get pods -n spring-6-reactive-mongo
 ```
+
 replace $POD with pods from the command above
+
 ```powershell
 kubectl logs $POD -n spring-6-reactive-mongo --all-containers
 ```
@@ -118,36 +134,43 @@ kubectl logs $POD -n spring-6-reactive-mongo --all-containers
 Show Details and Event
 
 $POD_NAME can be: spring-6-reactive-mongo-mongodb, spring-6-reactive-mongo
+
 ```powershell
 kubectl describe pod $POD_NAME -n spring-6-reactive-mongo
 ```
 
 Show Endpoints
+
 ```powershell
 kubectl get endpoints -n spring-6-reactive-mongo
 ```
 
 status
+
 ```powershell
 helm status $APPLICATION_NAME --namespace spring-6-reactive-mongot
 ```
 
 test
+
 ```powershell
 helm test $APPLICATION_NAME --namespace spring-6-reactive-mongo --logs
 ```
 
 uninstall
+
 ```powershell
 helm uninstall $APPLICATION_NAME --namespace spring-6-reactive-mongo
 ```
 
 delete all
+
 ```powershell
 kubectl delete all --all -n spring-6-reactive-mongo
 ```
 
 create busybox sidecar
+
 ```powershell
 kubectl run busybox-test --rm -it --image=busybox:1.36 --namespace=spring-6-reactive-mongo --command -- sh
 ```

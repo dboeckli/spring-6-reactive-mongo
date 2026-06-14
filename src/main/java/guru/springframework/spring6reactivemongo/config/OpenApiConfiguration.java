@@ -15,40 +15,26 @@ import org.springframework.boot.info.BuildProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-@OpenAPIDefinition(
-    info = @Info(
-        title = "Spring Rest MVC API",
-        description = "Some long and useful description",
-        version = "TODO",
-        license = @License(name = "Apache 2.0", url = "https://www.apache.org/licenses/LICENSE-2.0")
-    )
-)
-@SecurityScheme(
-    name = OpenApiConfiguration.SECURITY_SCHEME_NAME,
-    type = SecuritySchemeType.OAUTH2,
-    bearerFormat = "JWT",
-    scheme = "bearer",
-    flows = @OAuthFlows(
-        clientCredentials = @OAuthFlow(
-            authorizationUrl = "http://localhost:9000/oauth2/auth",
-            tokenUrl = "http://localhost:9000/oauth2/token",
-            refreshUrl = "http://localhost:9000/oauth2/refresh-token",
-            scopes = {
-                @OAuthScope(name = "message.read"),
-                @OAuthScope(name = "message.write")
-            })
-    )
-)
+@OpenAPIDefinition(info = @Info(title = "Spring Rest MVC API", description = "Some long and useful description",
+        version = "TODO", license = @License(name = "Apache 2.0", url = "https://www.apache.org/licenses/LICENSE-2.0")))
+@SecurityScheme(name = OpenApiConfiguration.SECURITY_SCHEME_NAME, type = SecuritySchemeType.OAUTH2,
+        bearerFormat = "JWT", scheme = "bearer",
+        flows = @OAuthFlows(clientCredentials = @OAuthFlow(authorizationUrl = "http://localhost:9000/oauth2/auth",
+                tokenUrl = "http://localhost:9000/oauth2/token",
+                refreshUrl = "http://localhost:9000/oauth2/refresh-token",
+                scopes = { @OAuthScope(name = "message.read"), @OAuthScope(name = "message.write") })))
 @Configuration
 @RequiredArgsConstructor
 public class OpenApiConfiguration {
-    
+
     private final BuildProperties buildProperties;
 
     @Value("${security.authorization-url-for-openapi:http://localhost:9000/oauth2/auth}")
     private String authorizationUrl;
+
     @Value("${security.token-url-for-openapi:http://localhost:9000/oauth2/token}")
     private String tokenUrl;
+
     @Value("${security.refresh-url-for-openapi:http://localhost:9000/oauth2/refresh-token}")
     private String refreshUrl;
 
@@ -62,7 +48,10 @@ public class OpenApiConfiguration {
             info.setVersion(buildProperties.getVersion());
 
             // Update OAuth URLs
-            openApi.getComponents().getSecuritySchemes().values().stream()
+            openApi.getComponents()
+                .getSecuritySchemes()
+                .values()
+                .stream()
                 .filter(scheme -> scheme.getType() == io.swagger.v3.oas.models.security.SecurityScheme.Type.OAUTH2)
                 .forEach(scheme -> {
                     io.swagger.v3.oas.models.security.OAuthFlows flows = scheme.getFlows();
@@ -75,4 +64,5 @@ public class OpenApiConfiguration {
                 });
         };
     }
+
 }

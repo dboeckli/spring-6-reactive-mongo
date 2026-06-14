@@ -21,12 +21,14 @@ import static org.hamcrest.Matchers.greaterThan;
 public class MongoExtension implements BeforeEachCallback {
 
     @Override
-    // This is a workaround to make sure data is inserted before running tests (inserted by BootStrapData). In ExtensionContext.Callback 
+    // This is a workaround to make sure data is inserted before running tests (inserted
+    // by BootStrapData). In ExtensionContext.Callback
     // interface we cannot autowire repositories here, so we have to do it manually.
     public void beforeEach(@NonNull ExtensionContext context) {
-        CustomerRepository customerRepository = SpringExtension.getApplicationContext(context).getBean(CustomerRepository.class);
+        CustomerRepository customerRepository = SpringExtension.getApplicationContext(context)
+            .getBean(CustomerRepository.class);
         BeerRepository beerRepository = SpringExtension.getApplicationContext(context).getBean(BeerRepository.class);
-        
+
         await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> {
             log.info("Waiting for data to be inserted...");
             assertThat(Objects.requireNonNull(customerRepository.count().block()).intValue(), greaterThan(2));
@@ -37,4 +39,5 @@ public class MongoExtension implements BeforeEachCallback {
         });
         log.info("Continue....");
     }
+
 }

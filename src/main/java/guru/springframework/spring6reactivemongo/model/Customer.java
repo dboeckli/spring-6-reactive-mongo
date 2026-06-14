@@ -30,5 +30,5 @@ public class Customer {
 
     @LastModifiedDate
     private LocalDateTime lastModifiedDate;
-    
+
 }

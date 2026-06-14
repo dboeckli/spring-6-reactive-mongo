@@ -29,6 +29,7 @@ import java.util.List;
 public class SecurityConfig {
 
     private static final List<String> ALLOWED_HEADERS = List.of("*");
+
     private static final List<String> ALLOWED_METHODS = List.of("POST", "GET", "PUT", "OPTIONS", "DELETE", "PATCH");
 
     private final AllowedOriginConfig allowedOriginConfig;
@@ -42,9 +43,9 @@ public class SecurityConfig {
 
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE)
-    SecurityWebFilterChain springSecurityActuator(ServerHttpSecurity http, CorsConfigurationSource corsConfigurationSource) {
-        return http
-            .securityMatcher(EndpointRequest.toAnyEndpoint())
+    SecurityWebFilterChain springSecurityActuator(ServerHttpSecurity http,
+            CorsConfigurationSource corsConfigurationSource) {
+        return http.securityMatcher(EndpointRequest.toAnyEndpoint())
             .csrf(ServerHttpSecurity.CsrfSpec::disable)
             .cors(cors -> cors.configurationSource(corsConfigurationSource))
             .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
@@ -56,20 +57,14 @@ public class SecurityConfig {
     @Bean
     @Order(Ordered.LOWEST_PRECEDENCE)
     SecurityWebFilterChain springSecurity(ServerHttpSecurity http, CorsConfigurationSource corsConfigurationSource) {
-        return http
-            .csrf(ServerHttpSecurity.CsrfSpec::disable)
+        return http.csrf(ServerHttpSecurity.CsrfSpec::disable)
             .cors(cors -> cors.configurationSource(corsConfigurationSource))
             .authorizeExchange(exchange -> exchange
-                .pathMatchers(
-                    "/favicon.ico",
-                    "/v3/api-docs",
-                    "/v3/api-docs.yaml",
-                    "/v3/api-docs/**",
-                    "/swagger-ui/**",
-                    "/swagger-ui.html"
-                ).permitAll()
-                .anyExchange().authenticated()
-            )
+                .pathMatchers("/favicon.ico", "/v3/api-docs", "/v3/api-docs.yaml", "/v3/api-docs/**", "/swagger-ui/**",
+                        "/swagger-ui.html")
+                .permitAll()
+                .anyExchange()
+                .authenticated())
             .oauth2ResourceServer(oAuth2 -> oAuth2.jwt(Customizer.withDefaults()))
             .build();
     }
@@ -93,6 +88,9 @@ public class SecurityConfig {
     @ConfigurationProperties(prefix = "security.cors")
     @Data
     public static class AllowedOriginConfig {
+
         private List<String> allowedOrigins;
+
     }
+
 }

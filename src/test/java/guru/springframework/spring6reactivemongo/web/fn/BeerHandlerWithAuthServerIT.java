@@ -1,6 +1,7 @@
 package guru.springframework.spring6reactivemongo.web.fn;
 
 import guru.springframework.spring6reactivemongo.test.config.AuthServerDockerContainer;
+import guru.springframework.spring6reactivemongo.web.rest.BeerController;
 import guru.springframework.spring6reactivemongo.test.config.MongoExtension;
 import guru.springframework.spring6reactivemongo.test.config.TestMongoDockerContainer;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @AutoConfigureWebTestClient
 @Slf4j
-@Import({TestMongoDockerContainer.class, AuthServerDockerContainer.class})
+@Import({ TestMongoDockerContainer.class, AuthServerDockerContainer.class })
 @ExtendWith(MongoExtension.class)
 class BeerHandlerWithAuthServerIT {
 
@@ -39,20 +40,20 @@ class BeerHandlerWithAuthServerIT {
 
     @Test
     void testListBeers() {
-        String accessToken = AuthTokenUtil.fetchClientCredentialsAccessToken(
-            objectMapper,
-            issuerUri,
-            "messaging-client",
-            "secret",
-            "message.read message.write"
-        );
+        String accessToken = AuthTokenUtil.fetchClientCredentialsAccessToken(objectMapper, issuerUri,
+                "messaging-client", "secret", "message.read message.write");
 
-        webTestClient
-            .get().uri(BeerRouterConfig.BEER_PATH)
+        webTestClient.get()
+            .uri(BeerController.BEER_PATH)
             .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
             .exchange()
-            .expectStatus().isOk()
-            .expectHeader().valueEquals("Content-type", "application/json")
-            .expectBody().jsonPath("$.size()").value(size -> assertEquals(3, size));
+            .expectStatus()
+            .isOk()
+            .expectHeader()
+            .valueEquals("Content-type", "application/json")
+            .expectBody()
+            .jsonPath("$.size()")
+            .value(size -> assertEquals(3, size));
     }
+
 }

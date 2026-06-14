@@ -33,13 +33,13 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @AutoConfigureWebTestClient
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @Log
-@Import({AuthServerDockerContainer.class, TestMongoDockerContainer.class})
+@Import({ AuthServerDockerContainer.class, TestMongoDockerContainer.class })
 @ExtendWith(MongoExtension.class)
 class BootstrapDataIT {
 
     @Autowired
     BeerService beerService;
-    
+
     @Autowired
     CustomerService customerService;
 
@@ -53,7 +53,8 @@ class BootstrapDataIT {
             assertThat(beers).extracting(BeerDto::getBeerName).contains("Galaxy Cat", "Crank", "Sunshine City");
             assertNotNull(customers);
             assertEquals(3, customers.size());
-            assertThat(customers).extracting(CustomerDto::getCustomerName).contains("John Doe", "Fridolin Mann", "Hansjörg Riesen");
+            assertThat(customers).extracting(CustomerDto::getCustomerName)
+                .contains("John Doe", "Fridolin Mann", "Hansjörg Riesen");
         });
     }
 
