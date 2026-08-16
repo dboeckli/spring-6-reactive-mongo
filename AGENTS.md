@@ -19,17 +19,12 @@ image and Helm chart.
 After changing code, always verify: run the relevant Maven goal above and report its output
 (evidence, not just "done").
 
-## Sandbox build quirk (required)
+## Sandbox build quirk (background)
 
-This sandbox mounts the repo via filesystem passthrough, which blocks symlinks. Spotless's
-`npm install` (prettier) therefore fails with `EPERM` unless npm skips bin links:
-
-```bash
-export npm_config_bin_links=false    # export BEFORE running ./mvnw
-```
-
-Without it, `./mvnw validate` / `./mvnw verify` fail in the spotless step. On a normal host
-(Windows/CI) this is not needed.
+This sandbox mounts the repo via filesystem passthrough, which blocks symlinks — Spotless's
+`npm install` (prettier) would fail with `EPERM` unless npm skips bin links. The sandbox kit sets
+`npm_config_bin_links=false` globally (`spec.yaml` → `environment.variables`), so no manual export
+is needed here. On a normal host (Windows/CI) this does not apply either.
 
 ## Formatting is enforced (fails the `validate` phase)
 
