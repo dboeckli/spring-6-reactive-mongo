@@ -686,7 +686,6 @@
               <goal>start</goal>
               <goal>stop</goal>
             </goals>
-            <phase>post-integration-test</phase>
             <configuration>
               <skip>${skip.start.stop.springboot}</skip>
               <!-- 1000 milliseconds is default -->
