@@ -2,7 +2,29 @@
 
 Examples of Reactive Programming with Spring Framework.
 
-![Architecture Diagram](guru.png)
+## Architecture Overview
+
+```mermaid
+graph LR
+    Client(["💻 Client"])
+
+    subgraph Auth ["OAuth2"]
+        AuthServer["Spring Auth Server\n:9000"]
+    end
+
+    subgraph Backends ["Backend Services"]
+        WebFlux["Spring WebFlux (Reactive)\n:8083"]
+    end
+
+    subgraph Databases ["Databases"]
+        MongoDB[("MongoDB\nReactive")]
+    end
+
+    AuthServer -->|"issues JWT"| Client
+    Client <-->|"HTTP (Bearer JWT)"| WebFlux
+    WebFlux -->|"validates JWT"| AuthServer
+    WebFlux <--> MongoDB
+```
 
 ## Getting started
 
@@ -108,7 +130,7 @@ cd target/helm/repo
 unpack
 
 ```powershell
-$file = Get-ChildItem -Filter spring-6-reactive-mongo-v*.tgz | Select-Object -First 1
+$file = Get-ChildItem -Filter spring-6-reactive-mongo-chart-*.tgz | Select-Object -First 1
 tar -xvf $file.Name
 ```
 
@@ -176,3 +198,56 @@ kubectl run busybox-test --rm -it --image=busybox:1.36 --namespace=spring-6-reac
 ```
 
 You can use the actuator rest call to verify via port 30083
+
+## Sandbox (local dev environment)
+
+The sandbox consists of the app (Spring Boot, port 8083) plus an auth-server (port 9000) and MongoDB,
+provided by `compose.yaml`. The services start automatically via `spring.docker.compose.enabled=true`
+when the app boots, so usually one step is enough.
+
+### Start the sandbox (opencode-sandbox-kit)
+
+The sandbox is provisioned by the opencode-sandbox-kit and runs as a Docker container. It mounts this
+repo, starts opencode, and connects the IntelliJ MCP server.
+
+Allow the kit source (GitHub without cloning):
+
+```powershell
+sbx settings set kit.allowedSources --% "[\"docker.io/\",\"github.com/dboeckli/\"]"
+```
+
+Start a new sandbox:
+
+```powershell
+sbx run opencode --name spring-6-reactive-mongo --kit "git+https://github.com/dboeckli/opencode-sandbox-kit.git" "C:\development\projects\spring-6-reactive-mongo"
+```
+
+Start the sandbox with Kubernetes support:
+
+```powershell
+sbx run opencode --name spring-6-reactive-mongo --kit "git+https://github.com/dboeckli/opencode-sandbox-kit.git" "C:\development\projects\spring-6-reactive-mongo" "$env:USERPROFILE\.kube:ro"
+```
+
+Apply the kit to an existing sandbox (restarts the sandbox, VM state is kept):
+
+```powershell
+sbx kit add spring-6-reactive-mongo "git+https://github.com/dboeckli/opencode-sandbox-kit.git"
+```
+
+### Start the app
+
+```shell
+docker compose -f compose.yaml up        # optional: start MongoDB + auth-server manually (else they start with the app)
+```
+
+Then run the `Spring6ReactiveMongoApplication` run configuration in IntelliJ
+(`.run/Docker with compose Spring6ReactiveMongoApplication.run.xml`). Alternatively start via
+`./mvnw spring-boot:run`.
+
+The compose file brings up:
+
+- `auth-server` (port 9000) — required by the OAuth2 resource server
+- `mongodb` (port 27018) — required by the reactive data layer
+
+### Verify
+
