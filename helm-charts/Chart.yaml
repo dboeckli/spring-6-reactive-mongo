@@ -6,7 +6,8 @@ version: @helm.chart.version@
 appVersion: @helm.chart.version@
 
 dependencies:
-  - name: spring-6-reactive-mongo-mongodb
+  - name: spring-6-reactive-mongo-mongodb-chart
     version: @helm.chart.version@
     repository: file://charts/mongodb
+    alias: mongodb
     condition: mongodb.enabled

@@ -55,6 +55,8 @@ probes:
 mongodb:
   enabled: true
   
+  fullnameOverride: spring-6-reactive-mongo-mongodb
+  
   port: 27017
   targetPort: 27017
   nodePort: 30017
@@ -82,6 +84,3 @@ spring-6-auth-server-chart:
   spring:
     issuer:
       uri: "http://spring-6-auth-server.spring-6-reactive-mongo.svc.cluster.local:9000"
-
-spring-6-reactive-mongo-mongodb:
-  fullnameOverride: spring-6-reactive-mongo-mongodb
