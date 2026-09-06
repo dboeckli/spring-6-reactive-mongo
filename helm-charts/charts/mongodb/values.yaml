@@ -15,7 +15,3 @@ mongoImage:
   repository: mongo
   tag: "8.3.8"
   pullPolicy: IfNotPresent
-debianSlimImage:
-  repository: debian
-  tag: "bullseye-20250610-slim"
-  pullPolicy: IfNotPresent
