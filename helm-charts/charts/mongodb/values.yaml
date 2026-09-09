@@ -13,5 +13,5 @@ mongodb:
 # You can verify this manually via `docker pull` and `docker inspect`.
 mongoImage:
   repository: mongo
-  tag: "8.3.8"
+  tag: "8.3.9"
   pullPolicy: IfNotPresent
