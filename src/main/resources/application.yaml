@@ -52,6 +52,24 @@ management:
       export:
         enabled: false
   tracing:
+    propagation:
+      type: w3c
+      produce: w3c
+      consume: w3c
+    baggage:
+      enabled: true
+      # Specify which baggage fields should be propagated to downstream services
+      correlation:
+        # Also make baggage available in MDC for logging
+        fields:
+          - testBaggage
+        enabled: true
+      # Allows receiving the "baggage: testBaggage=..." header set in the http request
+      remote-fields:
+        - testBaggage
+      # COPIES the value from baggage into the span labels (attributes)
+      tag-fields:
+        - testBaggage
     export:
       otlp:
         enabled: false
