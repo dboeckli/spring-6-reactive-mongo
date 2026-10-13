@@ -1,10 +1,13 @@
 package guru.springframework.spring6reactivemongo.config;
 
+import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
+import com.mongodb.observability.ObservabilitySettings;
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoClients;
+import io.micrometer.observation.ObservationRegistry;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -22,6 +25,8 @@ import static java.util.Collections.singletonList;
 @Log
 public class MongoClientConfig extends AbstractReactiveMongoConfiguration {
 
+    private final ObservationRegistry observationRegistry;
+
     @Value("${spring.mongodb.uri}")
     private String mongoUri;
 
@@ -31,9 +36,20 @@ public class MongoClientConfig extends AbstractReactiveMongoConfiguration {
     @Value("${spring.mongodb.password:}")
     private String password;
 
+    public MongoClientConfig(ObservationRegistry observationRegistry) {
+        this.observationRegistry = observationRegistry;
+    }
+
     @Bean
     public MongoClient mongoClient() {
-        return MongoClients.create(mongoUri);
+        MongoClientSettings settings = MongoClientSettings.builder()
+            .applyConnectionString(new ConnectionString(mongoUri))
+            .observabilitySettings(ObservabilitySettings.micrometerBuilder()
+                .observationRegistry(observationRegistry)
+                .enableCommandPayloadTracing(true)
+                .build())
+            .build();
+        return MongoClients.create(settings);
     }
 
     @Override
