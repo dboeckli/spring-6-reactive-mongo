@@ -14,7 +14,7 @@ public class TestMongoDockerContainer {
     @Bean
     @ServiceConnection
     MongoDBContainer mongoDBContainer() {
-        return new MongoDBContainer("mongo:9.0.2");
+        return new MongoDBContainer("mongo:9.0.4");
     }
 
     @Bean
