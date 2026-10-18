@@ -1,6 +1,8 @@
 # spring-6-reactive-mongo
 
-Examples of Reactive Programming with Spring Framework.
+Reactive REST API built with Spring Boot 4, Spring WebFlux and Spring Data Reactive MongoDB on Java 25.
+It is secured as an OAuth2 JWT resource server, exposes its endpoints via a reactive controller/service/
+repository stack, and ships with OpenAPI docs, Docker packaging and a Helm chart.
 
 ## Architecture Overview
 
@@ -210,41 +212,22 @@ when the app boots, so usually one step is enough.
 The sandbox is provisioned by the opencode-sandbox-kit and runs as a Docker container. It mounts this
 repo, starts opencode, and connects the IntelliJ MCP server.
 
-Allow the kit source (GitHub without cloning):
+Allow the kit source (Codeberg without cloning):
 
 ```powershell
-sbx settings set kit.allowedSources --% "[\"docker.io/\",\"github.com/dboeckli/\"]"
+sbx settings set kit.allowedSources --% "[\"docker.io/\",\"codeberg.org/dboeckli/\"]"
 ```
 
 Start a new sandbox:
 
 ```powershell
 sbx run opencode `
-    --kit "git+https://github.com/dboeckli/opencode-sandbox-kit.git#dir=opencode-agent" `
-    --template docker/sandbox-templates:opencode-docker-0.5.0 `
-    --no-share-skills `
-    --static-mcp idea `
+    --kit "git+https://codeberg.org/dboeckli/opencode-sandbox-kit.git#dir=opencode-agent" `
+    --template docker.io/domboeckli/sbx-opencode-tooling:latest `
+    --skills=off `
+    --static-mcp idea,k8s,docker `
     . `
     "C:\development\maven-repo:ro"
-```
-
-Start the sandbox with Kubernetes support:
-
-```powershell
-sbx run opencode `
-    --kit "git+https://github.com/dboeckli/opencode-sandbox-kit.git#dir=opencode-agent" `
-    --template docker/sandbox-templates:opencode-docker-0.5.0 `
-    --no-share-skills `
-    --static-mcp idea `
-    . `
-    "$env:USERPROFILE\.kube:ro" `
-    "C:\development\maven-repo:ro"
-```
-
-Apply the kit to an existing sandbox (restarts the sandbox, VM state is kept):
-
-```powershell
-sbx kit add <sandbox-name> "git+https://github.com/dboeckli/opencode-sandbox-kit.git#dir=opencode-agent"
 ```
 
 ### Start the app
