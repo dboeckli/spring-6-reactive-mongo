@@ -43,6 +43,14 @@ You can find the part in the spring boot startup log or via the "docker ps" comm
 
 In Unit Test we are using the TestContainer within Docker which requires Docker Desktop installed. In that case the port does change with each test.
 
+## Request flows
+
+Documented HTTP request flows live in [`restRequests/`](restRequests). Each flow directory contains a `.http` file
+with pre-request scripts and assertions plus a `.md` file with the sequence diagram and expected results.
+
+- Beer: list → update → delete, create → get → delete, patch
+- Customer: list → update → delete, create → get → delete
+
 ## Urls
 
 - openapi api-docs: http://localhost:8083/v3/api-docs or http://localhost:30083/v3/api-docs
