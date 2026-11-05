@@ -57,7 +57,7 @@
 
     <!-- https://springdoc.org/#what-is-the-compatibility-matrix-of-springdoc-openapi-with-spring-boot -->
     <springdoc.openapi.version>3.2.0</springdoc.openapi.version>
-    <springdoc-openapi-maven-plugin.version>1.5</springdoc-openapi-maven-plugin.version>
+    <springdoc-openapi-maven-plugin.version>1.6</springdoc-openapi-maven-plugin.version>
 
     <logstash-logback.version>9.0</logstash-logback.version>
 
