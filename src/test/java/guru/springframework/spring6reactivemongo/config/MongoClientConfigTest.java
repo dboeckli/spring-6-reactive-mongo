@@ -60,6 +60,16 @@ class MongoClientConfigTest {
         assertThat(builder.build().getCredential()).isNull();
     }
 
+    @Test
+    void configuresNoCredentialWhenUsernameIsNull() {
+        MongoClientConfig config = newConfig("mongodb://localhost:27017/testdb", null, "secret");
+        MongoClientSettings.Builder builder = MongoClientSettings.builder();
+
+        config.configureClientSettings(builder);
+
+        assertThat(builder.build().getCredential()).isNull();
+    }
+
     private static MongoClientConfig newConfig(String mongoUri, String username, String password) {
         MongoClientConfig config = new MongoClientConfig(ObservationRegistry.NOOP);
         ReflectionTestUtils.setField(config, "mongoUri", mongoUri);
