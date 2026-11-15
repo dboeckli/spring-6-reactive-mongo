@@ -148,7 +148,25 @@ Bruno-Smoke-Test als Pflicht-Gate aus:
 3. `bru run . -r --env local` (JUnit-/HTML-Report, `--reporter-skip-all-headers`)
 4. Upload des Reports als Artifact `bruno-reports`
 5. Publish der JUnit-Ergebnisse via `EnricoMi/publish-unit-test-result-action` im Checks-Tab
+6. HTML-Reports auf GitHub Pages (Job `publish-bruno-report`)
 
 `BRUNO_CLIENT_ID` (Repository-Variable) und `BRUNO_CLIENT_SECRET` (Secret) können gesetzt werden;
 ohne Werte greifen die Dev-Fallbacks `messaging-client`/`secret`.
+
+### GitHub Pages
+
+Der Job `publish-bruno-report` baut ein `_site` mit `index.html` und den HTML-Reports und
+veröffentlicht sie über die offiziellen Pages-Actions.
+
+Einmalige Voraussetzungen:
+
+- **Settings → Pages → Build and deployment → Source: GitHub Actions**.
+- Falls das `github-pages`-Environment Branch-Regeln hat: den deployenden Branch erlauben.
+
+Hinweise:
+
+- Es wird immer der **letzte Lauf** veröffentlicht (vorherige Reports werden überschrieben).
+- Die Bruno-HTML-Reports laden Vue/Naive UI von `unpkg.com` — der Browser braucht Internetzugang.
+- `--reporter-skip-all-headers` entfernt Auth-Header; Request-/Response-Bodies sind weiterhin im
+  Report. Bei öffentlichem Repo sind die Pages damit öffentlich.
 
