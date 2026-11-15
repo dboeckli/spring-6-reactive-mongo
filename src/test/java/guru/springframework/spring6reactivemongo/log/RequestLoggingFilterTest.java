@@ -38,6 +38,11 @@ class RequestLoggingFilterTest {
     }
 
     @Test
+    void logsEverythingWhenPathIsNull() {
+        assertThat(RequestLoggingFilter.isExcluded(null, List.of("/actuator/health"))).isFalse();
+    }
+
+    @Test
     void registersFilterByDefault() {
         contextRunner.run(context -> assertThat(context).hasSingleBean(WebFilter.class));
     }

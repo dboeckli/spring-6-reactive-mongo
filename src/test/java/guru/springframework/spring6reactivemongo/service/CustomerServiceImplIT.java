@@ -7,6 +7,7 @@ import guru.springframework.spring6reactivemongo.test.config.MongoExtension;
 import guru.springframework.spring6reactivemongo.test.config.TestMongoDockerContainer;
 import lombok.extern.java.Log;
 import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -41,6 +42,7 @@ class CustomerServiceImplIT {
     CustomerMapper customerMapper;
 
     @Test
+    @Order(1)
     void listCustomers() {
         List<CustomerDto> customers = customerService.listCustomers().collectList().block();
 
@@ -51,11 +53,41 @@ class CustomerServiceImplIT {
     }
 
     @Test
+    @Order(2)
     void findFirstCustomerByName() {
         Mono<CustomerDto> firstCustomer = customerService.findFirstByCustomerName("John Doe");
 
         assertNotNull(firstCustomer);
         assertEquals("John Doe", firstCustomer.block().getCustomerName());
+    }
+
+    @Test
+    @Order(3)
+    void patchCustomerWithEmptyNameKeepsExistingName() {
+        CustomerDto savedCustomer = customerService
+            .saveCustomer(Mono.just(CustomerDto.builder().customerName("Patch Me").build()))
+            .block();
+
+        CustomerDto patchedCustomer = customerService.patchCustomer(savedCustomer.getId(), new CustomerDto()).block();
+
+        assertNotNull(patchedCustomer);
+        assertEquals("Patch Me", patchedCustomer.getCustomerName());
+    }
+
+    @Test
+    @Order(4)
+    void patchCustomerWithNameUpdatesName() {
+        CustomerDto savedCustomer = customerService
+            .saveCustomer(Mono.just(CustomerDto.builder().customerName("Patch Me").build()))
+            .block();
+
+        CustomerDto patch = new CustomerDto();
+        patch.setCustomerName("Patched Customer");
+
+        CustomerDto patchedCustomer = customerService.patchCustomer(savedCustomer.getId(), patch).block();
+
+        assertNotNull(patchedCustomer);
+        assertEquals("Patched Customer", patchedCustomer.getCustomerName());
     }
 
 }
