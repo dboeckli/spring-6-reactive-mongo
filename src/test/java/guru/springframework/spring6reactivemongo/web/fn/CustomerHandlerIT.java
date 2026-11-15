@@ -10,6 +10,9 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient;
@@ -134,38 +137,12 @@ class CustomerHandlerIT {
         assertNotNull(createdCustomer);
     }
 
-    @Test
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = { "1" })
     @Order(3)
-    void testCreateCustomerEmptyName() {
-        CustomerDto customerToCreate = CustomerDto.builder().customerName("").build();
-
-        webTestClient.mutateWith(mockJwt())
-            .post()
-            .uri(CustomerController.CUSTOMER_PATH)
-            .body(Mono.just(customerToCreate), CustomerDto.class)
-            .exchange()
-            .expectStatus()
-            .isBadRequest();
-    }
-
-    @Test
-    @Order(3)
-    void testCreateCustomerTooShortName() {
-        CustomerDto customerToCreate = CustomerDto.builder().customerName("1").build();
-
-        webTestClient.mutateWith(mockJwt())
-            .post()
-            .uri(CustomerController.CUSTOMER_PATH)
-            .body(Mono.just(customerToCreate), CustomerDto.class)
-            .exchange()
-            .expectStatus()
-            .isBadRequest();
-    }
-
-    @Test
-    @Order(3)
-    void testCreateCustomerNullName() {
-        CustomerDto customerToCreate = CustomerDto.builder().customerName(null).build();
+    void testCreateCustomerWithInvalidName(String customerName) {
+        CustomerDto customerToCreate = CustomerDto.builder().customerName(customerName).build();
 
         webTestClient.mutateWith(mockJwt())
             .post()

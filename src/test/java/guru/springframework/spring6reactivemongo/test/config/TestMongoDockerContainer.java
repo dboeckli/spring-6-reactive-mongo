@@ -19,7 +19,7 @@ public class TestMongoDockerContainer {
 
     @Bean
     public DynamicPropertyRegistrar mongoDbProperties(MongoDBContainer mongoDBContainer) {
-        return (properties) -> {
+        return properties -> {
             String databaseName = "sfg";
             properties.add("spring.mongodb.database", () -> databaseName);
             // Nutze getReplicaSetUrl für die korrekte URI (beinhaltet bereits Host und

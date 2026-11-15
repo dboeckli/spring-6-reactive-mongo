@@ -10,6 +10,9 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient;
@@ -202,38 +205,12 @@ class BeerHandlerIT {
         assertNotNull(createdBeer);
     }
 
-    @Test
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = { "12" })
     @Order(3)
-    void testCreateBeerEmptyBeerName() {
-        BeerDto beerToCreate = BeerDto.builder().beerName("").build();
-
-        webTestClient.mutateWith(mockJwt())
-            .post()
-            .uri(BeerController.BEER_PATH)
-            .body(Mono.just(beerToCreate), BeerDto.class)
-            .exchange()
-            .expectStatus()
-            .isBadRequest();
-    }
-
-    @Test
-    @Order(3)
-    void testCreateBeerNullBeerName() {
-        BeerDto beerToCreate = BeerDto.builder().beerName(null).build();
-
-        webTestClient.mutateWith(mockJwt())
-            .post()
-            .uri(BeerController.BEER_PATH)
-            .body(Mono.just(beerToCreate), BeerDto.class)
-            .exchange()
-            .expectStatus()
-            .isBadRequest();
-    }
-
-    @Test
-    @Order(3)
-    void testCreateBeerToShortBeerName() {
-        BeerDto beerToCreate = BeerDto.builder().beerName("12").build();
+    void testCreateBeerWithInvalidBeerName(String beerName) {
+        BeerDto beerToCreate = BeerDto.builder().beerName(beerName).build();
 
         webTestClient.mutateWith(mockJwt())
             .post()

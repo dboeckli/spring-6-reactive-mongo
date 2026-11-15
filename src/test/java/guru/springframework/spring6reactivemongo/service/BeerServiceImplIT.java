@@ -194,6 +194,43 @@ class BeerServiceImplIT {
     }
 
     @Test
+    @DisplayName("Test Patch Beer With All Properties")
+    void testPatchAllProperties() {
+        BeerDto savedBeer = beerService.saveBeer(Mono.just(beerMapper.beerToBeerDto(getTestBeer()))).block();
+
+        BeerDto patch = new BeerDto();
+        patch.setBeerName("Patched Beer");
+        patch.setBeerStyle("Stout");
+        patch.setPrice(new BigDecimal("5.55"));
+        patch.setUpc("99999");
+        patch.setQuantityOnHand(7);
+
+        BeerDto patchedBeer = beerService.patchBeer(savedBeer.getId(), patch).block();
+
+        assertNotNull(patchedBeer);
+        assertThat(patchedBeer.getBeerName()).isEqualTo("Patched Beer");
+        assertThat(patchedBeer.getBeerStyle()).isEqualTo("Stout");
+        assertThat(patchedBeer.getPrice()).isEqualByComparingTo("5.55");
+        assertThat(patchedBeer.getUpc()).isEqualTo("99999");
+        assertThat(patchedBeer.getQuantityOnHand()).isEqualTo(7);
+    }
+
+    @Test
+    @DisplayName("Test Patch Beer With Empty Dto Keeps Existing Values")
+    void testPatchWithEmptyDto() {
+        BeerDto savedBeer = beerService.saveBeer(Mono.just(beerMapper.beerToBeerDto(getTestBeer()))).block();
+
+        BeerDto patchedBeer = beerService.patchBeer(savedBeer.getId(), new BeerDto()).block();
+
+        assertNotNull(patchedBeer);
+        assertThat(patchedBeer.getBeerName()).isEqualTo(savedBeer.getBeerName());
+        assertThat(patchedBeer.getBeerStyle()).isEqualTo(savedBeer.getBeerStyle());
+        assertThat(patchedBeer.getPrice()).isEqualByComparingTo(savedBeer.getPrice());
+        assertThat(patchedBeer.getUpc()).isEqualTo(savedBeer.getUpc());
+        assertThat(patchedBeer.getQuantityOnHand()).isEqualTo(savedBeer.getQuantityOnHand());
+    }
+
+    @Test
     void testDeleteBeer() {
         // first we add a new beer
         BeerDto savedBeer = beerService.saveBeer(Mono.just(beerMapper.beerToBeerDto(getTestBeer()))).block();
