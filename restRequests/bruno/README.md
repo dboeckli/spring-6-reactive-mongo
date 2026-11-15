@@ -145,10 +145,32 @@ Bruno-Smoke-Test als Pflicht-Gate aus:
 
 1. `actions/setup-node` + `npm install -g @usebruno/cli@4.2.1`
 2. `kubectl port-forward` für den Service (`:8083`) und den Auth-Server (`:9000`)
-3. `bru run . -r --env local` (JUnit-/HTML-Report, `--reporter-skip-all-headers`)
-4. Upload des Reports als Artifact `bruno-reports`
+3. Pro Flow ein eigener Lauf `bru run <flow> -r --env local` mit eigenem JUnit-/HTML-Report
+   (`TEST-bruno-<flow>.xml` / `bru-report-<flow>.html`, `--reporter-skip-all-headers`)
+4. Upload aller Reports als Artifact `bruno-reports`
 5. Publish der JUnit-Ergebnisse via `EnricoMi/publish-unit-test-result-action` im Checks-Tab
+6. HTML-Reports auf GitHub Pages (Job `publish-bruno-report`)
+
+Dadurch bleiben Requests, die zu einem Flow gehören, in einem eigenen Report zusammen und die
+Reihenfolge innerhalb des Flows ist direkt sichtbar.
 
 `BRUNO_CLIENT_ID` (Repository-Variable) und `BRUNO_CLIENT_SECRET` (Secret) können gesetzt werden;
 ohne Werte greifen die Dev-Fallbacks `messaging-client`/`secret`.
+
+### GitHub Pages
+
+Der Job `publish-bruno-report` baut ein `_site` mit `index.html` und den per-Flow-HTML-Reports und
+veröffentlicht sie über die offiziellen Pages-Actions.
+
+Einmalige Voraussetzungen:
+
+- **Settings → Pages → Build and deployment → Source: GitHub Actions**.
+- Falls das `github-pages`-Environment Branch-Regeln hat: den deployenden Branch erlauben.
+
+Hinweise:
+
+- Es wird immer der **letzte Lauf** veröffentlicht (vorherige Reports werden überschrieben).
+- Die Bruno-HTML-Reports laden Vue/Naive UI von `unpkg.com` — der Browser braucht Internetzugang.
+- `--reporter-skip-all-headers` entfernt Auth-Header; Request-/Response-Bodies sind weiterhin im
+  Report. Bei öffentlichem Repo sind die Pages damit öffentlich.
 
