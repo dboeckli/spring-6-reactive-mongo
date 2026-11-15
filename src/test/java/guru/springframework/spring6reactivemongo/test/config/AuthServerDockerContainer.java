@@ -72,7 +72,7 @@ public class AuthServerDockerContainer {
             authServer.start();
         }
         int mappedPort = authServer.getMappedPort(AUTH_SERVER_CONTAINER_PORT);
-        return (properties) -> {
+        return properties -> {
             String issuerUri = "http://localhost:" + mappedPort;
             log.info("### Setting Resource Server Issuer URI (Static Random Port): " + issuerUri);
             properties.add("spring.security.oauth2.resourceserver.jwt.issuer-uri", () -> issuerUri);

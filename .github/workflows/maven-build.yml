@@ -32,14 +32,14 @@ jobs:
       ORGANIZATION: ${{ steps.set_version.outputs.ORGANIZATION }}
 
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
         
-      - uses: mfinelli/setup-shfmt@v4
+      - uses: mfinelli/setup-shfmt@v4.0.1
         with:
           shfmt-version: 3.14.1  
 
       - name: Set up java
-        uses: actions/setup-java@v6
+        uses: actions/setup-java@v6.3.0
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: 'liberica'
@@ -89,7 +89,6 @@ jobs:
         id: show_variables
         shell: bash
         env:
-          ALLMYSECRETS: ${{ toJSON(secrets) }}
           ALLMYVARS: ${{ toJSON(vars) }}
           ALLMYOUTPUT: ${{ toJSON(steps.set_version.outputs) }}
           BRANCH_MVN_VERSION: ${{ steps.set_version.outputs.BRANCH_MVN_VERSION }}
@@ -100,7 +99,6 @@ jobs:
           ORGANIZATION: ${{ steps.set_version.outputs.ORGANIZATION }}
 
         run: |
-          echo "### ALLMYSECRETS: $ALLMYSECRETS"
           echo "### ALLMYVARS: $ALLMYVARS"
           echo "### ALLMYOUTPUT: $ALLMYOUTPUT"
           
@@ -141,14 +139,14 @@ jobs:
       actions: read
 
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
         
-      - uses: mfinelli/setup-shfmt@v4
+      - uses: mfinelli/setup-shfmt@v4.0.1
         with:
           shfmt-version: 3.14.1  
 
       - name: Set up java
-        uses: actions/setup-java@v6
+        uses: actions/setup-java@v6.3.0
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: 'liberica'
@@ -156,7 +154,7 @@ jobs:
           server-id: github # Value of the distributionManagement/repository/id field of the pom.xml.
           settings-path: ${{ github.workspace }} # location for the settings.xml file
 
-      # TODO: Remove workaround when https://github.com/buildpacks/pack/issues/2270 is fixed
+      # Workaround until https://github.com/buildpacks/pack/issues/2270 is fixed
       - name: Disable containerd image store (Docker Engine 29+ workaround for Buildpacks)
         run: |
           echo '{ "features": { "containerd-snapshotter": false } }' | sudo tee /etc/docker/daemon.json
@@ -169,11 +167,9 @@ jobs:
         id: show_build_variables
         shell: bash
         env:
-          ALLMYSECRETS: ${{ toJSON(secrets) }}
           ALLMYVARS: ${{ toJSON(vars) }}
           ALLMYOUTPUT: ${{ toJSON(needs.setup.outputs) }}
         run: |
-          echo "### ALLMYSECRETS: $ALLMYSECRETS"
           echo "### ALLMYVARS: $ALLMYVARS"
           echo "### ALLMYOUTPUT: $ALLMYOUTPUT"
 
@@ -259,16 +255,16 @@ jobs:
       actions: read
 
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
         with:
           fetch-depth: 0
           
-      - uses: mfinelli/setup-shfmt@v4
+      - uses: mfinelli/setup-shfmt@v4.0.1
         with:
           shfmt-version: 3.14.1    
 
       - name: Set up java
-        uses: actions/setup-java@v6
+        uses: actions/setup-java@v6.3.0
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: 'liberica'
@@ -310,7 +306,7 @@ jobs:
           mvn -B -e verify -Dskip.start.stop.springboot=true -Dskip.docker.build=true -Dskip.docker.publish=true -s $GITHUB_WORKSPACE/settings.xml	
 
       - name: Publish Test Results
-        uses: EnricoMi/publish-unit-test-result-action@v2
+        uses: EnricoMi/publish-unit-test-result-action@v2.26.0
         if: always()
         with:
           files: |
