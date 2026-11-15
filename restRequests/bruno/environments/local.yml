@@ -1,0 +1,11 @@
+variables:
+  - name: application-port
+    value: "8083"
+  - name: auth-server-port
+    value: "9000"
+  - name: clientId
+    value: messaging-client
+  - name: tokenUrl
+    value: http://localhost:9000/oauth2/token
+  - name: authUrl
+    value: http://localhost:9000/oauth2/auth
