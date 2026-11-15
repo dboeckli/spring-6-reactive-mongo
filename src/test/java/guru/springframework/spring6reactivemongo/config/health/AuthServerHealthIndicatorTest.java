@@ -20,7 +20,7 @@ class AuthServerHealthIndicatorTest {
     @Test
     void healthIsUpWhenAuthServerReportsUp() {
         ExchangeFunction exchangeFunction = request -> {
-            assertThat(request.url().toString()).isEqualTo(AUTH_SERVER_URL + "/actuator/health");
+            assertThat(request.url()).hasToString(AUTH_SERVER_URL + "/actuator/health");
             return Mono.just(responseWithBody("{\"status\":\"UP\"}"));
         };
 

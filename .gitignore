@@ -32,5 +32,8 @@ build/
 ### VS Code ###
 .vscode/
 
+### Bruno tools ###
+restRequests/bruno/tools/node_modules/
+
 ### Review patches ###
 .review/

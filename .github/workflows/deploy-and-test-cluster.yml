@@ -36,6 +36,11 @@ jobs:
   deploy-app-with-helm:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+      checks: write
+      pull-requests: write
+
     steps:
       - name: Show Version
         env:
@@ -129,6 +134,84 @@ jobs:
           else
             echo "All Helm tests passed successfully."
           fi                  
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7.1.0
+        with:
+          node-version: '24'
+
+      - name: Install Bruno CLI
+        run: |
+          # The npm registry occasionally serves package metadata before the
+          # tarball is available. npm does not retry 404s, so retry the install.
+          for attempt in 1 2 3; do
+            if npm install -g --ignore-scripts @usebruno/cli@4.2.1; then
+              echo "Bruno CLI installed (attempt $attempt)"
+              exit 0
+            fi
+            echo "::warning::npm install failed (attempt $attempt), retrying..."
+            npm cache clean --force || true
+            sleep 15
+          done
+          echo "::error::Could not install @usebruno/cli after 3 attempts"
+          exit 1
+
+      - name: Run Bruno smoke tests
+        working-directory: restRequests/bruno
+        env:
+          NAMESPACE: ${{ inputs.namespace }}
+          APPLICATION_NAME: ${{ inputs.application-name }}
+          BRUNO_CLIENT_ID: ${{ vars.BRUNO_CLIENT_ID }}
+          BRUNO_CLIENT_SECRET: ${{ secrets.BRUNO_CLIENT_SECRET }}
+        run: |
+          set -o pipefail
+          set -o nounset
+          set -o errexit
+
+          kubectl port-forward svc/"$APPLICATION_NAME" 8083:8083 -n "$NAMESPACE" > /tmp/port-forward-app.log 2>&1 &
+          APP_PORT_FORWARD_PID=$!
+          kubectl port-forward svc/spring-6-auth-server 9000:9000 -n "$NAMESPACE" > /tmp/port-forward-auth.log 2>&1 &
+          AUTH_PORT_FORWARD_PID=$!
+          trap 'kill $APP_PORT_FORWARD_PID $AUTH_PORT_FORWARD_PID 2>/dev/null || true' EXIT
+
+          for attempt in $(seq 1 30); do
+            if curl -fsS http://localhost:8083/actuator/health/readiness > /dev/null && \
+               curl -fsS http://localhost:9000/actuator/health/readiness > /dev/null; then
+              echo "Application and auth-server reachable via port-forward (attempt $attempt)"
+              break
+            fi
+            if [ "$attempt" -eq 30 ]; then
+              echo "::error::Application or auth-server not reachable via port-forward"
+              cat /tmp/port-forward-app.log
+              cat /tmp/port-forward-auth.log
+              exit 1
+            fi
+            sleep 2
+          done
+
+          mkdir -p "$GITHUB_WORKSPACE/bru-reports"
+          bru run . -r --env local \
+            --reporter-skip-all-headers \
+            --reporter-junit "$GITHUB_WORKSPACE/bru-reports/TEST-bruno-reactive-mongo.xml" \
+            --reporter-html "$GITHUB_WORKSPACE/bru-reports/bru-report-reactive-mongo.html"
+
+      - name: Upload Bruno reports
+        if: always()
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: bruno-reports
+          path: bru-reports/
+          if-no-files-found: warn
+
+      - name: Publish Bruno test results
+        if: always()
+        uses: EnricoMi/publish-unit-test-result-action@v2.26.0
+        with:
+          files: bru-reports/TEST-bruno-*.xml
+          check_name: Bruno API smoke tests
+          comment_mode: "off"
+          fail_on: test failures
+          action_fail: true
 
       - name: Display Deployment Information
         env:

@@ -51,6 +51,10 @@ with pre-request scripts and assertions plus a `.md` file with the sequence diag
 - Beer: list → update → delete, create → get → delete, patch
 - Customer: list → update → delete, create → get → delete
 
+The same flows are available as a generated Bruno collection in
+[`restRequests/bruno/`](restRequests/bruno). The `.http` files stay the source of truth; regenerate
+the Bruno YAML with the tool described there.
+
 ## Urls
 
 - openapi api-docs: http://localhost:8083/v3/api-docs or http://localhost:30083/v3/api-docs
