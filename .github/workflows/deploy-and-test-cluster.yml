@@ -190,10 +190,25 @@ jobs:
           done
 
           mkdir -p "$GITHUB_WORKSPACE/bru-reports"
-          bru run . -r --env local \
-            --reporter-skip-all-headers \
-            --reporter-junit "$GITHUB_WORKSPACE/bru-reports/TEST-bruno-reactive-mongo.xml" \
-            --reporter-html "$GITHUB_WORKSPACE/bru-reports/bru-report-reactive-mongo.html"
+          status=0
+          for folder in \
+            beer-flow-create-get-delete \
+            beer-flow-list-update-delete \
+            beer-flow-patch \
+            beerControllerRequest \
+            customer-flow-create-get-delete \
+            customer-flow-list-update-delete \
+            customerControllerRequest; do
+            echo "::group::Bruno smoke tests: $folder"
+            if ! bru run "$folder" -r --env local \
+              --reporter-skip-all-headers \
+              --reporter-junit "$GITHUB_WORKSPACE/bru-reports/TEST-bruno-$folder.xml" \
+              --reporter-html "$GITHUB_WORKSPACE/bru-reports/bru-report-$folder.html"; then
+              status=1
+            fi
+            echo "::endgroup::"
+          done
+          exit $status
 
       - name: Upload Bruno reports
         if: always()

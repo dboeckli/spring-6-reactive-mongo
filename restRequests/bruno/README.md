@@ -145,9 +145,13 @@ Bruno-Smoke-Test als Pflicht-Gate aus:
 
 1. `actions/setup-node` + `npm install -g @usebruno/cli@4.2.1`
 2. `kubectl port-forward` für den Service (`:8083`) und den Auth-Server (`:9000`)
-3. `bru run . -r --env local` (JUnit-/HTML-Report, `--reporter-skip-all-headers`)
-4. Upload des Reports als Artifact `bruno-reports`
+3. Pro Flow ein eigener Lauf `bru run <flow> -r --env local` mit eigenem JUnit-/HTML-Report
+   (`TEST-bruno-<flow>.xml` / `bru-report-<flow>.html`, `--reporter-skip-all-headers`)
+4. Upload aller Reports als Artifact `bruno-reports`
 5. Publish der JUnit-Ergebnisse via `EnricoMi/publish-unit-test-result-action` im Checks-Tab
+
+Dadurch bleiben Requests, die zu einem Flow gehören, in einem eigenen Report zusammen und die
+Reihenfolge innerhalb des Flows ist direkt sichtbar.
 
 `BRUNO_CLIENT_ID` (Repository-Variable) und `BRUNO_CLIENT_SECRET` (Secret) können gesetzt werden;
 ohne Werte greifen die Dev-Fallbacks `messaging-client`/`secret`.
